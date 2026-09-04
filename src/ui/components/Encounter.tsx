@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { useGame, useSel } from '../store';
 import { useEvents } from '../hooks/useEvents';
 import { fmt, type GameEvent } from '@/engine';
@@ -10,7 +10,6 @@ import { Figure } from './Figure';
 import { Vfx } from '@/vfx/Vfx';
 import { vfxSupported } from '@/vfx/gl';
 import { FloatingNumbers } from './FloatingNumbers';
-import { BossBanner } from './BossBanner';
 
 /**
  * The combat frame. One slab, one scene: the region plate behind, the figure standing in it,
@@ -39,7 +38,6 @@ export const Encounter = memo(function Encounter() {
   const zoneName = useSel((s) => getZone(s.encounter.zone).name);
   const tier = useSel((s) => s.encounter.tier);
   const tierName = useSel((s) => { const z = getZone(s.encounter.zone); return s.encounter.tier >= 0 ? z.tiers[s.encounter.tier].name : s.encounter.tier === -1 ? 'Boss Arena' : s.encounter.tier === -2 ? 'A hidden place' : 'Something new walks the road'; });
-  const deathScreen = useSel((s) => s.deathScreen > 0);
   const phaseName = useSel((s) => (s.encounter.enemy?.isBoss ? getBoss(s.encounter.enemy.id).phases[s.encounter.enemy.phase].name : ''));
   const bossTitle = useSel((s) => (s.encounter.enemy?.isBoss ? getBoss(s.encounter.enemy.id).title : ''));
   const bossName = useSel((s) => (s.encounter.enemy?.isBoss ? getBoss(s.encounter.enemy.id).name : ''));
@@ -88,7 +86,7 @@ export const Encounter = memo(function Encounter() {
         {!name && <div className="absolute inset-x-0 bottom-[30%] text-center t-lore text-[18px] pointer-events-none">The ash settles.</div>}
 
         {/* name card */}
-        <div className="absolute left-7 top-6 max-w-[62%] pointer-events-none">
+        <div className="arena-namecard absolute left-7 top-6 max-w-[62%] pointer-events-none">
           <div className="t-label">{zoneName} · {tierName}</div>
           <div className={`t-display leading-none mt-2 ${isBoss ? 'text-[44px]' : 'text-[30px]'}`} style={{ textShadow: '0 2px 0 var(--void), 0 0 24px var(--void)' }}>{isBoss ? bossName : name || '—'}</div>
           {isBoss && bossTitle && <div className="t-display text-[17px] mt-2" style={{ color: 'var(--bone)', letterSpacing: '0.2em' }}>{bossTitle}</div>}
@@ -115,8 +113,6 @@ export const Encounter = memo(function Encounter() {
           </div>
         )}
         <FloatingNumbers />
-        <BossBanner />
-        {deathScreen && <DeathOverlay />}
       </div>
 
       {/* the foot: health, poise, statuses */}
@@ -143,14 +139,4 @@ function TierProgress() {
   const need = useSel((s) => getZone(s.encounter.zone).tiers[s.encounter.tier].kills);
   const cleared = useSel((s) => (s.zones[s.encounter.zone]?.cleared ?? -1) >= s.encounter.tier);
   return <span className="t-num">{cleared ? 'Tier cleared' : `${kills} / ${need} to clear`}</span>;
-}
-
-function DeathOverlay() {
-  const [, setT] = useState(0);
-  useEffect(() => { const i = window.setInterval(() => setT((x) => x + 1), 100); return () => window.clearInterval(i); }, []);
-  return (
-    <div className="absolute inset-0 z-20 flex items-center justify-center" style={{ background: 'color-mix(in srgb, var(--void) 86%, transparent)' }}>
-      <div className="t-display text-[64px] md:text-[92px]" style={{ color: 'var(--blood-bright)', animation: 'you-died 1.2s ease-out forwards', textShadow: '0 0 40px color-mix(in srgb, var(--blood-bright) 60%, transparent)' }}>You Died</div>
-    </div>
-  );
 }

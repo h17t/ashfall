@@ -19,6 +19,7 @@ import { startAudio } from './audio';
 import { useHotkeys } from './hooks/useHotkeys';
 import { Grain } from '@/render/Grain';
 import { FireLight } from '@/render/FireLight';
+import { Cinema } from '@/render/cinematics/Cinema';
 
 export default function App() {
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -46,6 +47,7 @@ export default function App() {
       <Fx />
       <Bonfire />
       <Hints />
+      <Cinema />
       <EmberField />
       {loadError && (
         <div className="relative z-20 max-w-[1440px] mx-auto mt-3 px-5">

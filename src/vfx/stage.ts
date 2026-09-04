@@ -157,9 +157,9 @@ export class Stage {
   /** where the figure stands, in stage px (y up) */
   figureRect() {
     const big = this.snap.big;
-    const fh = this.h * (big ? 0.84 : 0.74);
+    const fh = this.h * (big ? 0.8 : 0.74);
     const fw = this.figure ? fh * (this.figure.w / this.figure.h) : fh * 0.8;
-    const cx = this.w * 0.5, bottom = this.h * 0.11;
+    const cx = this.w * 0.5, bottom = this.h * 0.1;
     return { x: cx - fw / 2, y: bottom, w: fw, h: fh, cx, cy: bottom + fh * 0.5 };
   }
 
@@ -334,7 +334,8 @@ export class Stage {
       const fw = f.w * punch, fh = f.h * punch;
       const zx = 0.5, zy = 0.12;
       const zw = fw / this.w * 2 * this.zoom, zh = fh / this.h * 2 * this.zoom;
-      const x = (zx - 0.5) * 2 - zw / 2, y = (zy - 0.5) * 2 - (this.zoom - 1) * (zy * 2 - 0) * 0.5;
+      // zoom grows the figure upward; drop its feet so the head stays in frame
+      const x = (zx - 0.5) * 2 - zw / 2, y = (zy - 0.5) * 2 - (this.zoom - 1) * 1.2;
       gl.useProgram(this.pFigure);
       gl.uniform4f(this.uFigure.u_rect, x, y, zw, zh);
       gl.uniform2f(this.uFigure.u_uvA, 1, 1); gl.uniform2f(this.uFigure.u_uvB, 0, 0);

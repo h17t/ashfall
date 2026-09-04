@@ -8,7 +8,7 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
   - [x] M2 pipeline: tools/assets, treatment chain, manifest, audit wired into `npm test`; 153 plates built
   - [x] M3 foundation reskin: fonts, tokens, Slab material, grain, fire light, gauges, every screen re-dressed; review round 1
   - [x] M4 VFX layer: WebGL2 stage in src/vfx (layers, masked figure, particles, bloom/CA/shock/heat/vignette/iris post), hit-stop, riposte sequence; review round 2
-  - [ ] M5 cinematics sequencer (boss intro, phase, YOU DIED, bloodstain, Kindling, region transition)
+  - [x] M5 cinematics: gsap sequencer + Cinema layer (boss intro, phase, YOU DIED, bloodstain, first Kindling rite, region transition); review round 3
   - [ ] M6 parallax regions (4 layers, drift, pointer/combat parallax)
   - [ ] M7 asset production (fix the figure faults in ART.md round 2; icon crops for weapons)
   - [ ] M8 Kindling ritual & meta screens
