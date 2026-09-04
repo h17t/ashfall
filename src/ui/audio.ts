@@ -5,9 +5,12 @@
 import { useSettings } from './settings';
 import { subscribeEvents } from './store';
 import type { GameEvent } from '@/engine';
+import { attachBed, followGame, setRegion, toll, swell } from './audio-bed';
+import { useGame } from './store';
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
+let bus: GainNode | null = null;
 let lastHit = 0;
 
 function ensure(): AudioContext | null {
@@ -19,6 +22,8 @@ function ensure(): AudioContext | null {
     master = ctx.createGain();
     master.gain.value = useSettings.getState().volume;
     master.connect(ctx.destination);
+    bus = attachBed(ctx, master);
+    setRegion(useGame.getState().state.encounter.zone);
   }
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
   return ctx;
@@ -31,7 +36,7 @@ function env(node: AudioNode, t0: number, attack: number, decay: number, peak = 
   g.gain.exponentialRampToValueAtTime(peak, t0 + attack);
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + attack + decay);
   node.connect(g);
-  g.connect(master!);
+  g.connect(bus ?? master!);
   return g;
 }
 
@@ -160,7 +165,9 @@ export function startAudio(): () => void {
         case 'enemyAttack': if (e.dodged) sfx.dodge(e.perfect); else sfx.hurt(); break;
         case 'death': sfx.died(); break;
         case 'bossKilled': sfx.toll(); break;
-        case 'levelUp': case 'unlock': case 'kindled': sfx.unlock(); break;
+        case 'bossPhase': if (e.phase === 0) toll('arrival'); else window.setTimeout(() => toll('phase'), 600); break;
+        case 'kindled': swell(5); break;
+        case 'levelUp': case 'unlock': sfx.unlock(); break;
         case 'bloodstainRecovered': sfx.recover(); break;
         case 'cast': sfx.cast(); break;
       }
@@ -168,8 +175,9 @@ export function startAudio(): () => void {
     if (hitWeight >= 0) sfx.hit(hitWeight, hitCrit);
   };
   const unsub = subscribeEvents(handler);
+  const unfollow = followGame();
   // browsers require a gesture before audio; the first click anywhere primes the context
   const prime = () => { if (useSettings.getState().sound) ensure(); };
   window.addEventListener('pointerdown', prime, { passive: true });
-  return () => { unsub(); unsubSettings(); window.removeEventListener('pointerdown', prime); };
+  return () => { unsub(); unfollow(); unsubSettings(); window.removeEventListener('pointerdown', prime); };
 }

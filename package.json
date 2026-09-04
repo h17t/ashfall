@@ -14,7 +14,8 @@
     "art": "tsx tools/assets/generate.ts",
     "art:bible": "tsx tools/assets/bible-palette.ts && tsx tools/assets/bible-silhouettes.ts && node scripts/shot-file.mjs tools/assets/bible-silhouettes.html art/silhouettes.png 1400 && node scripts/shot-file.mjs tools/assets/bible-type.html art/type.png 1200",
     "art:audit": "vitest run tools/assets/audit.test.ts",
-    "perf": "node scripts/perf.mjs"
+    "perf": "node scripts/perf.mjs",
+    "audio:check": "node scripts/audio-check.mjs"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.3.0",
