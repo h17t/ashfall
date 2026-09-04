@@ -21,6 +21,7 @@ export const Encounter = memo(function Encounter() {
   const windup = useSel((s) => s.encounter.enemy?.windup ?? 0);
   const windupTotal = useSel((s) => s.encounter.enemy?.windupTotal ?? 1);
   const attackDmg = useSel((s) => s.encounter.enemy?.attackDamage ?? 0);
+  const attackPct = useSel((s) => s.encounter.enemy ? Math.round((s.encounter.enemy.attackDamage / Math.max(1, s.player.hpMax)) * 100) : 0);
   const attackId = useSel((s) => s.encounter.enemy?.attackId ?? '');
   const zoneName = useSel((s) => getZone(s.encounter.zone).name);
   const tier = useSel((s) => s.encounter.tier);
@@ -79,7 +80,7 @@ export const Encounter = memo(function Encounter() {
         )}
         {telegraph && !staggered && (
           <div className="absolute inset-x-0 bottom-3 px-8">
-            <div className="text-center text-[10px] uppercase tracking-[0.3em] text-blood-500 mb-1">{attackId} · {attackDmg} dmg</div>
+            <div className="text-center text-[10px] uppercase tracking-[0.3em] text-blood-500 mb-1">{attackId} · {attackDmg} dmg · {attackPct}% of your HP · dodge!</div>
             <div className="h-1.5 bg-ash-900 border border-blood-600 rounded-sm overflow-hidden">
               <div className="h-full bg-blood-500" style={{ width: `${(1 - windup / windupTotal) * 100}%` }} />
             </div>
