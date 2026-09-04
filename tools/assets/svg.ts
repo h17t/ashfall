@@ -133,21 +133,22 @@ export function mirrorX(pts: Pt[], cx: number): Pt[] {
 // ---------------------------------------------------------------------------
 
 /** Broken etched edge + ink bleed: turbulence-displaced, slightly eroded. */
-export function inkFilter(id: string, seed: number, amount = 3.5, freq = 0.035): string {
-  return `<filter id="${id}" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
-    <feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="3" seed="${seed}" result="n"/>
-    <feDisplacementMap in="SourceGraphic" in2="n" scale="${amount}" xChannelSelector="R" yChannelSelector="G" result="d"/>
+export function inkFilter(id: string, seed: number, amount = 3.5, freq = 0.035, w = 4000, h = 4000): string {
+  // integer user-space region: resvg asserts on fractional displacement-map regions
+  return `<filter id="${id}" filterUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}" color-interpolation-filters="sRGB">
+    <feTurbulence x="0" y="0" width="${w}" height="${h}" type="fractalNoise" baseFrequency="${freq}" numOctaves="3" seed="${seed}" result="n"/>
+    <feDisplacementMap x="0" y="0" width="${w}" height="${h}" in="SourceGraphic" in2="n" scale="${amount}" xChannelSelector="R" yChannelSelector="G" result="d"/>
     <feMorphology in="d" operator="erode" radius="0.35" result="e"/>
     <feGaussianBlur in="e" stdDeviation="0.35"/>
   </filter>`;
 }
 
 /** Wash pooling: blur the mass, then multiply back so ink gathers in the concavities. */
-export function washFilter(id: string, seed: number, spread = 6): string {
-  return `<filter id="${id}" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
-    <feGaussianBlur in="SourceAlpha" stdDeviation="${spread}" result="b"/>
-    <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="${seed}" result="n"/>
-    <feDisplacementMap in="b" in2="n" scale="${spread * 2}" xChannelSelector="R" yChannelSelector="G" result="db"/>
+export function washFilter(id: string, seed: number, spread = 6, w = 4000, h = 4000): string {
+  return `<filter id="${id}" filterUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}" color-interpolation-filters="sRGB">
+    <feGaussianBlur x="0" y="0" width="${w}" height="${h}" in="SourceAlpha" stdDeviation="${spread}" result="b"/>
+    <feTurbulence x="0" y="0" width="${w}" height="${h}" type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="${seed}" result="n"/>
+    <feDisplacementMap x="0" y="0" width="${w}" height="${h}" in="b" in2="n" scale="${spread * 2}" xChannelSelector="R" yChannelSelector="G" result="db"/>
     <feComposite in="db" in2="SourceAlpha" operator="in" result="pool"/>
     <feColorMatrix in="pool" type="matrix" values="0 0 0 0 0.03  0 0 0 0 0.02  0 0 0 0 0.02  0 0 0 0.9 0" result="dark"/>
     <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="dark"/></feMerge>
@@ -155,8 +156,8 @@ export function washFilter(id: string, seed: number, spread = 6): string {
 }
 
 /** Paper tooth and foxing as an overlay layer (use on a full-canvas rect). */
-export function paperFilter(id: string, seed: number): string {
-  return `<filter id="${id}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+export function paperFilter(id: string, seed: number, w = 4000, h = 4000): string {
+  return `<filter id="${id}" filterUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}" color-interpolation-filters="sRGB">
     <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="${seed}" result="fine"/>
     <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="4" seed="${seed + 7}" result="fox"/>
     <feColorMatrix in="fine" type="matrix" values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0.35 0" result="grain"/>

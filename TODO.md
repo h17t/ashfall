@@ -3,6 +3,17 @@
 Kept accurate enough that a fresh session can resume mid-milestone. Update before stopping, every time.
 
 ## Status
+- **Pass 2 (art direction & presentation) in progress.** Engine untouched; all 102 engine/UI tests pass unchanged. See ART.md for the bible and the review log.
+  - [x] M1 audit & bible (ART.md, palette/type/silhouette sheets, mockups A/B/C)
+  - [x] M2 pipeline: tools/assets, treatment chain, manifest, audit wired into `npm test`; 153 plates built
+  - [x] M3 foundation reskin: fonts, tokens, Slab material, grain, fire light, gauges, every screen re-dressed; review round 1
+  - [ ] M4 VFX layer (pixi/WebGL post, particles, hit-stop, riposte sequence) + review round 2
+  - [ ] M5 cinematics sequencer (boss intro, phase, YOU DIED, bloodstain, Kindling, region transition)
+  - [ ] M6 parallax regions (4 layers, drift, pointer/combat parallax)
+  - [ ] M7 asset production (fix the figure faults in ART.md round 2; icon crops for weapons)
+  - [ ] M8 Kindling ritual & meta screens
+  - [ ] M9 audio pass
+  - [ ] M10 final review, perf, a11y, SCREENSHOTS.md
 - **All twelve milestones complete.** The build is playable end to end: six regions, 17 bosses, 32 weapons, 25 spells, 6 phantoms, 5 covenants, Kindling with a 25-node tree, the Dark Sigil with 14 unlocks, the endless Abyss, the Age of Dark, the full automation ladder.
 - A fresh session should: read DESIGN.md (decisions), BALANCE.md (latest simulator run), this file; run `npm test` and `npm run sim -- --hours 12`; then pick from the list below.
 

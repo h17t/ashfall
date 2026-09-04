@@ -22,6 +22,12 @@ export interface TreatOptions {
   erode?: number;
   /** keep colour of glows (skip the ramp where saturation is high) */
   keepSaturated?: boolean;
+  /** apply percentile auto-levels (plates yes, region layers no) */
+  levels?: boolean;
+  /** skip the hatch pass (region layers) */
+  hatch?: boolean;
+  /** keep the source colours and curve untouched: only grain is applied (region layers, whose tone is painted in the SVG) */
+  tone?: boolean;
 }
 
 export interface TreatResult {
@@ -59,6 +65,7 @@ export async function treat(pngInput: Buffer, opts: TreatOptions = {}): Promise<
   for (let i = 0; i < 256; i++) { acc += hist[i]; if (acc >= count * 0.02) { lo = i; break; } }
   acc = 0;
   for (let i = 255; i >= 0; i--) { acc += hist[i]; if (acc >= count * 0.03) { hi = i; break; } }
+  if (opts.levels === false) { lo = 0; hi = 255; }
   const span = Math.max(24, hi - lo);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -70,13 +77,16 @@ export async function treat(pngInput: Buffer, opts: TreatOptions = {}): Promise<
       const mx = Math.max(R, G, B), mn = Math.min(R, G, B);
       const sat = mx === 0 ? 0 : (mx - mn) / mx;
       // 2. levels, then crush + compress: lift blacks slightly, gentle S-curve on the mids
-      const ln = Math.min(1, Math.max(0, (l0 * 255 - lo) / span)) * 0.88;
+      const ln = Math.min(1, Math.max(0, (l0 * 255 - lo) / span)) * (opts.levels === false ? 1 : 0.88);
       let l = Math.pow(ln, 1.05);
       l = 0.03 + l * 0.97;
       l = l < 0.5 ? 1.6 * l * l + 0.2 * l : 1 - 1.6 * (1 - l) * (1 - l) - 0.2 * (1 - l);
       // 1. re-tint through the ramp; keep genuine light sources (saturated & bright) as they are
       let c: [number, number, number];
-      if (opts.keepSaturated !== false && sat > 0.55 && l0 > 0.35) {
+      if (opts.tone === false) {
+        c = [R, G, B];
+        l = l0;
+      } else if (opts.keepSaturated !== false && sat > (opts.levels === false ? 0.25 : 0.55) && l0 > 0.2) {
         c = [R, G, B];
       } else {
         c = toneRamp(Math.min(1, Math.max(0, l)), opts.tint ?? null, opts.tintStrength ?? 0.22);
@@ -86,7 +96,7 @@ export async function treat(pngInput: Buffer, opts: TreatOptions = {}): Promise<
       // 4. hatch in shadows: diagonal lines, stronger the darker the pixel
       const shadow = Math.max(0, 0.55 - l) / 0.55;
       const line = ((x + y * 0.6) % 4.2) < 1.2 ? 1 : 0;
-      const hatch = 1 - shadow * line * 0.35;
+      const hatch = opts.hatch === false ? 1 : 1 - shadow * line * 0.35;
       // 5. edge erosion: alpha reduced by noise near the boundary
       let a = A / 255;
       if (erode > 0) {

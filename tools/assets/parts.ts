@@ -40,9 +40,10 @@ export function horns(cx: number, cy: number, r: Rng, len = 30, spread = 18): Pt
 
 export function torso(cx: number, cy: number, r: Rng, w = 60, h = 90, bulk = 1, hunched = false): Pt[] {
   const top = cy - h / 2, bot = cy + h / 2;
+  // shoulders wide, waist narrow, hips out again: a body, not a box
   const pts: Pt[] = hunched
-    ? [[cx - w * 0.55 * bulk, bot], [cx - w * 0.6 * bulk, cy], [cx - w * 0.45 * bulk, top + 10], [cx + w * 0.2, top - 6], [cx + w * 0.62 * bulk, top + 14], [cx + w * 0.55 * bulk, cy + 4], [cx + w * 0.45 * bulk, bot]]
-    : [[cx - w * 0.45, bot], [cx - w * 0.55 * bulk, cy + h * 0.1], [cx - w * 0.6 * bulk, top + 8], [cx - w * 0.25, top], [cx + w * 0.25, top], [cx + w * 0.6 * bulk, top + 8], [cx + w * 0.55 * bulk, cy + h * 0.1], [cx + w * 0.45, bot]];
+    ? [[cx - w * 0.5 * bulk, bot], [cx - w * 0.42 * bulk, cy + h * 0.15], [cx - w * 0.62 * bulk, cy - h * 0.1], [cx - w * 0.5 * bulk, top + 10], [cx + w * 0.15, top - 8], [cx + w * 0.66 * bulk, top + 16], [cx + w * 0.5 * bulk, cy + 6], [cx + w * 0.4 * bulk, bot]]
+    : [[cx - w * 0.44, bot], [cx - w * 0.36 * bulk, cy + h * 0.12], [cx - w * 0.62 * bulk, top + 14], [cx - w * 0.3, top], [cx + w * 0.3, top], [cx + w * 0.62 * bulk, top + 14], [cx + w * 0.36 * bulk, cy + h * 0.12], [cx + w * 0.44, bot]];
   return jitter(resample(pts, 22), r, 2.2);
 }
 
@@ -62,8 +63,25 @@ export function cloak(cx: number, cy: number, r: Rng, w = 90, h = 150, tatter = 
   return jitter(pts, r, 1.5);
 }
 
-export function limb(a: Pt, b: Pt, r: Rng, w0 = 16, w1 = 11): Pt[] {
-  return taper(a, b, w0, w1, r, 0.9, 5);
+/** A limb with a joint: two tapered segments bent at the knee/elbow, so legs and arms read as anatomy. */
+export function limb(a: Pt, b: Pt, r: Rng, w0 = 16, w1 = 11, bend = 0.18): Pt[] {
+  const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const len = Math.hypot(dx, dy) || 1;
+  const side = r.sign();
+  const joint: Pt = [mx + (-dy / len) * len * bend * side, my + (dx / len) * len * bend * side];
+  const upper = taper(a, joint, w0, w0 * 0.85, r, 0.6, 3);
+  const lower = taper(joint, b, w0 * 0.8, w1, r, 0.6, 3);
+  const half = (p: Pt[]) => p.length / 2;
+  // stitch: upper left side, lower left side, lower right, upper right
+  const uL = upper.slice(0, half(upper)), uR = upper.slice(half(upper));
+  const lL = lower.slice(0, half(lower)), lR = lower.slice(half(lower));
+  return [...uL, ...lL, ...lR, ...uR];
+}
+
+/** Boot / foot mass at the end of a leg. */
+export function boot(b: Pt, r: Rng, w = 18): Pt[] {
+  return jitter([[b[0] - w * 0.5, b[1] - 8], [b[0] + w * 0.4, b[1] - 10], [b[0] + w * 0.9, b[1] - 2], [b[0] + w * 0.6, b[1] + 3], [b[0] - w * 0.5, b[1] + 3]], r, 1);
 }
 
 export function shield(cx: number, cy: number, r: Rng, w = 46, h = 62, kite = true): Pt[] {
@@ -164,6 +182,7 @@ export interface HumanoidSpec {
   head?: 'skull' | 'helm' | 'helmCrest' | 'hood' | 'bare' | 'none' | 'crowned' | 'lantern';
   cloak?: number;       // 0 none .. 1 long
   hunched?: boolean;
+  lunge?: boolean;
   weapon?: { kind: 'sword' | 'great' | 'dagger' | 'mace' | 'spear' | 'halberd' | 'staff' | 'club' | 'crossbow' | 'cleaver' | 'rapier' | 'twin' | 'katana' | 'hammer' | 'bell' | 'axe' | 'none'; raised?: boolean };
   shield?: 'kite' | 'round' | 'none';
   horns?: boolean;
@@ -184,8 +203,12 @@ export function humanoid(r: Rng, spec: HumanoidSpec = {}): Layer[] {
   const w = 62 * B;
   const L: Layer[] = [];
   // legs (fire side leg lit)
-  L.push({ kind: 'mass', pts: limb([cx - w * 0.22, hipY + 4], [cx - w * 0.28 + r.range(-4, 4), ground], r, 18 * B, 13 * B), z: 1 });
-  L.push({ kind: 'mass', pts: limb([cx + w * 0.22, hipY + 4], [cx + w * 0.3 + r.range(-4, 4), ground], r, 18 * B, 13 * B), z: 1 });
+  const lunge = spec.lunge ? 1 : 0;
+  const footL: Pt = [cx - w * (0.28 + lunge * 0.9) + r.range(-4, 4), ground - lunge * 6], footR: Pt = [cx + w * (0.3 + lunge * 0.5) + r.range(-4, 4), ground];
+  L.push({ kind: 'mass', pts: limb([cx - w * 0.22, hipY + 4], footL, r, 19 * B, 12 * B, 0.12), z: 1 });
+  L.push({ kind: 'mass', pts: limb([cx + w * 0.22, hipY + 4], footR, r, 19 * B, 12 * B, 0.12), z: 1 });
+  L.push({ kind: 'mass', pts: boot(footL, r, 18 * B), z: 1 });
+  L.push({ kind: 'mass', pts: boot(footR, r, 18 * B), z: 1 });
   // cloak behind
   if ((spec.cloak ?? 0) > 0) L.push({ kind: 'mass', pts: cloak(cx + 4, hipY - torsoH * 0.1, r, w * 1.5, torsoH + legH * (0.3 + spec.cloak! * 0.7), 0.6), z: 0, tone: 0 });
   // torso
@@ -199,22 +222,30 @@ export function humanoid(r: Rng, spec: HumanoidSpec = {}): Layer[] {
   if (spec.head === 'skull' || spec.head === undefined || spec.head === 'bare') L.push({ kind: 'mass', pts: spec.head === 'bare' ? blob(cx, hy, headR * 0.9, headR * 1.05, r, 0.08, 14) : skull(cx, hy, r, headR), z: 4 });
   else if (spec.head === 'helm' || spec.head === 'helmCrest') { L.push({ kind: 'mass', pts: helm(cx, hy, r, headR, spec.head === 'helmCrest'), z: 4 }); L.push({ kind: 'detail', pts: jitter([[cx - headR * 0.75, hy - headR * 0.15], [cx + headR * 0.75, hy - headR * 0.2], [cx + headR * 0.7, hy + headR * 0.08], [cx - headR * 0.7, hy + headR * 0.12]], r, 0.8), color: 'void', alpha: 0.95, smooth: false, z: 8 }); }
   else if (spec.head === 'hood') L.push({ kind: 'mass', pts: hood(cx, hy + 6, r, headR * 1.15), z: 4 });
-  else if (spec.head === 'crowned') { L.push({ kind: 'mass', pts: skull(cx, hy, r, headR), z: 4 }); for (let i = -2; i <= 2; i++) L.push({ kind: 'mass', pts: taper([cx + i * headR * 0.42, hy - headR * 0.7], [cx + i * headR * 0.55, hy - headR * (1.5 + (i === 0 ? 0.5 : 0.1))], 5, 1, r, 0.5, 3), z: 4 }); }
+  else if (spec.head === 'crowned') { L.push({ kind: 'mass', pts: skull(cx, hy, r, headR), z: 4 }); for (let i = -2; i <= 2; i++) L.push({ kind: 'mass', pts: taper([cx + i * headR * 0.42, hy - headR * 0.7], [cx + i * headR * 0.75, hy - headR * (2.1 + (i === 0 ? 0.8 : 0.2))], 7, 1, r, 0.6, 3), z: 4 }); }
   else if (spec.head === 'lantern') { L.push({ kind: 'mass', pts: helm(cx, hy, r, headR), z: 4 }); L.push({ kind: 'glow', cx: cx - w * 0.9, cy: shoulderY + 20, r: 26, color: 'gold', z: 9 }); }
   if (spec.horns) for (const h of horns(cx, hy - headR * 0.6, r, headR * 1.6, headR)) L.push({ kind: 'mass', pts: h, z: 4 });
   if (spec.eyes && spec.eyes !== 'none' && spec.head !== 'none') {
-    L.push({ kind: 'glow', cx: cx - headR * 0.32, cy: hy - 2, r: headR * 0.28, color: spec.eyes === 'ember' ? 'emberHot' : spec.eyes, z: 9 });
-    L.push({ kind: 'glow', cx: cx + headR * 0.34, cy: hy - 2, r: headR * 0.26, color: spec.eyes === 'ember' ? 'emberHot' : spec.eyes, z: 9 });
+    // eyes are sunk and small: a pinprick of light in a socket, asymmetric, never two cartoon dots
+    const ec = spec.eyes === 'ember' ? 'emberHot' : spec.eyes;
+    const helmed = spec.head === 'helm' || spec.head === 'helmCrest' || spec.head === 'lantern';
+    if (helmed) L.push({ kind: 'glow', cx: cx - headR * 0.1, cy: hy - headR * 0.05, r: headR * 0.42, color: ec, z: 9 });
+    else {
+      L.push({ kind: 'detail', pts: blob(cx - headR * 0.3, hy - 2, headR * 0.22, headR * 0.16, r, 0.2, 8), color: 'void', alpha: 0.9, z: 8 });
+      L.push({ kind: 'detail', pts: blob(cx + headR * 0.32, hy - 1, headR * 0.2, headR * 0.15, r, 0.2, 8), color: 'void', alpha: 0.9, z: 8 });
+      L.push({ kind: 'glow', cx: cx - headR * 0.3, cy: hy - 2, r: headR * 0.13, color: ec, z: 9 });
+      if (r.chance(0.7)) L.push({ kind: 'glow', cx: cx + headR * 0.32, cy: hy - 1, r: headR * 0.1, color: ec, z: 9 });
+    }
   }
   // arms + weapon
   const shL: Pt = [cx - w * 0.5, shoulderY + 12], shR: Pt = [cx + w * 0.5, shoulderY + 12];
   const raised = spec.weapon?.raised ?? r.chance(0.4);
   const handR: Pt = raised ? [cx + w * 0.85, shoulderY - 20] : [cx + w * 0.75, hipY - 6];
   const handL: Pt = spec.shield && spec.shield !== 'none' ? [cx - w * 0.9, hipY - torsoH * 0.35] : [cx - w * 0.72, hipY + 4];
-  L.push({ kind: 'mass', pts: limb(shR, handR, r, 15 * B, 10 * B), z: 3 });
-  L.push({ kind: 'mass', pts: limb(shL, handL, r, 15 * B, 10 * B), z: 3 });
+  L.push({ kind: 'mass', pts: limb(shR, handR, r, 16 * B, 10 * B, 0.2), z: 6 });
+  L.push({ kind: 'mass', pts: limb(shL, handL, r, 16 * B, 10 * B, 0.2), z: 3 });
   const wk = spec.weapon?.kind ?? 'sword';
-  const wl = 70 * H;
+  const wl = 84 * H;
   const tipDir: Pt = raised ? [0.35, -1] : [0.15, -1];
   const tip: Pt = [handR[0] + tipDir[0] * wl * 1.4, handR[1] + tipDir[1] * wl * 1.4];
   const grip: Pt = [handR[0] - tipDir[0] * wl * 0.3, handR[1] - tipDir[1] * wl * 0.3];
@@ -295,21 +326,26 @@ function segmentedBody(cx: number, cy: number, w: number, h: number, r: Rng): Pt
   return [...top, ...bot.reverse()];
 }
 
-export interface WraithSpec { height?: number; tatter?: number; eyes?: 'soul' | 'ember' | 'gold' | 'none'; arms?: boolean; crown?: boolean; sun?: boolean }
+export type WraithForm = 'shroud' | 'column' | 'flayed' | 'spire' | 'wide';
+export interface WraithSpec { height?: number; tatter?: number; eyes?: 'soul' | 'ember' | 'gold' | 'none'; arms?: boolean; crown?: boolean; sun?: boolean; form?: WraithForm; hands?: boolean }
 
 export function wraith(r: Rng, spec: WraithSpec = {}): Layer[] {
   const H = spec.height ?? 1;
   const cx = PW * 0.5, top = PH * 0.12, bot = PH * 0.95;
-  const w = 70 * H;
+  const form = spec.form ?? 'shroud';
+  const w = (form === 'column' ? 44 : form === 'wide' ? 100 : form === 'spire' ? 56 : 70) * H;
   const L: Layer[] = [];
-  const pts: Pt[] = [[cx - 8, top], [cx + w * 0.55, top + 60 * H], [cx + w * 0.7, bot - 90], [cx + w * 0.5, bot - 40]];
-  const n = 8;
-  for (let i = 0; i <= n; i++) { const t = i / n; pts.push([cx + w * 0.5 - t * w, bot - (i % 2 ? 0 : (spec.tatter ?? 0.6) * r.range(20, 60))]); }
+  const pts: Pt[] = form === 'spire' ? [[cx, top - 20], [cx + w * 0.3, top + 80 * H], [cx + w * 0.7, bot - 60], [cx + w * 0.5, bot - 40]] : [[cx - 8, top], [cx + w * 0.55, top + 60 * H], [cx + w * 0.7, bot - 90], [cx + w * 0.5, bot - 40]];
+  const n = form === 'flayed' ? 14 : 8;
+  const tat = (spec.tatter ?? 0.6) * (form === 'flayed' ? 1.8 : 1);
+  for (let i = 0; i <= n; i++) { const t = i / n; pts.push([cx + w * 0.5 - t * w, bot - (i % 2 ? 0 : tat * r.range(20, 60))]); }
   pts.push([cx - w * 0.7, bot - 90], [cx - w * 0.6, top + 60 * H]);
+  if (form === 'flayed') for (let i = 0; i < 5; i++) L.push({ kind: 'mass', pts: taper([cx + r.range(-w * 0.4, w * 0.4), top + 120 * H], [cx + r.range(-w * 1.1, w * 1.1), bot + 10], 14, 1, r, 3, 5), z: 1 });
   L.push({ kind: 'mass', pts: jitter(pts, r, 3), z: 2 });
-  L.push({ kind: 'mass', pts: blob(cx, top + 34 * H, 22 * H, 26 * H, r, 0.1, 14), z: 3 });
+  L.push({ kind: 'mass', pts: form === 'spire' ? jitter([[cx - 18 * H, top + 60 * H], [cx, top + 4], [cx + 18 * H, top + 60 * H]], r, 2) : blob(cx, top + 34 * H, 22 * H, 26 * H, r, 0.1, 14), z: 3 });
+  if (spec.hands) { L.push({ kind: 'mass', pts: jitter([[cx - w * 0.5, top + 110], [cx - w * 0.9, top + 60], [cx - w * 0.75, top + 100], [cx - w * 0.6, top + 130]], r, 2), z: 3 }); L.push({ kind: 'mass', pts: jitter([[cx + w * 0.5, top + 110], [cx + w * 0.9, top + 60], [cx + w * 0.75, top + 100], [cx + w * 0.6, top + 130]], r, 2), z: 3 }); }
   if (spec.arms) { L.push({ kind: 'mass', pts: limb([cx - w * 0.4, top + 90], [cx - w * 1.0, top + 150], r, 12, 6), z: 3 }); L.push({ kind: 'mass', pts: limb([cx + w * 0.4, top + 90], [cx + w * 0.95, top + 40], r, 12, 6), z: 3 }); }
-  if (spec.crown) for (let i = -2; i <= 2; i++) L.push({ kind: 'mass', pts: taper([cx + i * 10, top + 14], [cx + i * 13, top - 14 - (2 - Math.abs(i)) * 6], 5, 1, r, 0.5, 3), z: 3 });
+  if (spec.crown) for (let i = -2; i <= 2; i++) L.push({ kind: 'mass', pts: taper([cx + i * 14 * H, top + 16], [cx + i * 20 * H, top - 30 - (2 - Math.abs(i)) * 12], 9, 1, r, 0.6, 3), z: 3 });
   if (spec.sun) L.push({ kind: 'glow', cx, cy: top + 34 * H, r: 60, color: 'gold', z: 9 });
   if (spec.eyes && spec.eyes !== 'none') { L.push({ kind: 'glow', cx: cx - 8, cy: top + 32 * H, r: 8, color: spec.eyes === 'ember' ? 'emberHot' : spec.eyes, z: 9 }); L.push({ kind: 'glow', cx: cx + 9, cy: top + 32 * H, r: 8, color: spec.eyes === 'ember' ? 'emberHot' : spec.eyes, z: 9 }); }
   L.push({ kind: 'line', pts: [[cx - 10, top + 90], [cx - 24, bot - 70]], width: 1.2, closed: false, z: 7 });
@@ -318,16 +354,31 @@ export function wraith(r: Rng, spec: WraithSpec = {}): Layer[] {
   return L;
 }
 
-export function robed(r: Rng, spec: HumanoidSpec & { staff?: boolean; lantern?: boolean; hoodUp?: boolean } = {}): Layer[] {
+export type RobeForm = 'cone' | 'tall' | 'wide' | 'bent';
+export type HoodForm = 'pointed' | 'cowl' | 'mitre' | 'bare' | 'veil';
+
+export function robed(r: Rng, spec: HumanoidSpec & { staff?: boolean; lantern?: boolean; hoodUp?: boolean; form?: RobeForm; hoodForm?: HoodForm; sleeves?: boolean; book?: boolean } = {}): Layer[] {
   const H = spec.height ?? 1;
   const cx = PW * 0.5, ground = PH * 0.94;
   const top = ground - 230 * H;
   const L: Layer[] = [];
-  const robe: Pt[] = [[cx - 26 * H, top + 40 * H], [cx + 26 * H, top + 40 * H], [cx + 44 * H, top + 130 * H], [cx + 62 * H, ground]];
-  for (let i = 0; i <= 7; i++) robe.push([cx + 62 * H - (i / 7) * 124 * H, ground - (i % 2 ? 6 : 0) + r.range(-2, 2)]);
-  robe.push([cx - 44 * H, top + 130 * H]);
+  const form = spec.form ?? 'cone';
+  const shoulder = form === 'wide' ? 44 : form === 'tall' ? 20 : form === 'bent' ? 30 : 26;
+  const hem = form === 'wide' ? 84 : form === 'tall' ? 40 : form === 'bent' ? 56 : 62;
+  const lean = form === 'bent' ? 22 : 0;
+  const robe: Pt[] = [[cx - shoulder * H + lean, top + 40 * H], [cx + shoulder * H + lean, top + 40 * H], [cx + (hem * 0.7) * H + lean * 0.5, top + 130 * H], [cx + hem * H, ground]];
+  for (let i = 0; i <= 7; i++) robe.push([cx + hem * H - (i / 7) * 2 * hem * H, ground - (i % 2 ? 6 : 0) + r.range(-2, 2)]);
+  robe.push([cx - (hem * 0.7) * H + lean * 0.5, top + 130 * H]);
   L.push({ kind: 'mass', pts: jitter(robe, r, 2), z: 2 });
-  L.push({ kind: 'mass', pts: spec.hoodUp === false ? skull(cx, top + 22 * H, r, 18 * H) : hood(cx, top + 26 * H, r, 22 * H), z: 4 });
+  const hf: HoodForm = spec.hoodForm ?? (spec.hoodUp === false ? 'bare' : 'pointed');
+  const hx = cx + lean, hy = top + 26 * H;
+  if (hf === 'bare') L.push({ kind: 'mass', pts: skull(hx, top + 22 * H, r, 18 * H), z: 4 });
+  else if (hf === 'pointed') L.push({ kind: 'mass', pts: jitter([[hx - 26 * H, hy + 28 * H], [hx - 18 * H, hy - 8 * H], [hx - 2 * H, hy - 44 * H], [hx + 12 * H, hy - 10 * H], [hx + 26 * H, hy + 28 * H]], r, 2), z: 4 });
+  else if (hf === 'cowl') L.push({ kind: 'mass', pts: hood(hx, hy, r, 22 * H), z: 4 });
+  else if (hf === 'mitre') L.push({ kind: 'mass', pts: jitter([[hx - 20 * H, hy + 26 * H], [hx - 16 * H, hy - 30 * H], [hx, hy - 62 * H], [hx + 16 * H, hy - 30 * H], [hx + 20 * H, hy + 26 * H]], r, 2), z: 4 });
+  else if (hf === 'veil') { L.push({ kind: 'mass', pts: blob(hx, hy - 4, 16 * H, 18 * H, r, 0.1, 12), z: 4 }); L.push({ kind: 'mass', pts: jitter([[hx - 30 * H, hy - 20 * H], [hx + 30 * H, hy - 20 * H], [hx + 34 * H, hy + 70 * H], [hx - 34 * H, hy + 70 * H]], r, 3), z: 3, tone: 0.3 }); }
+  if (spec.sleeves) { L.push({ kind: 'mass', pts: jitter([[cx - shoulder * H, top + 50 * H], [cx - shoulder * H - 40 * H, top + 120 * H], [cx - shoulder * H - 10 * H, top + 130 * H], [cx - shoulder * H + 10 * H, top + 80 * H]], r, 2), z: 3 }); L.push({ kind: 'mass', pts: jitter([[cx + shoulder * H, top + 50 * H], [cx + shoulder * H + 40 * H, top + 120 * H], [cx + shoulder * H + 10 * H, top + 130 * H], [cx + shoulder * H - 10 * H, top + 80 * H]], r, 2), z: 3 }); }
+  if (spec.book) { L.push({ kind: 'mass', pts: jitter([[cx - 30 * H, top + 100 * H], [cx + 30 * H, top + 96 * H], [cx + 32 * H, top + 130 * H], [cx - 28 * H, top + 134 * H]], r, 1.5), z: 5, tone: 0.5 }); }
   const handR: Pt = [cx + 44 * H, top + 110 * H];
   L.push({ kind: 'mass', pts: limb([cx + 22 * H, top + 60 * H], handR, r, 14, 9), z: 3 });
   L.push({ kind: 'mass', pts: limb([cx - 22 * H, top + 60 * H], [cx - 40 * H, top + 120 * H], r, 14, 9), z: 3 });

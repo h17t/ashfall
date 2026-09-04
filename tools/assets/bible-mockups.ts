@@ -21,7 +21,7 @@ const fonts = `
 @font-face{font-family:"Barlow Condensed";font-weight:600;src:url("../../node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-600-normal.woff2") format("woff2")}`;
 
 /** A stone slab with a noise-displaced edge, bevel from the fire (bottom-left) and grain. */
-function slab(seed: number, w: number, h: number, fill = PALETTE.stone): string {
+function slab(seed: number, w: number, h: number, fill: string = PALETTE.stone): string {
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="position:absolute;inset:0;width:100%;height:100%" preserveAspectRatio="none">
   <defs>
     <filter id="edge${seed}"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="${seed}"/><feDisplacementMap in="SourceGraphic" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter>

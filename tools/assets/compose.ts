@@ -36,10 +36,10 @@ export function composePlate(p: Plate): string {
   const bleed = p.bleed ?? 3.5;
   const tintHex = p.tint ? PALETTE[p.tint] : PALETTE.ash;
   const defs = [
-    inkFilter('ink', p.seed, bleed, 0.03),
-    inkFilter('inkFine', p.seed + 3, 1.6, 0.08),
-    washFilter('wash', p.seed + 11, Math.max(4, p.w / 80)),
-    paperFilter('paper', p.seed + 5),
+    inkFilter('ink', p.seed, bleed, 0.03, p.w, p.h),
+    inkFilter('inkFine', p.seed + 3, 1.6, 0.08, p.w, p.h),
+    washFilter('wash', p.seed + 11, Math.max(4, p.w / 80), p.w, p.h),
+    paperFilter('paper', p.seed + 5, p.w, p.h),
     hatchPattern('hatch', 3.2, -32, PALETTE.ink, 1.0),
     hatchPattern('hatchCross', 4.5, 40, PALETTE.ink, 0.7),
     fireGradient('rim', PALETTE.emberHot, PALETTE.ember, fire[0], fire[1], 0.95),
