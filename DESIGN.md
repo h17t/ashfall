@@ -1,0 +1,39 @@
+# Ashfall — Design Log
+
+Decisions and the reasoning behind them. Newest milestone at the bottom. Read this with `TODO.md` and `BALANCE.md` before resuming work.
+
+## Architecture (Milestone 1)
+
+**Stack.** Vite 8 + React 19 + TypeScript 7 + Zustand + Tailwind 4. `break_infinity.js` for every economy number from day one.
+
+**Three layers, strictly separated.**
+- `src/engine/` — pure, deterministic, framework-free. `step(state, dt, actions)` → `{ state, events }`. No `Date.now()`, no DOM. The only clock is `state.t`, advanced by ticks. Randomness comes from a mulberry32 PRNG whose state lives in `GameState.rng`, so a seed fully determines a run.
+- `src/content/` — typed data (weapons, enemies, bosses, zones, spells, phantoms, covenants, tree). The engine reads content only through `src/content/index.ts`. `validateContent()` is a test that every cross-reference resolves and that no shipped text contains placeholder words.
+- `src/ui/` — React, rendering only. Components select primitives from the store so a tick only re-renders what changed.
+
+**Engine "purity" convention.** The engine *mutates the state object in place* and returns it. It is pure in the sense that matters: deterministic, no side effects outside the state object, no hidden clocks. Returning fresh immutable copies at 10Hz with a 5-phantom squad and DoTs would allocate heavily for no gameplay benefit, and the simulator would pay the same price hundreds of thousands of times. Tests that need snapshots clone explicitly.
+
+**Which numbers are Decimals.** Souls, humanity, enemy HP, damage, costs, drop counts that scale with NG+ → `Decimal`. Player HP, stamina, FP, stat points, timers, poise, stagger buildup → plain numbers. Player HP is a plain number because enemy damage is defined *relative to the player's expected HP at that tier* (see Balance), so it never needs to reach 1e300.
+
+**Tick loop.** 10Hz fixed logic step driven by `setInterval` (so throttled background tabs keep ticking coarsely) with an accumulator and a catch-up cap of 60 simulated seconds per frame. Gaps larger than that are handed to the offline calculator (Milestone 6) rather than simulated tick-by-tick. Clicks are applied synchronously through the reducer, not queued to the next tick, so there is no 100ms input lag.
+
+**Actions and events.** Every player intention is an `Action` handled by `applyAction`. Invalid actions emit an `error` event and change nothing; they never throw. The engine emits `GameEvent`s (hit, kill, death, stagger, …) which the UI subscribes to for juice, and which the simulator counts for metrics. Nothing in the UI reads engine internals to decide when to flash.
+
+**Extension hooks.** Later systems (phantoms, covenants, prestige) register per-tick hooks (`registerTickHook`) and action handlers (`registerActionHandler`) rather than editing the core loop. This keeps `combat.ts` about combat.
+
+## Combat design (Milestones 1 & 3 — built together because they share a state shape)
+
+- **Damage** = weapon base × 1.15^reinforce × (1 + Σ gradeCoef × statCurve(stat)) × infusion × requirement penalty × buffs × permanent modifiers. Every factor is shown in the weapon tooltip. Grade coefficients: E .25, D .5, C .8, B 1.1, A 1.4, S 1.8. The stat curve is piecewise linear with soft caps at 20/40/60 (slopes .03/.0175/.008, tail .0025). So an S-scaling weapon at 40 points gives +171% damage; the same points in an unscaled stat give nothing. Builds matter.
+- **Stagger.** Each hit adds the weapon's stagger value (heavy weapons ~3× fast ones) to a meter against the enemy's poise. Full meter → 2s riposte window, enemy attack cancelled. Hits during the window use the weapon's riposte multiplier (daggers 5×, greatweapons 2.4×). Stagger does not build during the window itself, so you can't chain-stun.
+- **Stamina.** Attacks cost stamina; attacking below the cost still lands but at 40% damage and builds no stagger ("exhausted"). This is deliberately soft: a spammer is worse off than a rhythmic player but never punished with a locked-out click.
+- **Enemy telegraphs.** A visible wind-up bar. Dodge grants 0.45s of i-frames on a 1.6s cooldown; a dodge pressed inside the last 0.22s of a wind-up is *perfect* and grants +35% damage for 4s. Missing a dodge costs HP; missing a riposte costs only the bonus.
+- **Death.** The full soul balance drops as a bloodstain at the encounter. Respawn at the bonfire, full HP and Estus. A *corpse run* begins: one kill per tier from the bonfire to the stain; reaching the stain's tier restores the souls. Dying again first loses the old stain. Travel is locked during a run (you can abandon the stain to unlock it). This keeps the recovery under a few minutes in Region 1 and makes "how deep did I fall" the real cost.
+- **Tier clearing.** Each tier needs N kills to clear; cleared tiers stay open. The boss arena opens when the last tier is cleared. Bosses can be re-fought for 25% souls but yield their boss soul only once per cycle.
+
+## Balance skeleton (see BALANCE.md for numbers and simulator output)
+
+Enemy HP grows ×1.55 per global tier, souls ×1.5, damage ×1.2, level cost ×1.115 per level (4 levels ≈ 1 tier). Player HP gains ×1.035 per soul level ("the ember hardens") so that Vigor stays a choice while HP still keeps pace with exponential enemy damage. Weapons step ×~5 base damage per region; reinforcement +10 is ×4; scaling adds up to ×3–4. The shortfall versus enemy HP growth is what phantoms, buffs, and the Humanity tree fill — by design, so that those systems are needed rather than decorative.
+
+## Milestone 1 note
+
+Skeleton is in place and exceeds the M1 brief: the combat state shape for M3 (stagger, riposte, dodge, Estus, death, bloodstain, corpse run) was built at the same time because the enemy/player structs would have been rewritten otherwise. What is *not* here yet: the simulator, tests, level-up UI, weapon UI, zone navigation UI, bonfire, save system.
