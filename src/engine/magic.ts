@@ -10,6 +10,7 @@ import type { Mods } from './mods';
 import { statCurve } from './formulas';
 import { registerActionHandler } from './registry';
 import { registerTickHook } from './registry';
+import { castSpell } from './actions';
 
 export const MAX_BOUGHT_SLOTS = 3;
 
@@ -90,10 +91,22 @@ registerActionHandler((state, action, events) => {
   return false;
 });
 
-// keep the catalyst flag in sync with ownership so refreshPlayerMaxes grants the slot
-registerTickHook((state) => {
+// keep the catalyst flag in sync with ownership so refreshPlayerMaxes grants the slot,
+// and run auto-cast when unlocked
+registerTickHook((state, mods, events) => {
   const has = hasAnyCatalyst(state);
   if (has !== !!state.flags.hasCatalyst) state.flags.hasCatalyst = has;
+  if (state.automation.autoSpells && mods.unlocks.has('autoSpells') && state.encounter.enemy && state.deathScreen <= 0) {
+    const p = state.player;
+    for (let i = 0; i < p.attuned.length; i++) {
+      const id = p.attuned[i];
+      if (!id) continue;
+      const sp = getSpell(id);
+      if ((p.cooldowns[id] ?? 0) > 0 || p.fp < sp.fp) continue;
+      if (sp.effect.kind === 'heal' && p.hp > p.hpMax * 0.6) continue;
+      castSpell(state, mods, events, id);
+    }
+  }
 });
 
 export { SPELLS, WEAPONS };

@@ -5,7 +5,8 @@
 import { D, Decimal, ZERO, safe, decMin } from './num';
 import { rand, chance, pick } from './rng';
 import { BALANCE } from '@/content/balance';
-import { getEnemy, getZone, getBoss, getWeapon, globalTier, nextZone, BOSSES, WEAPONS } from '@/content';
+import { getEnemy, getZone, getBoss, getWeapon, getSpell, globalTier, nextZone, BOSSES, WEAPONS } from '@/content';
+const getSpellSchool = (id: string) => getSpell(id).school;
 import type { AttackPattern, BossPhase, EnemyDef } from '@/content/types';
 import type { GameState, GameEvent, EnemyInstance, StatusKey, DamageType, Buff, StatKey } from './types';
 import { tierHp, tierDmg, tierPoise, tierSouls, reinforceMult, gradeCoef, statCurve, critChance, playerHpMax, playerStaminaMax, playerStaminaRegen, playerFpMax } from './formulas';
@@ -556,7 +557,17 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
     if (first) state.prestige.bossesEverKilled.push(bossId);
     const firstThisCycle = (enc.tier === -1 ? zp.bossKills : zp.secretKills) === 1;
     if (firstThisCycle) {
-      state.bossSouls[bossId] = (state.bossSouls[bossId] ?? 0) + 1;
+      const remembered = state.bossSoulChoices[bossId];
+      const bossDef = getBoss(bossId);
+      if (remembered === 'weapon' && !state.player.weapons[bossDef.soulWeapon]) {
+        state.player.weapons[bossDef.soulWeapon] = { id: bossDef.soulWeapon, level: mods.startWeaponLevel, infusion: 'none' };
+        events.push({ type: 'unlock', what: 'weapon:' + bossDef.soulWeapon, text: `${getWeapon(bossDef.soulWeapon).name} returns to your hand, as it was shaped before.` });
+      } else if (remembered === 'spell') {
+        if (!state.spellsKnown.includes(bossDef.soulSpell)) state.spellsKnown.push(bossDef.soulSpell);
+        if (getSpellSchool(bossDef.soulSpell) === 'pyromancy') state.flags.hasFlame = true;
+      } else {
+        state.bossSouls[bossId] = (state.bossSouls[bossId] ?? 0) + 1;
+      }
     }
     events.push({ type: 'bossKilled', boss: bossId });
     if (enc.tier === -1) {
@@ -794,6 +805,8 @@ export function restAtBonfire(state: GameState, mods: Mods, events: GameEvent[])
   p.estus = p.estusMax;
   p.poisoned = 0;
   p.buffs = p.buffs.filter((b) => b.id.startsWith('spell:'));
+  // Resting leaves a boss arena: the fog gate must be crossed deliberately again.
+  if (enc.tier < 0) enc.tier = Math.max(0, Math.min(getZone(enc.zone).tiers.length - 1, state.zones[enc.zone]?.cleared ?? 0));
   enc.enemy = null;
   enc.respawnIn = 0.8;
   enc.streak = 0;

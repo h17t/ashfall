@@ -230,7 +230,7 @@ export type TreeEffectKey =
   | 'dmgMult' | 'soulMult' | 'offlineCapHours' | 'startWeaponLevel' | 'phantomRate' | 'estusCount' | 'estusPotency'
   | 'startLevels' | 'staminaRegen' | 'staggerMult' | 'humanityMult' | 'materialMult' | 'critChance' | 'riposteMult'
   | 'unlockAutoAttack' | 'unlockAutoLevel' | 'unlockAutoRiposte' | 'unlockAutoDodge' | 'unlockAutoEstus' | 'unlockAutoAdvance'
-  | 'phantomSlot' | 'attunementSlot' | 'fpMult' | 'keepWeapons' | 'startSouls' | 'bloodstainKeep' | 'dodgeCd' | 'hpMult' | 'skipTutorialBoss';
+  | 'phantomSlot' | 'attunementSlot' | 'fpMult' | 'keepWeapons' | 'startSouls' | 'bloodstainKeep' | 'dodgeCd' | 'hpMult' | 'phantomDmg' | 'ngScaling';
 
 export interface SigilUnlock {
   id: string;

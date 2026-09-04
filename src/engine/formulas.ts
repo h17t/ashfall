@@ -99,8 +99,8 @@ export function critChance(dex: number, bonus: number): number {
 }
 
 /** Expected soul level for a global tier; used by phantom hunting difficulty and tooltips. */
-export function expectedLevel(g: number): number {
-  return 10 + 4 * g;
+export function expectedLevel(g: number, ng = 0): number {
+  return 10 + 4 * g + 5 * ng;
 }
 
 export const STAT_NAMES: Record<StatKey, string> = {

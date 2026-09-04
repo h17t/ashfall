@@ -14,3 +14,4 @@ export * from './idle';
 export * from './phantoms';
 export * from './magic';
 export * from './covenants';
+export * from './prestige';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSel } from '../store';
-import { canRecruit } from '@/engine';
+import { canRecruit, canKindle, humanityPreview } from '@/engine';
 import { PHANTOMS } from '@/content';
 import { BonfirePanel } from './BonfirePanel';
 import { WeaponsPanel } from './WeaponsPanel';
@@ -10,12 +10,14 @@ import { SettingsPanel } from './SettingsPanel';
 import { SquadPanel } from './SquadPanel';
 import { MagicPanel } from './MagicPanel';
 import { CovenantPanel } from './CovenantPanel';
+import { KindlePanel } from './KindlePanel';
 
-type Tab = 'bonfire' | 'weapons' | 'magic' | 'map' | 'squad' | 'covenant' | 'souls' | 'settings';
+type Tab = 'bonfire' | 'weapons' | 'magic' | 'map' | 'squad' | 'covenant' | 'souls' | 'kindle' | 'settings';
 
 export function SidePanel() {
   const [tab, setTab] = useState<Tab>('bonfire');
   const soulsHeld = useSel((s) => Object.values(s.bossSouls).some((n) => n > 0));
+  const kindleReady = useSel((s) => canKindle(s) === null && humanityPreview(s).gte(s.prestige.humanityTotal.mul(0.5).add(1)));
   const recruitable = useSel((s) => Object.keys(PHANTOMS).some((id) => canRecruit(s, id) === null));
   const tabs: { id: Tab; label: string; badge?: boolean }[] = [
     { id: 'bonfire', label: 'Bonfire' },
@@ -25,6 +27,7 @@ export function SidePanel() {
     { id: 'squad', label: 'Squad', badge: recruitable },
     { id: 'covenant', label: 'Oaths' },
     { id: 'souls', label: 'Souls', badge: soulsHeld },
+    { id: 'kindle', label: 'Kindle', badge: kindleReady },
     { id: 'settings', label: '⚙' },
   ];
   return (
@@ -44,6 +47,7 @@ export function SidePanel() {
         {tab === 'squad' && <SquadPanel />}
         {tab === 'covenant' && <CovenantPanel />}
         {tab === 'souls' && <SoulsPanel />}
+        {tab === 'kindle' && <KindlePanel />}
         {tab === 'settings' && <SettingsPanel />}
       </div>
     </div>

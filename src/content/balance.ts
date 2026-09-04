@@ -27,10 +27,10 @@ export const BALANCE = {
 
   // ---- NG+ scaling per kindle ----
   ng: {
-    hpGrowth: 1.6,
-    dmgGrowth: 1.28,
-    soulGrowth: 1.45,
-    dropGrowth: 1.3,
+    hpGrowth: 1.45,
+    dmgGrowth: 1.2,
+    soulGrowth: 1.55, // souls outgrow HP: a cycle is net-positive, so the 20 minutes after a Kindle are faster than the 20 before
+    dropGrowth: 1.35,
   },
 
   // ---- Player ----

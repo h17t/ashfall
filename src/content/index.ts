@@ -8,12 +8,12 @@ import { BOSSES } from './bosses';
 import { SPELLS } from './spells';
 import { PHANTOMS } from './phantoms';
 import { COVENANTS } from './covenants';
-import { TREE, SIGIL_UNLOCKS } from './tree';
+import { TREE, SIGIL_UNLOCKS, BRANCH_INFO } from './tree';
 import { MATERIALS, reinforceMaterial } from './materials';
 import { BALANCE } from './balance';
 import type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef } from './types';
 
-export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, PHANTOMS, COVENANTS, TREE, SIGIL_UNLOCKS, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial };
+export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, PHANTOMS, COVENANTS, TREE, SIGIL_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial };
 export type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef };
 
 export function getWeapon(id: string): WeaponDef {

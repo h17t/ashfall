@@ -119,3 +119,17 @@ Simulator after M7: idle-only earns ~15% of the greedy player's souls in the fir
 **Phantom affinity**: a phantom whose covenant matches yours gets +15% damage (healers +40% healing). This is the horizontal hook that makes two players' squads differ.
 
 Simulator: strategies now buy a catalyst, learn and cast, and swear by play style (Embers for skilled, Vigil for casual, Legion for idle). First boss: greedy 9.6m, casual 21.9m without a death (Heal carries it). Souls/hour up ~50% from the Embers passive and Magic Weapon.
+
+## Milestone 9 — Kindling
+
+**Humanity** = (cycle souls ÷ 5,000)^0.42 × 1.15^lords × (1 + 4% per deepest tier) × bonuses. Sub-linear on souls so that kindling *more often* out-gathers waiting, and it needs at least one lord's soul to catch. The Kindle panel shows the gain live, and the confirm step lists exactly what is kept and what turns to ash, computed from the actual modifiers.
+
+**What survives.** Humanity and the tree; covenant standing (rites reset); spells known; boss-soul *choices* (the weapon is handed back the moment that boss falls again — the choice was permanent, the item is a consequence); recruited phantoms (levels reset to 1) and the phantom slots earned from lords; every automation unlocked; the bestiary. Weapons, levels, materials, zone progress, Estus and attunement purchases burn — unless *Unforgotten Steel* (10 Humanity) is bought.
+
+**Why NG+ is net-positive.** The first tuning pass had HP ×1.6 and souls ×1.45 per cycle, and the simulator showed the exact anti-pattern the spec forbids: souls/hour fell by 80% after the first Kindle and deaths spiked. Now HP ×1.45, damage ×1.2, souls ×1.55, drops ×1.35 — the cycle pays for itself — and the Flame branch (starting levels, starting souls, weapons at +N) front-loads the first twenty minutes. Simulator after the fix: greedy's souls/hour go 70K → 116K → 169K → 253K → 426K across five hours and eight Kindles (Region 1 only; the cadence stretches once Regions 2–6 exist).
+
+**The tree** is 25 nodes in four branches. Automation lives in the tree as *earned* nodes (Reflex of the Ember = auto-riposte, Reflex of the Bone = auto-dodge, Instinct to Drink, The Fire Chooses = auto-level, Restless Feet = auto-advance). Each sits behind the manual-skill nodes of its branch, so you graduate from a system only after investing in it. Familiar Dark (−8% NG+ scaling per rank, ×2 cost growth) is the long-tail sink.
+
+**Variants.** NG+ enemies roll modifiers (Ashen, Hollowed, Abyssal, Ancient, Ember-touched) with a chance that rises per cycle, each changing how the fight plays (poise, damage, attack speed, telegraph length) rather than only its size. Cycle-exclusive bosses hook in through `BossDef.cycle` and ship with Milestone 10's regions.
+
+**A found rule.** Resting at a bonfire now leaves a boss arena and returns you to the last tier. Before that fix the simulator's casual player retreated from Eskel's third phase, watched him reset, and walked back in for 50 minutes without ever going to level up. Real players do this too. The fog gate must be crossed deliberately every time.

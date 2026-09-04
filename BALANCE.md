@@ -18,147 +18,152 @@ Smoke run (2 min, click every 0.3s, tier 0): 68 kills, 309 souls, no deaths.
 
 ## Latest simulator run
 
-### Run — 2026-09-04 11:42 UTC · 3h · seed 7
+### Run — 2026-09-04 11:51 UTC · 6h · seed 7
 
 | Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| greedy | 2.9m | — | 9.6m | — | — | — | — | 60 | 3 | 0 | 0 | 0 | 854 |
-| optimal | 3.8m | — | 10.7m | — | — | — | — | 60 | 3 | 0 | 0 | 0 | 716 |
-| casual | 6.0m | — | 21.9m | — | — | — | — | 57 | 3 | 0 | 0 | 0 | 556 |
-| idle | 6.0m | 26.6m | — | — | — | — | — | 37 | 3 | 0 | 55 | 0 | 646 |
-| noclick | 6.0m | 2.5m | — | — | — | — | — | 35 | 3 | 0 | 54 | 0 | 472 |
+| greedy | 2.9m | 2.56h | 9.6m | — | — | 25.5m | — | 58 | 3 | 8 | 6 | 0 | 2658 |
+| optimal | 3.8m | — | 10.7m | — | — | 26.5m | — | 41 | 3 | 10 | 0 | 0 | 2439 |
+| casual | 6.0m | 1.69h | 24.8m | — | — | 40.5m | — | 67 | 3 | 4 | 1 | 0 | 1261 |
+| idle | 6.0m | 26.6m | 4.75h | — | — | 4.76h | — | 31 | 3 | 1 | 103 | 0 | 1684 |
+| noclick | 6.0m | 2.5m | 5.00h | — | — | 5.00h | — | 29 | 3 | 1 | 101 | 0 | 1084 |
 
 Souls earned per hour (first 12 buckets):
 
-| Strategy | h1 | h2 | h3 |
-|---|---|---|---|
-| greedy | 82.7K | 112K |
-| optimal | 82.2K | 111K |
-| casual | 49.7K | 83.3K |
-| idle | 10.5K | 6.64K |
-| noclick | 7.06K | 8.02K |
+| Strategy | h1 | h2 | h3 | h4 | h5 | h6 |
+|---|---|---|---|---|---|---|
+| greedy | 69.7K | 116K | 169K | 253K | 426K |
+| optimal | 70.4K | 147K | 254K | 376K | 545K |
+| casual | 33.7K | 62.4K | 98.8K | 163K | 199K |
+| idle | 10.5K | 6.64K | 8.30K | 10.2K | 11.4K |
+| noclick | 7.06K | 8.02K | 7.87K | 9.53K | 12.4K |
+
+Bosses (first kill):
+
+- **greedy**: Eskel 9.6m
+- **optimal**: Eskel 10.7m
+- **casual**: Eskel 24.8m
+- **idle**: Eskel 4.75h
+- **noclick**: Eskel 5.00h
+
+Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
+
+<details><summary>Previous runs</summary>
+
+### Run — 2026-09-04 11:50 UTC · 6h · seed 7
+
+| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| greedy | 2.9m | 1.69h | 9.6m | — | — | 25.5m | — | 36 | 3 | 8 | 17 | 1 | 2609 |
+| optimal | 3.8m | 2.80h | 10.7m | — | — | 26.5m | — | 63 | 3 | 9 | 6 | 1 | 1997 |
+| casual | 6.0m | — | 21.9m | — | — | 37.5m | — | 41 | 3 | 4 | 0 | 4 | 1624 |
+| idle | 6.0m | 26.6m | 4.75h | — | — | 4.76h | — | 31 | 3 | 1 | 103 | 0 | 1703 |
+| noclick | 6.0m | 2.5m | 5.00h | — | — | 5.00h | — | 29 | 3 | 1 | 101 | 0 | 1128 |
+
+Souls earned per hour (first 12 buckets):
+
+| Strategy | h1 | h2 | h3 | h4 | h5 | h6 |
+|---|---|---|---|---|---|---|
+| greedy | 69.7K | 96.0K | 97.9K | 226K | 199K |
+| optimal | 70.4K | 147K | 178K | 258K | 212K |
+| casual | 32.1K | 65.6K | 1.92K | 1.94K | 43.3K |
+| idle | 10.5K | 6.64K | 8.30K | 10.2K | 11.4K |
+| noclick | 7.06K | 8.02K | 7.87K | 9.53K | 12.4K |
 
 Bosses (first kill):
 
 - **greedy**: Eskel 9.6m
 - **optimal**: Eskel 10.7m
 - **casual**: Eskel 21.9m
-- **idle**: none
-- **noclick**: none
+- **idle**: Eskel 4.75h
+- **noclick**: Eskel 5.00h
+
+Stalls (no progress event for 20+ min):
+
+- **greedy** stalled 22.9m from 5.20h at The Cindered Approach tier -1 (cleared 3), level 60
+- **optimal** stalled 23.6m from 4.26h at The Cindered Approach tier -1 (cleared 3), level 58
+- **casual** stalled 40.2m from 2.00h at The Cindered Approach tier -1 (cleared 3), level 35
+- **casual** stalled 53.4m from 2.67h at The Cindered Approach tier -1 (cleared 3), level 36
+- **casual** stalled 55.3m from 3.56h at The Cindered Approach tier -1 (cleared 3), level 37
+- **casual** stalled 52.0m from 5.13h at The Cindered Approach tier -1 (cleared 3), level 41
 
 Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
 
-<details><summary>Previous runs</summary>
+---
 
-### Run — 2026-09-04 11:15 UTC · 6h · seed 7
+### Run — 2026-09-04 11:49 UTC · 6h · seed 7
 
 | Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| greedy | 3.2m | — | 12.5m | — | — | — | — | 67 | 3 | 0 | 0 | 5 | 576 |
-| optimal | 4.4m | — | 11.4m | — | — | — | — | 67 | 3 | 0 | 0 | 5 | 457 |
-| casual | 6.0m | 21.1m | 31.2m | — | — | — | — | 66 | 3 | 0 | 1 | 5 | 451 |
-| idle | 6.0m | 26.9m | — | — | — | — | — | 34 | 3 | 0 | 127 | 0 | 323 |
-| noclick | 6.0m | 2.5m | — | — | — | — | — | 33 | 3 | 0 | 132 | 0 | 327 |
+| greedy | 2.9m | 1.69h | 9.6m | — | — | 25.5m | — | 47 | 3 | 6 | 37 | 1 | 2430 |
+| optimal | 3.8m | 2.80h | 10.7m | — | — | 26.5m | — | 51 | 3 | 10 | 5 | 1 | 1922 |
+| casual | 6.0m | — | 21.9m | — | — | 37.5m | — | 41 | 3 | 4 | 0 | 4 | 1642 |
+| idle | 6.0m | 26.6m | 4.75h | — | — | 4.76h | — | 31 | 3 | 1 | 103 | 0 | 1682 |
+| noclick | 6.0m | 2.5m | 5.00h | — | — | 5.00h | — | 29 | 3 | 1 | 101 | 0 | 1104 |
 
 Souls earned per hour (first 12 buckets):
 
 | Strategy | h1 | h2 | h3 | h4 | h5 | h6 |
 |---|---|---|---|---|---|---|
-| greedy | 51.9K | 67.7K | 69.5K | 70.2K | 71.1K |
-| optimal | 53.4K | 67.9K | 69.2K | 70.0K | 71.0K |
-| casual | 33.6K | 62.9K | 65.4K | 66.9K | 68.9K |
-| idle | 7.07K | 1.68K | 1.57K | 1.56K | 1.47K |
-| noclick | 5.71K | 3.45K | 1.59K | 1.62K | 1.62K |
+| greedy | 69.7K | 96.0K | 14.3K | 60.7K | 16.0K |
+| optimal | 70.4K | 147K | 178K | 258K | 295K |
+| casual | 32.1K | 65.6K | 1.92K | 1.94K | 43.3K |
+| idle | 10.5K | 6.64K | 8.30K | 10.2K | 11.4K |
+| noclick | 7.06K | 8.02K | 7.87K | 9.53K | 12.4K |
 
 Bosses (first kill):
 
-- **greedy**: Eskel 12.5m
-- **optimal**: Eskel 11.4m
-- **casual**: Eskel 31.2m
-- **idle**: none
-- **noclick**: none
+- **greedy**: Eskel 9.6m
+- **optimal**: Eskel 10.7m
+- **casual**: Eskel 21.9m
+- **idle**: Eskel 4.75h
+- **noclick**: Eskel 5.00h
 
 Stalls (no progress event for 20+ min):
 
-- **greedy** stalled 21.8m from 3.68h at The Cindered Approach tier 3 (cleared 3), level 62
-- **greedy** stalled 24.5m from 4.04h at The Cindered Approach tier 3 (cleared 3), level 63
-- **greedy** stalled 27.1m from 4.45h at The Cindered Approach tier 3 (cleared 3), level 64
-- **greedy** stalled 30.3m from 4.90h at The Cindered Approach tier 3 (cleared 3), level 65
-- **greedy** stalled 33.6m from 5.41h at The Cindered Approach tier 3 (cleared 3), level 66
-- **optimal** stalled 21.9m from 3.66h at The Cindered Approach tier 3 (cleared 3), level 62
-- **optimal** stalled 24.5m from 4.03h at The Cindered Approach tier 3 (cleared 3), level 63
-- **optimal** stalled 27.1m from 4.44h at The Cindered Approach tier 3 (cleared 3), level 64
-- **optimal** stalled 30.4m from 4.89h at The Cindered Approach tier 3 (cleared 3), level 65
-- **optimal** stalled 33.7m from 5.40h at The Cindered Approach tier 3 (cleared 3), level 66
-- **casual** stalled 20.8m from 3.77h at The Cindered Approach tier 3 (cleared 3), level 61
-- **casual** stalled 22.8m from 4.12h at The Cindered Approach tier 3 (cleared 3), level 62
-- **casual** stalled 24.7m from 4.50h at The Cindered Approach tier 3 (cleared 3), level 63
-- **casual** stalled 27.9m from 4.91h at The Cindered Approach tier 3 (cleared 3), level 64
-- **casual** stalled 30.7m from 5.38h at The Cindered Approach tier 3 (cleared 3), level 65
+- **greedy** stalled 26.7m from 2.44h at The Cindered Approach tier -1 (cleared 3), level 38
+- **optimal** stalled 23.6m from 4.26h at The Cindered Approach tier -1 (cleared 3), level 58
+- **casual** stalled 40.2m from 2.00h at The Cindered Approach tier -1 (cleared 3), level 35
+- **casual** stalled 53.4m from 2.67h at The Cindered Approach tier -1 (cleared 3), level 36
+- **casual** stalled 55.3m from 3.56h at The Cindered Approach tier -1 (cleared 3), level 37
+- **casual** stalled 52.0m from 5.13h at The Cindered Approach tier -1 (cleared 3), level 41
 
 Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
 
 ---
 
-### Run — 2026-09-04 11:14 UTC · 2h · seed 7
+### Run — 2026-09-04 11:48 UTC · 6h · seed 7
 
 | Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| greedy | 3.2m | — | 12.5m | — | — | — | — | 55 | 3 | 0 | 0 | 0 | 240 |
-| optimal | 4.4m | — | 11.4m | — | — | — | — | 55 | 3 | 0 | 0 | 0 | 194 |
-| casual | 6.0m | 21.1m | 31.2m | — | — | — | — | 53 | 3 | 0 | 1 | 0 | 186 |
-| idle | 6.0m | 26.9m | — | — | — | — | — | 28 | 3 | 0 | 34 | 0 | 125 |
-| noclick | 6.0m | 2.5m | — | — | — | — | — | 28 | 3 | 0 | 33 | 0 | 101 |
+| greedy | 2.9m | 1.12h | 9.6m | — | — | 30.5m | — | 33 | 3 | 4 | 113 | 0 | 2703 |
+| optimal | 3.8m | 1.10h | 10.7m | — | — | 30.5m | — | 37 | 3 | 5 | 56 | 1 | 1831 |
+| casual | 6.0m | 59.1m | 21.9m | — | — | 31.0m | — | 29 | 3 | 2 | 36 | 1 | 833 |
+| idle | 6.0m | 26.6m | 4.75h | — | — | 4.76h | — | 28 | 3 | 1 | 108 | 0 | 1448 |
+| noclick | 6.0m | 2.5m | 5.00h | — | — | 5.00h | — | 27 | 3 | 1 | 105 | 0 | 1009 |
 
 Souls earned per hour (first 12 buckets):
 
-| Strategy | h1 | h2 |
-|---|---|---|
-| greedy | 51.9K |
-| optimal | 53.4K |
-| casual | 33.6K |
-| idle | 7.07K |
-| noclick | 5.71K |
+| Strategy | h1 | h2 | h3 | h4 | h5 | h6 |
+|---|---|---|---|---|---|---|
+| greedy | 69.5K | 12.0K | 16.5K | 6.18K | 20.9K |
+| optimal | 70.9K | 50.2K | 31.0K | 10.9K | 7.37K |
+| casual | 20.7K | 16.1K | 806 | 1.27K | 1.26K |
+| idle | 10.5K | 6.64K | 8.30K | 10.2K | 11.2K |
+| noclick | 7.06K | 8.02K | 7.87K | 9.53K | 12.4K |
 
 Bosses (first kill):
 
-- **greedy**: Eskel 12.5m
-- **optimal**: Eskel 11.4m
-- **casual**: Eskel 31.2m
-- **idle**: none
-- **noclick**: none
+- **greedy**: Eskel 9.6m
+- **optimal**: Eskel 10.7m
+- **casual**: Eskel 21.9m
+- **idle**: Eskel 4.75h
+- **noclick**: Eskel 5.00h
 
-Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
+Stalls (no progress event for 20+ min):
 
----
-
-### Run — 2026-09-04 11:14 UTC · 3h · seed 7
-
-| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| greedy | 3.2m | — | 10.0m | — | — | — | — | 59 | 3 | 0 | 0 | 0 | 328 |
-| optimal | 4.4m | — | 10.8m | — | — | — | — | 59 | 3 | 0 | 0 | 0 | 271 |
-| casual | 6.0m | — | 18.5m | — | — | — | — | 58 | 3 | 0 | 0 | 0 | 252 |
-| idle | 6.0m | 26.9m | 1.50h | — | — | — | — | 43 | 3 | 0 | 26 | 0 | 225 |
-| noclick | 6.0m | 2.5m | 1.24h | — | — | — | — | 40 | 3 | 0 | 21 | 0 | 195 |
-
-Souls earned per hour (first 12 buckets):
-
-| Strategy | h1 | h2 | h3 |
-|---|---|---|---|
-| greedy | 54.3K | 67.8K |
-| optimal | 54.0K | 67.9K |
-| casual | 43.7K | 63.6K |
-| idle | 7.28K | 9.84K |
-| noclick | 5.64K | 11.7K |
-
-Bosses (first kill):
-
-- **greedy**: Eskel 10.0m
-- **optimal**: Eskel 10.8m
-- **casual**: Eskel 18.5m
-- **idle**: Eskel 1.50h
-- **noclick**: Eskel 1.24h
+- **optimal** stalled 32.9m from 5.26h at The Cindered Approach tier -1 (cleared 3), level 36
+- **casual** stalled 22.6m from 2.05h at The Cindered Approach tier -1 (cleared 3), level 25
 
 Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
 </details>

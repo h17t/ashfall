@@ -11,7 +11,7 @@ await page.goto(url, { waitUntil: 'networkidle' });
 await page.waitForTimeout(800);
 if (setup) await page.evaluate(setup);
 await page.waitForTimeout(300);
-if (tab) await page.getByRole('button', { name: new RegExp('^' + tab + '$', 'i') }).first().click();
+if (tab) await page.getByRole('button', { name: new RegExp('^' + tab, 'i') }).first().click();
 await page.waitForTimeout(500);
 await page.screenshot({ path: out });
 await browser.close();

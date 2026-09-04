@@ -44,7 +44,7 @@ function TierRow({ zone, tier, name, cleared, here, boss }: { zone: string; tier
   const g = globalTier(zone, tier);
   const ng = useSel((s) => ngLevel(s, computeMods(s)));
   const level = useSel((s) => s.player.level);
-  const exp = expectedLevel(g);
+  const exp = expectedLevel(g, ng);
   const z = getZone(zone);
   const tip = tier >= 0 ? (
     <div className="flex flex-col gap-1">

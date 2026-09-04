@@ -137,7 +137,11 @@ export function makePolicy(params: PolicyParams): Strategy {
         }
         // estus
         if (p.hp < p.hpMax * params.estusAt && p.estus > 0) out.push({ type: 'estus' });
-        else if (params.retreatAt > 0 && p.estus === 0 && p.hp < p.hpMax * params.retreatAt && !s.corpseRun) out.push({ type: 'retreat' });
+        else if (params.retreatAt > 0 && p.estus === 0 && p.hp < p.hpMax * params.retreatAt && !s.corpseRun) {
+          out.push({ type: 'retreat' });
+          // retreating from a boss resets it: count it as a failed attempt and go level up
+          if (s.encounter.tier < 0) { mem.bossDeathBoss = s.encounter.tier === -1 ? getZone(s.encounter.zone).boss : getZone(s.encounter.zone).secretBoss ?? null; mem.bossDeathLevel = p.level; }
+        }
         // clicking
         const clicking = params.clickRate > 0 && (params.clickUntil === undefined || view.t < params.clickUntil);
         if (clicking) {
@@ -209,7 +213,7 @@ export function makePolicy(params: PolicyParams): Strategy {
           } else if (tier >= 0 && zp.cleared >= tier && tier < lastTier) {
             // push when strong enough
             const g = globalTier(zoneId, tier + 1);
-            if (p.level >= expectedLevel(g) - params.pushLead && !travelBlocked(s, zoneId, tier + 1)) out.push({ type: 'travel', zone: zoneId, tier: tier + 1 });
+            if (p.level >= expectedLevel(g, s.prestige.kindles) - params.pushLead && !travelBlocked(s, zoneId, tier + 1)) out.push({ type: 'travel', zone: zoneId, tier: tier + 1 });
           } else if (tier >= 0 && zp.cleared >= lastTier && !bossDone) {
             // boss attempt gating
             const canRetry = mem.bossDeathBoss !== zone.boss || p.level >= mem.bossDeathLevel + params.bossRetryLevels;
