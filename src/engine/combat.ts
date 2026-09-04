@@ -741,7 +741,7 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
   // boss regen mechanic (Hanged Pilgrim): heals unless bleeding/poisoned
   const ph = currentPhase(enemy);
   if (ph?.mechanic === 'regen') {
-    const suppressed = enemy.statuses.poison.active > 0 || enemy.statuses.frost.active > 0 || (enemy.mech.lastBleed !== undefined && enc.t - enemy.mech.lastBleed < 4);
+    const suppressed = enemy.statuses.poison.active > 0 || enemy.statuses.frost.active > 0 || (enemy.mech.lastBleed !== undefined && enc.t - enemy.mech.lastBleed < 6);
     if (!suppressed && enemy.hp.gt(0) && enemy.riposte <= 0) {
       enemy.hp = decMin(enemy.hpMax, enemy.hp.add(enemy.hpMax.mul((ph.mechParam ?? 0.02) * dt)));
     }

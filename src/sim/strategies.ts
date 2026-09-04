@@ -100,23 +100,46 @@ function bestOwnedWeapon(view: SimView): string {
   const ph = boss ? boss.phases[enemy!.phase] : null;
   const needsStatus = !!ph && ph.mechanic === 'regen';
   const resists = (st: string) => (ph?.statusResist?.[st as 'bleed'] ?? 1) <= 0;
-  for (const id of Object.keys(s.player.weapons)) {
+  const usableStatus = (id: string) => {
+    const def = getWeapon(id);
+    const inst = s.player.weapons[id];
+    const statuses = { ...(def.status ?? {}) } as Record<string, number>;
+    const inf = inst.infusion !== 'none' ? (BALANCE_INFUSION[inst.infusion]?.status as string | undefined) : undefined;
+    if (inf) statuses[inf] = (statuses[inf] ?? 0) + 20;
+    return Object.keys(statuses).some((st) => !resists(st));
+  };
+  const ids = Object.keys(s.player.weapons).filter((id) => getWeapon(id).archetype !== 'catalyst');
+  const pool = needsStatus && ids.some(usableStatus) ? ids.filter(usableStatus) : ids;
+  for (const id of pool) {
     const br = weaponDamage(s, view.mods, id);
     const def = getWeapon(id);
-    if (def.archetype === 'catalyst') continue;
     // damage per stamina point, weighted towards raw hit for boss-killing
-    let score = br.total.toNumber() * (0.6 + 0.4 * (10 / def.stamina)) * (1 + def.stagger / 40);
-    if (needsStatus) {
-      const inst = s.player.weapons[id];
-      const statuses = { ...(def.status ?? {}) } as Record<string, number>;
-      const inf = inst.infusion !== 'none' ? (BALANCE_INFUSION[inst.infusion]?.status as string | undefined) : undefined;
-      if (inf) statuses[inf] = (statuses[inf] ?? 0) + 20;
-      const usable = Object.keys(statuses).some((st) => !resists(st));
-      score *= usable ? 4 : 0.25;
-    }
+    const score = br.total.toNumber() * (0.6 + 0.4 * (10 / def.stamina)) * (1 + def.stagger / 40);
     if (score > bestScore) { bestScore = score; best = id; }
   }
   return best;
+}
+
+/** Against a regenerating lord, infuse the best infusable weapon with a status it cannot shrug off. */
+function infuseForBoss(view: SimView, out: Action[]) {
+  const s = view.state;
+  const enemy = s.encounter.enemy;
+  if (!enemy?.isBoss || (s.materials.coal ?? 0) < 1 || !s.flags.infusionUnlocked) return;
+  const ph = BOSSES[enemy.id]?.phases[enemy.phase];
+  if (ph?.mechanic !== 'regen') return;
+  const resists = (st: string) => (ph.statusResist?.[st as 'bleed'] ?? 1) <= 0;
+  const status = (['bleed', 'poison', 'frost'] as const).find((st) => !resists(st));
+  if (!status) return;
+  // best infusable weapon we own that does not already carry a usable status
+  let best: string | null = null; let bestBase = -1;
+  for (const [id, inst] of Object.entries(s.player.weapons)) {
+    const def = getWeapon(id);
+    if (!def.infusable || inst.infusion === status) continue;
+    if (def.status && Object.keys(def.status).some((st) => !resists(st))) continue;
+    const base = def.base * Math.pow(1.15, inst.level);
+    if (base > bestBase) { bestBase = base; best = id; }
+  }
+  if (best) out.push({ type: 'infuse', weapon: best, infusion: status });
 }
 import { BALANCE } from '@/content/balance';
 const BALANCE_INFUSION = BALANCE.weapon.infusion;
@@ -198,7 +221,8 @@ export function makePolicy(params: PolicyParams): Strategy {
             break;
           }
         }
-        // equip best
+        // read the lord: infuse for its mechanic, then equip the best answer
+        infuseForBoss(view, out);
         const best = bestOwnedWeapon(view);
         if (best !== p.weapon) out.push({ type: 'equip', weapon: best });
         // reinforce equipped weapon when materials allow

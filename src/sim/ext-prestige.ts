@@ -28,7 +28,9 @@ registerSimExtension((view, params, mem, out) => {
   const allBossesDead = s.unlockedZones.every((z) => (s.zones[z]?.bossKills ?? 0) > 0);
   // Players kindle when they are stuck (no new tier or lord for 45 min, or the road is fully cleared and 15 min pass)
   // and the gain is worth having; or, late, when it would double their Humanity after four lords.
-  const stuck = (stuckFor > 90 * 60 || (allBossesDead && stuckFor > 30 * 60)) && gain.gte(2);
+  // Idle players farm longer before giving up on a wall: levels always pay, and their cycles gather little.
+  const patience = params.clickRate === 0 || params.clickUntil !== undefined ? 240 * 60 : 90 * 60;
+  const stuck = (stuckFor > patience || (allBossesDead && stuckFor > 30 * 60)) && gain.gte(2);
   const doubling = s.stats.cycleBosses >= 4 && gain.gte(4) && gain.gte(s.prestige.humanityTotal.add(1));
   if (!canKindle(s) && (doubling || stuck)) {
     out.push({ type: 'kindle' });

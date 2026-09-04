@@ -1,0 +1,22 @@
+import { createRequire } from 'node:module';
+const require = createRequire('/opt/node22/lib/node_modules/');
+const { chromium } = require('playwright');
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--autoplay-policy=no-user-gesture-required'] });
+const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+const errors = [];
+page.on('pageerror', (e) => errors.push(e.message));
+page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+await page.goto('http://localhost:4173/', { waitUntil: 'networkidle' });
+await page.getByRole('button', { name: '⚙' }).click();
+await page.getByText('Sound (synthesized').locator('..').getByRole('button').click();
+await page.waitForTimeout(200);
+const arena = page.locator('.cursor-pointer').first();
+for (let i = 0; i < 40; i++) { await arena.click({ force: true }); await page.waitForTimeout(80); }
+await page.keyboard.press('Space');
+await page.waitForTimeout(1500);
+const ctxState = await page.evaluate(() => (window.AudioContext ? 'has AudioContext' : 'no AudioContext'));
+console.log('sound on; errors:', errors.length, errors.slice(0, 3), ctxState);
+await page.evaluate(() => { const g = window.__ashfall.getState(); g.state.player.hp = 1; g.state.encounter.enemy && (g.state.encounter.enemy.hp = g.state.encounter.enemy.hp.mul(1e6)); });
+await page.waitForTimeout(6000);
+console.log('after death; errors:', errors.length, 'deaths', await page.evaluate(() => window.__ashfall.getState().state.stats.deaths));
+await browser.close();

@@ -12,6 +12,10 @@ import { SidePanel } from './components/SidePanel';
 import { Log } from './components/Log';
 import { SpellBar } from './components/SpellBar';
 import { AutomationBar } from './components/AutomationBar';
+import { Fx } from './components/Fx';
+import { Hints } from './components/Hints';
+import { Bonfire } from './components/Bonfire';
+import { startAudio } from './audio';
 import { useHotkeys } from './hooks/useHotkeys';
 
 export default function App() {
@@ -28,12 +32,16 @@ export default function App() {
       saveToStorage();
     });
     const stopSave = startAutosave();
-    return () => { stopLoop(); stopSave(); };
+    const stopAudio = startAudio();
+    return () => { stopLoop(); stopSave(); stopAudio(); };
   }, []);
   useHotkeys();
   return (
     <div className={`min-h-full relative ${reduceFx ? 'reduce-fx' : ''}`}>
       <OfflineModal />
+      <Fx />
+      <Bonfire />
+      <Hints />
       {loadError && (
         <div className="relative z-20 max-w-[1400px] mx-auto mt-3 px-4">
           <div className="border border-blood-600 bg-blood-600/10 text-bone-200 text-[12px] px-3 py-2 rounded-sm flex justify-between gap-3">
@@ -48,9 +56,9 @@ export default function App() {
           <h1 className="font-display text-3xl tracking-[0.35em] uppercase text-bone-100">Ashfall</h1>
           <span className="text-[10px] uppercase tracking-widest text-bone-400">an ember-tender's idle</span>
         </header>
-        <PlayerPanel />
-        <div className="flex flex-col gap-3"><div className="min-h-[520px] flex-1"><Encounter /></div><SpellBar /><AutomationBar /><Log /></div>
-        <SidePanel />
+        <div className="order-2 lg:order-1"><PlayerPanel /></div>
+        <div className="flex flex-col gap-3 order-1 lg:order-2"><div className="min-h-[520px] flex-1"><Encounter /></div><SpellBar /><AutomationBar /><Log /></div>
+        <div className="order-3"><SidePanel /></div>
       </div>
     </div>
   );

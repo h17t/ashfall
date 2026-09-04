@@ -1,0 +1,14 @@
+import { createRequire } from 'node:module';
+const require = createRequire('/opt/node22/lib/node_modules/');
+const { chromium } = require('playwright');
+const [out, width = '1400', setup = '', wait = '600'] = process.argv.slice(2);
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const page = await browser.newPage({ viewport: { width: Number(width), height: 900 } });
+page.on('pageerror', (e) => console.log('PAGEERROR', e.message));
+await page.goto('http://localhost:4173/', { waitUntil: 'networkidle' });
+await page.waitForTimeout(500);
+if (setup) await page.evaluate(setup);
+await page.waitForTimeout(Number(wait));
+await page.screenshot({ path: out });
+await browser.close();
+console.log('saved', out);

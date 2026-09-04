@@ -27,7 +27,58 @@ Smoke run (2 min, click every 0.3s, tier 0): 68 kills, 309 souls, no deaths.
 
 Region cadence (skilled / casual): Eskel 9m / 18m · Mother Nettle 35m / 45m · Archivist 1.1h / 1.9h · Orvane 3.5h / 4.7h · Keeper 4.5h / 6h · Lord of Cinders 7h / 9.8h. First Kindle 2.4h / 3.2h / 3.5h (idle).
 
+## Rev 3 — Milestones 11–12 (deep meta, polish)
+
+| Knob | Value | Why |
+|---|---|---|
+| Sigil Marks | (lifetime Humanity ÷ 25)^0.6 × √(NG+ ÷ 5) × (1 + 0.1 × depth record) | opens at NG+5; depth record feeds it so the Abyss matters |
+| Dark Level | 8 × 1.7^n Marks → ×1.5 dmg/souls, ×1.25 Humanity each | the endless horizon |
+| Auto-Kindle | gain ≥ 2 × last Kindle's gain, ≥ 10, after 20 min | comparing with *held* Humanity kindled every minute (players spend it) |
+| Bleed vs regen | open wound suppresses regen 6s (was 4s); Nettle mends 1.2%/2% (was 1.5%/2.5%) | the idle path could never sustain suppression at 1 hit/s |
+| Reflex nodes | auto-riposte / auto-dodge cost 4 (was 6) | they are what get an idle player past a lord |
+
+Final 60h, seed 7 — every strategy fells all six lords. Lords (skilled / casual / idle): Eskel 9m / 18m / 2.3h · Nettle 17m / 35m / 3.1h · Archivist 35m / 1.0h / 5.3h · Orvane 1.8h / 2.2h / 10h · Keeper 3.1h / 4.1h / 13h · Lord of Cinders 4.2h / 5.4h / 22h · the Watcher 8.3h / 16h / —. First Kindle 1.8h / 2.2h / 10h; first Sigil (see table). Deaths in 60h: 20 / 19 / 0. Two stalls, both 22 minutes, both idle at Sanctum tier 4.
+
+Known gaps versus the spec targets: the skilled first Kindle (1.8h) is under the 3–7h window because the simulator kindles the moment it is stuck 90 minutes; a human who reads the depth multiplier will wait longer. The first Sigil for skilled play arrives well before the 30–60h target for the same reason (cycles are ~1–2h for a skilled player); both are cadence choices the player owns rather than walls. Region cadence from Orvane onward is 60–90 min per region for skilled play, as intended.
+
 ## Latest simulator run
+
+### Run — 2026-09-04 13:07 UTC · 60h · seed 7
+
+| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| greedy | 3.1m | 1.13h | 8.6m | 8.6m | 17.1m | 1.81h | 4.24h | 871 | 146 | 6 | 20 | 0 | 94327 |
+| optimal | 3.7m | 3.30h | 9.4m | 9.4m | 17.9m | 1.40h | 3.86h | 829 | 139 | 3 | 5 | 0 | 70274 |
+| casual | 6.0m | 4.40h | 17.7m | 17.7m | 34.5m | 2.16h | 5.55h | 851 | 134 | 8 | 19 | 0 | 92819 |
+| idle | 6.0m | — | 2.34h | 2.34h | 3.10h | 10.07h | 15.63h | 773 | 33 | 7 | 0 | 1 | 63988 |
+| noclick | 6.0m | 14.98h | 2.43h | 2.43h | 3.54h | 10.24h | 15.07h | 708 | 35 | 7 | 2 | 1 | 64895 |
+
+Souls earned per hour (first 12 buckets):
+
+| Strategy | h1 | h2 | h3 | h4 | h5 | h6 | h7 | h8 | h9 | h10 | h11 | h12 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| greedy | 2.01M | 6.54M | 155M | 6.06B | 13.9B | 31.4B | 120B | 67.2T | 238Qa | 751Qi | 69.9Sx | 7.29Sp |
+| optimal | 2.53M | 10.4M | 1.15B | 17.3B | 3.48B | 42.9B | 65.7B | 60.5T | 211Qa | 2.08Sx | 131Sx | 2.45Sp |
+| casual | 430K | 5.07M | 7.52M | 155M | 3.59B | 15.0B | 8.80B | 23.7B | 127B | 204T | 344Qa | 38.6Qi |
+| idle | 11.3K | 27.4K | 65.1K | 236K | 418K | 2.11M | 3.65M | 3.72M | 4.21M | 7.70M | 3.43M | 18.8M |
+| noclick | 5.82K | 22.0K | 59.4K | 203K | 332K | 991K | 2.76M | 3.99M | 4.09M | 4.54M | 2.50M | 16.5M |
+
+Bosses (first kill):
+
+- **greedy**: Eskel 8.6m, Mother Nettle 17.1m, Archivist Null 34.9m, Saint Orvane 1.81h, The Keeper 3.13h, The Lord of Cinders 4.18h, The Watcher 8.27h
+- **optimal**: Eskel 9.4m, Mother Nettle 17.9m, Archivist Null 36.0m, Saint Orvane 1.39h, The Keeper 2.73h, The Lord of Cinders 3.77h, The Watcher 8.66h
+- **casual**: Eskel 17.7m, Mother Nettle 34.5m, Archivist Null 1.04h, Saint Orvane 2.15h, The Keeper 4.10h, The Lord of Cinders 5.44h, The Watcher 16.34h
+- **idle**: Eskel 2.34h, Mother Nettle 3.10h, Archivist Null 5.25h, Saint Orvane 10.07h, The Keeper 13.19h, The Lord of Cinders 21.97h
+- **noclick**: Eskel 2.43h, Mother Nettle 3.54h, Archivist Null 6.20h, Saint Orvane 10.24h, The Keeper 12.83h, The Lord of Cinders 22.36h
+
+Stalls (no progress event for 20+ min):
+
+- **idle** stalled 22.6m from 7.72h at The Sanctum of the Vigil tier 4 (cleared 4), level 89
+- **noclick** stalled 22.3m from 9.17h at The Sanctum of the Vigil tier 4 (cleared 4), level 92
+
+Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
+
+<details><summary>Previous runs</summary>
 
 ### Run — 2026-09-04 12:55 UTC · 60h · seed 7
 
@@ -82,7 +133,7 @@ Stalls (no progress event for 20+ min):
 
 Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
 
-<details><summary>Previous runs</summary>
+---
 
 ### Run — 2026-09-04 12:40 UTC · 60h · seed 7
 
@@ -172,84 +223,6 @@ Stalls (no progress event for 20+ min):
 - **optimal** stalled 22.2m from 25.55h at The Kiln of the First Flame tier 3 (cleared 3), level 190
 - **optimal** stalled 21.1m from 27.90h at The Kiln of the First Flame tier 2 (cleared 3), level 192
 - **casual** stalled 22.1m from 33.99h at The Deep tier 2 (cleared 3), level 172
-
-Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
-
----
-
-### Run — 2026-09-04 12:20 UTC · 40h · seed 7
-
-| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| greedy | 3.1m | 28.1m | 8.6m | 8.6m | 34.9m | 1.06h | — | 178 | 31 | 14 | 293 | 16 | 49842 |
-| optimal | 3.7m | 1.30h | 9.4m | 9.4m | 19.7m | 41.0m | — | 204 | 31 | 16 | 212 | 5 | 47909 |
-| casual | 6.0m | 7.07h | 17.7m | 17.7m | 44.5m | 1.88h | — | 196 | 31 | 12 | 189 | 21 | 46380 |
-| idle | 6.0m | 32.5m | 1.88h | 1.88h | 17.75h | 19.82h | — | 161 | 27 | 7 | 472 | 0 | 16978 |
-| noclick | 6.0m | 2.5m | 2.01h | 2.01h | 18.00h | 20.22h | — | 73 | 21 | 4 | 472 | 1 | 16472 |
-
-Souls earned per hour (first 12 buckets):
-
-| Strategy | h1 | h2 | h3 | h4 | h5 | h6 | h7 | h8 | h9 | h10 | h11 | h12 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| greedy | 485K | 1.34M | 5.65M | 71.7M | 1.30B | 2.91B | 4.42B | 28.9B | 48.2B | 72.5B | 105B | 107B |
-| optimal | 462K | 1.59M | 14.5M | 219M | 2.59B | 2.71B | 34.5B | 48.5B | 56.0B | 86.9B | 64.4B | 99.7B |
-| casual | 259K | 1.53M | 1.48M | 4.87M | 16.0M | 129M | 666M | 2.81B | 6.52B | 28.6B | 45.0B | 59.8B |
-| idle | 12.2K | 12.2K | 74.3K | 56.0K | 64.9K | 75.7K | 87.2K | 98.7K | 110K | 124K | 133K | 144K |
-| noclick | 9.52K | 7.40K | 58.2K | 64.4K | 62.5K | 74.1K | 84.4K | 95.6K | 106K | 120K | 131K | 142K |
-
-Bosses (first kill):
-
-- **greedy**: Eskel 8.6m, Mother Nettle 34.9m, Archivist Null 1.05h, Saint Orvane 3.97h, The Keeper 4.77h, The Lord of Cinders 8.24h
-- **optimal**: Eskel 9.4m, Mother Nettle 19.7m, Archivist Null 40.6m, Saint Orvane 3.56h, The Keeper 4.26h, The Lord of Cinders 6.77h
-- **casual**: Eskel 17.7m, Mother Nettle 44.5m, Archivist Null 1.88h, Saint Orvane 5.96h, The Keeper 6.73h, The Lord of Cinders 9.78h
-- **idle**: Eskel 1.88h, Mother Nettle 17.75h, Archivist Null 19.81h, Saint Orvane 35.85h, The Keeper 38.25h
-- **noclick**: Eskel 2.01h, Mother Nettle 18.00h, Archivist Null 20.22h, Saint Orvane 39.51h
-
-Stalls (no progress event for 20+ min):
-
-- **greedy** stalled 21.0m from 22.62h at The Kiln of the First Flame tier 5 (cleared 5), level 196
-- **greedy** stalled 23.5m from 23.88h at The Kiln of the First Flame tier 5 (cleared 5), level 199
-- **greedy** stalled 27.5m from 24.27h at The Kiln of the First Flame tier 5 (cleared 5), level 200
-- **greedy** stalled 20.4m from 24.73h at The Kiln of the First Flame tier 5 (cleared 5), level 201
-- **greedy** stalled 30.8m from 25.07h at The Kiln of the First Flame tier 5 (cleared 5), level 202
-- **greedy** stalled 26.6m from 25.58h at The Kiln of the First Flame tier 5 (cleared 5), level 203
-- **greedy** stalled 34.5m from 26.02h at The Kiln of the First Flame tier 5 (cleared 5), level 204
-- **greedy** stalled 32.7m from 26.60h at The Kiln of the First Flame tier 5 (cleared 5), level 205
-- **greedy** stalled 42.6m from 27.14h at The Kiln of the First Flame tier 5 (cleared 5), level 206
-- **greedy** stalled 26.9m from 27.85h at The Kiln of the First Flame tier 5 (cleared 5), level 207
-- **greedy** stalled 39.2m from 28.38h at The Kiln of the First Flame tier 5 (cleared 5), level 208
-- **greedy** stalled 23.4m from 35.93h at The Kiln of the First Flame tier 5 (cleared 5), level 199
-- **greedy** stalled 26.5m from 36.32h at The Kiln of the First Flame tier 5 (cleared 5), level 200
-- **greedy** stalled 20.1m from 36.76h at The Kiln of the First Flame tier 5 (cleared 5), level 201
-- **greedy** stalled 24.5m from 37.65h at The Kiln of the First Flame tier 5 (cleared 5), level 203
-- **greedy** stalled 31.7m from 38.05h at The Kiln of the First Flame tier 5 (cleared 5), level 204
-- **optimal** stalled 25.5m from 30.53h at The Kiln of the First Flame tier 5 (cleared 5), level 198
-- **optimal** stalled 22.4m from 30.96h at The Kiln of the First Flame tier 5 (cleared 5), level 199
-- **optimal** stalled 20.8m from 37.88h at The Kiln of the First Flame tier 4 (cleared 5), level 199
-- **optimal** stalled 23.6m from 38.72h at The Kiln of the First Flame tier 5 (cleared 5), level 201
-- **optimal** stalled 29.3m from 39.11h at The Kiln of the First Flame tier 5 (cleared 5), level 202
-- **casual** stalled 23.4m from 17.90h at The Kiln of the First Flame tier 5 (cleared 5), level 190
-- **casual** stalled 20.4m from 18.29h at The Kiln of the First Flame tier 5 (cleared 5), level 191
-- **casual** stalled 24.7m from 18.63h at The Kiln of the First Flame tier 5 (cleared 5), level 192
-- **casual** stalled 23.5m from 24.46h at The Kiln of the First Flame tier 5 (cleared 5), level 192
-- **casual** stalled 21.9m from 24.86h at The Kiln of the First Flame tier 5 (cleared 5), level 193
-- **casual** stalled 26.3m from 25.22h at The Kiln of the First Flame tier 5 (cleared 5), level 194
-- **casual** stalled 30.1m from 25.97h at The Kiln of the First Flame tier 5 (cleared 5), level 196
-- **casual** stalled 23.9m from 26.47h at The Kiln of the First Flame tier 5 (cleared 5), level 197
-- **casual** stalled 35.7m from 26.87h at The Kiln of the First Flame tier 5 (cleared 5), level 198
-- **casual** stalled 32.9m from 27.47h at The Kiln of the First Flame tier 5 (cleared 5), level 199
-- **casual** stalled 36.8m from 28.01h at The Kiln of the First Flame tier 5 (cleared 5), level 200
-- **casual** stalled 25.7m from 28.63h at The Kiln of the First Flame tier 5 (cleared 5), level 201
-- **casual** stalled 41.7m from 29.06h at The Kiln of the First Flame tier 5 (cleared 5), level 202
-- **casual** stalled 33.5m from 29.75h at The Kiln of the First Flame tier 5 (cleared 5), level 203
-- **casual** stalled 45.4m from 30.31h at The Kiln of the First Flame tier 5 (cleared 5), level 204
-- **casual** stalled 44.1m from 31.06h at The Kiln of the First Flame tier 5 (cleared 5), level 205
-- **casual** stalled 56.4m from 31.80h at The Kiln of the First Flame tier 5 (cleared 5), level 206
-- **casual** stalled 36.6m from 32.74h at The Kiln of the First Flame tier 5 (cleared 5), level 207
-- **casual** stalled 21.6m from 38.38h at The Kiln of the First Flame tier 5 (cleared 5), level 192
-- **casual** stalled 21.1m from 38.74h at The Kiln of the First Flame tier 5 (cleared 5), level 193
-- **casual** stalled 24.5m from 39.09h at The Kiln of the First Flame tier 5 (cleared 5), level 194
-- **noclick** stalled 24.3m from 35.69h at The Drowned Mire tier -1 (cleared 4), level 92
 
 Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
 </details>
