@@ -79,6 +79,20 @@ describe('boss mechanics', () => {
     const ev = advance(s, 0, [{ type: 'travel', zone: 'approach', tier: -3 }]);
     expect(ev.some((e) => e.type === 'error')).toBe(true);
   });
+  it('an open wound stops a regenerating boss from mending', () => {
+    const s = arena('approach', -2);
+    const e = s.encounter.enemy!;
+    expect(e.id).toBe('hangedPilgrim');
+    e.hp = e.hpMax.mul(0.5);
+    const before = e.hp;
+    advance(s, 2);
+    expect(e.hp.gt(before)).toBe(true); // regenerates untouched
+    e.hp = e.hpMax.mul(0.5);
+    e.mech.lastBleed = s.encounter.t; // a bleed just procced
+    const after = e.hp;
+    advance(s, 2);
+    expect(e.hp.lte(after)).toBe(true);
+  });
   it('every region has a cycle boss for cycles 1-5 and every zone chain unlocks in order', () => {
     const cycles = ZONE_ORDER.map((z) => cycleBossFor(z)?.cycle).filter((c) => c !== undefined).sort();
     expect(cycles).toEqual([1, 2, 3, 4, 5]);

@@ -218,6 +218,12 @@ export interface PrestigeState {
   bossesEverKilled: string[];
   /** per-cycle bonus bosses that have appeared */
   cycleBossesSpawned: string[];
+  /** the Abyss: current depth (persists; the stair remembers) and the record */
+  abyssDepth: number;
+  abyssRecord: number;
+  /** what the last Kindle / Sigil gathered: automation kindles when the next would beat it */
+  lastKindleGain: Decimal;
+  lastSigilGain: Decimal;
 }
 
 export interface AutomationState {
@@ -231,6 +237,7 @@ export interface AutomationState {
   autoKindleAt: number; // NG+ trigger: kindle when humanity gain >= threshold multiple
   autoSpells: boolean;
   autoAdvance: boolean;
+  autoSigil: boolean;
   /** unlocked automation features */
   unlocked: string[];
 }

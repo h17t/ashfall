@@ -112,4 +112,23 @@ export const ZONES: Record<string, ZoneDef> = {
   },
 };
 
-export const ZONE_ORDER: string[] = ['approach', 'mire', 'archive', 'sanctum', 'deep', 'kiln'];
+ZONES.abyss = {
+  id: 'abyss',
+  name: 'The Abyss',
+  region: 7,
+  materialTier: 4,
+  requires: 'lordOfCinders',
+  requiresUnlock: 'abyss',
+  endless: true,
+  boss: 'abyssWatcher',
+  tiers: [
+    { name: 'The First Dark', enemies: ['abyssCrawler', 'shadowOfTheLost', 'humanitySprite'], kills: 14 },
+    { name: 'Where the Road Ends', enemies: ['deepKnight', 'ashWraith'], kills: 16 },
+    { name: 'Unlit Halls', enemies: ['paleGaoler', 'cinderLordAsh', 'shadowOfTheLost'], kills: 16 },
+    { name: 'The Sleeping Shore', enemies: ['deepKnight', 'pyreGolem', 'humanitySprite'], kills: 18 },
+    { name: 'The Watcher\'s Stair', enemies: ['cinderLordAsh', 'deepKnight', 'flameShepherd'], kills: 20 },
+  ],
+  lore: 'Below the Kiln there is a stair, and the stair does not end. Every landing is a little darker and a little more crowded. Something at the bottom is watching you come down, and it has been counting the steps for longer than there have been steps.',
+};
+
+export const ZONE_ORDER: string[] = ['approach', 'mire', 'archive', 'sanctum', 'deep', 'kiln', 'abyss'];

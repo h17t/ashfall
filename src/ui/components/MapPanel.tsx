@@ -16,6 +16,7 @@ export const MapPanel = memo(function MapPanel() {
 
 function ZoneBlock({ zone }: { zone: string }) {
   const z = getZone(zone);
+  const depthOf = () => useGame.getState().state.prestige.abyssDepth;
   const cleared = useSel((s) => s.zones[zone]?.cleared ?? -1);
   const bossKills = useSel((s) => s.zones[zone]?.bossKills ?? 0);
   const secretFound = useSel((s) => s.zones[zone]?.secretFound ?? false);
@@ -27,7 +28,7 @@ function ZoneBlock({ zone }: { zone: string }) {
   return (
     <div className="border border-ash-700 rounded-sm p-2">
       <Tooltip tip={<span className="italic">{z.lore}</span>}>
-        <div className="font-display text-base text-bone-100 cursor-help">{z.name} <span className="text-[10px] uppercase tracking-widest text-bone-400 not-italic">Region {z.region}</span></div>
+        <div className="font-display text-base text-bone-100 cursor-help">{z.name} <span className="text-[10px] uppercase tracking-widest text-bone-400 not-italic">{z.endless ? `Dark Depth ${depthOf()}` : `Region ${z.region}`}</span></div>
       </Tooltip>
       <div className="flex flex-col gap-0.5 mt-1">
         {z.tiers.map((t, i) => <TierRow key={i} zone={zone} tier={i} name={t.name} cleared={cleared >= i} here={here} />)}
@@ -45,7 +46,8 @@ function TierRow({ zone, tier, name, cleared, here, boss }: { zone: string; tier
   const current = useSel((s) => here && s.encounter.tier === tier);
   const kills = useSel((s) => tier >= 0 ? (s.zones[zone]?.kills[tier] ?? 0) : 0);
   const need = tier >= 0 ? getZone(zone).tiers[tier].kills : 0;
-  const g = globalTier(zone, tier);
+  const depth = useSel((s) => s.prestige.abyssDepth);
+  const g = globalTier(zone, tier, depth);
   const ng = useSel((s) => ngLevel(s, computeMods(s)));
   const level = useSel((s) => s.player.level);
   const exp = expectedLevel(g, ng);

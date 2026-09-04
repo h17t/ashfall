@@ -5,7 +5,9 @@ import { canRecruit, phantomLevelCost, levelCost } from '@/engine';
 
 registerSimExtension((view, params, mem, out) => {
   const s = view.state;
-  if (view.t - ((mem.lastSquad as number) ?? -10) < 3) return;
+  const arenaChanged = (s.encounter.tier < 0) !== ((mem.wasArena as boolean) ?? false);
+  mem.wasArena = s.encounter.tier < 0;
+  if (!arenaChanged && view.t - ((mem.lastSquad as number) ?? -10) < 3) return;
   mem.lastSquad = view.t;
   const reserve = levelCost(s.player.level).mul(params.soulsReserve);
   // recruit anyone available
@@ -13,10 +15,12 @@ registerSimExtension((view, params, mem, out) => {
     if (!canRecruit(s, id) && s.souls.sub(PHANTOMS[id].recruitCost).gte(reserve)) { out.push({ type: 'recruit', phantom: id }); return; }
   }
   const active = params.clickRate > 0 && (params.clickUntil === undefined || view.t < params.clickUntil);
+  const inArena = s.encounter.tier < 0;
   for (const ph of s.squad.phantoms) {
     const def = getPhantom(ph.id);
-    // assignment: active players keep damage/stagger/buffer beside them; idle players send everyone hunting
-    const wantBeside = active && (def.role === 'dps' || def.role === 'stagger' || def.role === 'buffer');
+    // assignment: everyone stands beside you for a boss; otherwise active players keep damage/stagger/buffer
+    // beside them and idle players send everyone hunting
+    const wantBeside = inArena || (active && (def.role === 'dps' || def.role === 'stagger' || def.role === 'buffer'));
     const want = wantBeside ? 'beside' : 'hunt';
     if (ph.assignment !== want) out.push({ type: 'assignPhantom', phantom: ph.id, assignment: want });
     // gear: hand over the best weapon we are not wielding

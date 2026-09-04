@@ -52,6 +52,7 @@ export function kindle(state: GameState, events: GameEvent[], mods: Mods = compu
   const pr = state.prestige;
   pr.humanity = pr.humanity.add(gained);
   pr.humanityTotal = pr.humanityTotal.add(gained);
+  pr.lastKindleGain = gained;
   pr.kindles++;
   pr.cycleBossesSpawned = [];
   // ---- player ----
@@ -88,8 +89,8 @@ export function kindle(state: GameState, events: GameEvent[], mods: Mods = compu
   state.squad.killAcc = 0;
   state.squad.matAcc = {};
   state.squad.buff = { mult: 1, t: 0 };
-  // ---- covenant: standing stays, rites reset ----
-  state.covenant.upgrades = {};
+  // ---- covenant: standing stays, rites reset (unless Oaths Remembered) ----
+  if (!state.automation.unlocked.includes('keepRites')) state.covenant.upgrades = {};
   // ---- cycle stats ----
   state.stats.cycleSouls = ZERO;
   state.stats.cycleKills = ZERO;
@@ -99,6 +100,11 @@ export function kindle(state: GameState, events: GameEvent[], mods: Mods = compu
   state.flags.hasCatalyst = false;
   state.flags.hasFlame = false;
   state.flags.infusionUnlocked = false;
+  // Sigil gifts: the chime and the hexes return every cycle
+  if (mods.unlocks.has('hex')) {
+    state.flags.hexUnlocked = true;
+    state.player.weapons.abyssalChime = state.player.weapons.abyssalChime ?? { id: 'abyssalChime', level: mods.startWeaponLevel, infusion: 'none' };
+  }
   refreshPlayerMaxes(state, computeMods(state));
   events.push({ type: 'kindled', humanity: gained });
   events.push({ type: 'unlock', what: 'kindle', text: `New Game+${pr.kindles}. The world is crueler; so are you.` });

@@ -138,6 +138,11 @@ function emptyStatuses(): Record<StatusKey, { buildup: number; active: number; d
   };
 }
 
+/** Global tier of the current encounter, depth-aware for the Abyss. */
+export function gTier(state: GameState, zone: string, tier: number): number {
+  return globalTier(zone, tier, state.prestige.abyssDepth);
+}
+
 export function ngLevel(state: GameState, mods: Mods): number {
   return state.prestige.kindles * mods.ngScaling;
 }
@@ -145,7 +150,7 @@ export function ngLevel(state: GameState, mods: Mods): number {
 export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
   const enc = state.encounter;
   const zone = getZone(enc.zone);
-  const g = globalTier(enc.zone, enc.tier);
+  const g = gTier(state, enc.zone, enc.tier);
   const ng = ngLevel(state, mods);
   enc.t = 0;
   if (enc.tier < 0) {
@@ -183,7 +188,7 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
   const tier = zone.tiers[enc.tier];
   const defId = pick(state.rng, tier.enemies);
   const def = getEnemy(defId);
-  const variants = pickVariants(state, ng);
+  const variants = pickVariants(state, state.prestige.kindles);
   const vMult = variantMults(variants);
   const hp = tierHp(g, ng).mul(def.hpMult).mul(vMult.hp).floor();
   const souls = tierSouls(g, ng).mul(def.soulMult).mul(vMult.souls).floor();
@@ -224,7 +229,7 @@ function pickVariants(state: GameState, ng: number): string[] {
   const p = Math.min(0.6, 0.12 * ng);
   if (chance(state.rng, p)) {
     const eligible = Object.keys(VARIANTS).filter((k) => VARIANTS[k].minNg <= ng);
-    out.push(pick(state.rng, eligible));
+    if (eligible.length > 0) out.push(pick(state.rng, eligible));
   }
   return out;
 }
@@ -369,6 +374,7 @@ export function applyStatus(state: GameState, mods: Mods, events: GameEvent[], s
     events.push({ type: 'statusProc', status, target: 'enemy' });
     const b = BALANCE.status;
     if (status === 'bleed') {
+      enemy.mech.lastBleed = state.encounter.t; // an open wound keeps regenerating bosses from mending for 4s
       const burst = enemy.hpMax.mul(b.bleed.burstFrac * mods.statusDmg);
       damageEnemy(state, mods, events, burst, 'physical', 'dot', { kind: 'bleed' });
     } else if (status === 'poison') {
@@ -525,7 +531,7 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
   const enc = state.encounter;
   const enemy = enc.enemy!;
   const zone = getZone(enc.zone);
-  const g = globalTier(enc.zone, enc.tier);
+  const g = gTier(state, enc.zone, enc.tier);
   const zp = state.zones[enc.zone];
   const soulMult = mods.souls * buffMult(state.player.buffs, 'souls');
   const souls = safe(enemy.souls.mul(soulMult).floor());
@@ -600,14 +606,26 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
     if (enc.tier === -1) {
       const nz = nextZone(enc.zone);
       if (nz && !state.unlockedZones.includes(nz)) {
-        state.unlockedZones.push(nz);
-        events.push({ type: 'zoneUnlocked', zone: nz });
+        const req = getZone(nz).requiresUnlock;
+        if (!req || mods.unlocks.has(req)) {
+          state.unlockedZones.push(nz);
+          events.push({ type: 'zoneUnlocked', zone: nz });
+        }
+      }
+      if (zone.endless) {
+        // The stair goes on: descend, and the road resets one landing deeper.
+        state.prestige.abyssDepth++;
+        state.prestige.abyssRecord = Math.max(state.prestige.abyssRecord, state.prestige.abyssDepth);
+        zp.kills = zp.kills.map(() => 0);
+        zp.cleared = -1;
+        zp.bossKills = 0;
+        events.push({ type: 'unlock', what: 'abyss:' + state.prestige.abyssDepth, text: `You descend. Dark Depth ${state.prestige.abyssDepth}. The stair continues, and so does the Watcher.` });
       }
     }
     // Boss arena: after the kill, the arena is empty; player returns to the last tier
     enc.enemy = null;
     enc.respawnIn = 2.0;
-    enc.tier = zone.tiers.length - 1;
+    enc.tier = zone.endless && enc.tier === -1 ? 0 : zone.tiers.length - 1;
   } else {
     // tier progress
     zp.kills[enc.tier] = (zp.kills[enc.tier] ?? 0) + 1;
@@ -795,7 +813,7 @@ function beginTelegraph(state: GameState, mods: Mods) {
   let r = rand(state.rng) * totalW;
   let atk = attacks[0];
   for (const a of attacks) { r -= a.weight; if (r <= 0) { atk = a; break; } }
-  const g = globalTier(state.encounter.zone, state.encounter.tier);
+  const g = gTier(state, state.encounter.zone, state.encounter.tier);
   const ng = ngLevel(state, mods);
   const base = tierDmg(g, ng);
   let mult = atk.mult;

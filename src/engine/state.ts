@@ -69,11 +69,11 @@ export function newGame(seed = 1): GameState {
     covenant: { current: null, rep: {}, upgrades: {}, switches: 0 },
     prestige: {
       kindles: 0, humanity: ZERO, humanityTotal: ZERO, tree: {}, sigils: 0, sigilMarks: ZERO, sigilUnlocks: {},
-      darkLevel: 0, darkEmbers: ZERO, bossesEverKilled: [], cycleBossesSpawned: [],
+      darkLevel: 0, darkEmbers: ZERO, bossesEverKilled: [], cycleBossesSpawned: [], abyssDepth: 0, abyssRecord: 0, lastKindleGain: ZERO, lastSigilGain: ZERO,
     },
     automation: {
       autoAttack: false, autoRiposte: false, autoDodge: false, autoEstus: false, autoLevel: false, autoLevelStat: 'balanced',
-      autoKindle: false, autoKindleAt: 2, autoSpells: false, autoAdvance: false, unlocked: [],
+      autoKindle: false, autoKindleAt: 2, autoSpells: false, autoAdvance: false, autoSigil: false, unlocked: [],
     },
     stats: {
       kills: ZERO, deaths: 0, bossKills: 0, soulsEarned: ZERO, soulsLost: ZERO, clicks: 0, ripostes: 0, perfectDodges: 0, playTime: 0,

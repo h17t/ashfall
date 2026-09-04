@@ -3,7 +3,7 @@ import { useGame, useSel } from '../store';
 import { computeMods, STAT_NAMES, STAT_KEYS } from '@/engine';
 import { Tooltip } from './Tooltip';
 
-const FEATURES: { key: 'autoAttack' | 'autoRiposte' | 'autoDodge' | 'autoEstus' | 'autoLevel' | 'autoAdvance' | 'autoKindle' | 'autoSpells'; label: string; desc: string }[] = [
+const FEATURES: { key: 'autoAttack' | 'autoRiposte' | 'autoDodge' | 'autoEstus' | 'autoLevel' | 'autoAdvance' | 'autoKindle' | 'autoSpells' | 'autoSigil'; label: string; desc: string }[] = [
   { key: 'autoAttack', label: 'Attack', desc: 'Hollow Instinct: swings once a second (scaled by weapon speed) whenever stamina allows. Clicking adds on top.' },
   { key: 'autoRiposte', label: 'Riposte', desc: 'Strikes the Riposte window for you.' },
   { key: 'autoDodge', label: 'Dodge', desc: 'Perfect-dodges every telegraph the cooldown allows.' },
@@ -11,7 +11,8 @@ const FEATURES: { key: 'autoAttack' | 'autoRiposte' | 'autoDodge' | 'autoEstus' 
   { key: 'autoLevel', label: 'Level', desc: 'Spends souls on levels as soon as you can afford one.' },
   { key: 'autoAdvance', label: 'Advance', desc: 'Pushes into the next tier the moment one is cleared.' },
   { key: 'autoSpells', label: 'Spells', desc: 'Casts attuned spells whenever they are ready.' },
-  { key: 'autoKindle', label: 'Kindle', desc: 'Kindles automatically when the gathered Humanity would at least double what you hold.' },
+  { key: 'autoKindle', label: 'Kindle', desc: 'Kindles automatically when this cycle would gather at least double what the last Kindle gathered (and at least 10), after 20 minutes.' },
+  { key: 'autoSigil', label: 'Sigil', desc: 'Carves the Sigil automatically when it would gather at least 1.5× what the last Sigil gathered (and at least 5).' },
 ];
 
 /** Automation toggles. Only unlocked features are shown; each one was earned. */

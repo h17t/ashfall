@@ -293,3 +293,9 @@ Object.assign(WEAPONS, {
     lore: 'Not the first blade ever made. The blade the first fire made, when it wanted a shape to be dangerous in. Everything since has been an imitation. Including, arguably, you.',
   },
 } satisfies Record<string, WeaponDef>);
+
+WEAPONS.abyssalChime = {
+  id: 'abyssalChime', name: 'Abyssal Chime', archetype: 'catalyst', base: 900, damageType: 'dark', stamina: 8, stagger: 4, riposteMult: 2, crit: 0,
+  scaling: { int: 'C', fth: 'C' }, req: { int: 12, fth: 12 }, infusable: false, source: { kind: 'start' }, speed: 1.0, region: 5,
+  lore: 'A bell with no clapper. It rings anyway, when the dark wants it to. Given by the Sigil, and it is not clear the Sigil expects it back. Wielding it channels hexes.',
+};

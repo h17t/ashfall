@@ -156,3 +156,31 @@ Simulator: strategies now buy a catalyst, learn and cast, and swear by play styl
 **Humanity now compounds with depth** (×1.06 per deepest tier instead of +4%): the simulator's players were kindling at 40 minutes after three quick lords; now the first Kindle lands at 2.4h (skilled), 3.2h (casual), 3.5h (idle). Region cadence for a skilled player: 9m, 35m, 1.1h, 3.5h, 4.5h, 7h. The R3→R4 step is the long one; Milestone 12 will look at it.
 
 **Late-game stall (expected).** Past ~22 hours the greedy run sits at level ~200 on the Kiln floor in NG+14 waiting for levels that cost hours each. That is precisely the horizon the Dark Sigil (NG+5) and the Age of Dark exist for; Milestone 11 builds them.
+
+## Milestone 11 — deep meta
+
+**The Dark Sigil** (opens at NG+5). Marks = (lifetime Humanity this Sigil ÷ 25)^0.6 × √(NG+ ÷ 5) × (1 + 10% per Abyss depth record). Carving resets Humanity, the tree and the NG+ count and performs a Kindling on top; it keeps Marks, unlocks, standing, spells, boss-soul choices, phantoms and slots, automation, the depth record. The ledger in the panel is computed from real state, as with Kindling.
+
+**Sigil unlocks are structural, not stat pads** (fourteen of them): the Sixth Banner (6th phantom slot); the Dark Arts (Hex school, an Abyssal Chime handed over at the start of every cycle, three hexes: Dark Orb, *Dead Again* — ×2 souls for 20s — and Numbness); the Abyss; auto-Kindle and auto-spells; Deep Roots (keep 25/50/75% of tree ranks through a Sigil); Familiar Ash (start at NG+1/2/3); The Cruel World, Known (−10% NG+ scaling per rank); wider mind, longer night, sharper shades, and the two long sinks (Sigil Edge / Sigil Hunger, +20% each rank, five ranks).
+
+**The Abyss** is a seventh road below the Kiln with five tiers and the Watcher. Killing the Watcher *descends*: depth +1, the road resets, every tier is five global tiers harder, and the depth persists through Kindling (the stair remembers). Depth record feeds the Sigil formula. It is the endless treadmill for the player who has cleared everything, and it always has a boss at the end of it.
+
+**The Age of Dark** begins after three Sigils. Each Dark Level costs Marks (8 × 1.7^n) and is a permanent ×1.5 damage and souls, ×1.25 Humanity, plus a gift for the first five: auto-Kindle *and* auto-Sigil (the fire tends itself), rites that survive Kindling, the Abyss resuming at record depth, weapons surviving the Sigil, double Dark Embers. After the fifth gift the multiplier simply never stops; a 200-hour player always has the next Dark Level and the next landing.
+
+**The automation ladder, complete:** attack (tier 2 / 6 min) → riposte, dodge, estus, level, advance (Humanity tree) → spells, kindle (Sigil) → sigil (Age of Dark). Each is a toggle in the bar under the encounter and each was earned by playing the system it replaces.
+
+**Sim findings.** The idle path had 1,151 deaths in 60h because the policy pushed tiers at parity and never retreated; a real idle player parks somewhere safe, so the policy now pushes only when 6–8 levels over-levelled (deaths → 0). It then sat at Mother Nettle for 20 hours fighting alone with auto-attack; now every strategy calls the whole squad beside it inside an arena, and the idle tree priority buys the Bone reflexes first (auto-dodge is what gets an idle player past a lord). The two reflex nodes cost 4 instead of 6. Cycle cadence is player-driven; the simulator now waits 90 minutes of no progress before kindling, which stretches skilled cycles toward the spec's ~6h loop rather than the 40-minute churn of the first pass.
+
+## Milestone 12 — polish
+
+**Juice.** Impact flash and damage-scaled root shake (both off under *reduce effects* and the shake toggle); crit and riposte numbers in their own colour and size; the riposte moment gets a 0.65s time-dilation (every animation in the arena slows), a chromatic edge on the viewport, a stagger crack and a rising chime; death gets a slow "YOU DIED" freeze, an ash burst and a descending sting; boss deaths a long bell; the bonfire flame at the foot of the page grows with lords, Kindles and Sigils, and turns violet once the Sigil is carved. `prefers-reduced-motion` is honoured and a manual toggle exists.
+
+**Audio** is fully synthesized (`src/ui/audio.ts`): each cue is a tiny instrument built from oscillators, noise and envelopes. Off by default; the first pointer event primes the context once the player opts in.
+
+**Onboarding teaches by playing.** Eleven contextual hints, each appearing in the moment it matters (first strike, first telegraph, first stagger, exhaustion, first affordable level, first death, first cleared tier, first affordable phantom, the open arena, the first offline stretch, the first Kindle) and dismissing itself when the player does the thing. Seen hints are remembered outside the save. No text wall anywhere.
+
+**Bestiary.** Every foe met, with lore and its resistances; lords stay veiled until felled. Kept through Kindling and the Sigil, as knowledge should be.
+
+**Performance.** The engine tick with six phantoms, a DoT, a boss and every automation on costs 0.02ms (benchmark in `scripts/bench.ts`). Every component selects primitives from the store, so a tick re-renders only what changed; floating numbers are capped at thirty.
+
+**Auto-Kindle found a real bug.** After the first Sigil the simulator's players kindled every minute for fifty hours: the automation compared the gain with *held* Humanity, which a sensible player spends to zero. It now compares with what the *previous* Kindle gathered (×2, minimum 10, after 20 minutes), so each automatic cycle must beat the last and the cadence spaces itself. Auto-Sigil uses the same shape (×1.5, minimum 5).

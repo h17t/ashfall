@@ -123,7 +123,7 @@ export function huntTargets(state: GameState): { zone: string; tier: number }[] 
 export function evaluateHunt(state: GameState, mods: Mods, hunters: PhantomState[], zone: string, tier: number): HuntReport {
   const z = getZone(zone);
   const t = z.tiers[Math.max(0, Math.min(tier, z.tiers.length - 1))];
-  const g = globalTier(zone, tier);
+  const g = globalTier(zone, tier, state.prestige.abyssDepth);
   const ng = ngLevel(state, mods);
   const defs = t.enemies.map(getEnemy);
   const avg = (f: (e: ReturnType<typeof getEnemy>) => number) => defs.reduce((a, e) => a + f(e), 0) / defs.length;

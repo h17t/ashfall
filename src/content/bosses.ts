@@ -204,4 +204,15 @@ export const BOSSES: Record<string, BossDef> = {
     ],
     lore: 'The sun the Vigil waited for. It rose, once, in the fifth burning, and looked at the world, and went down into the Deep instead. It has been down there since, and it is not coming back up, and it does not want visitors.',
   },
+  abyssWatcher: {
+    id: 'abyssWatcher', name: 'The Watcher', title: 'At the Bottom of the Stair', zone: 'abyss', secret: false, noSoul: true,
+    hpMult: 1.3, dmgMult: 1.2, poiseMult: 1.5, soulMult: 1.6, soulWeapon: 'abyssGreatsword', soulSpell: 'darkOrb',
+    drops: { darkEmber: 6, slab: 2, soulVessel: 1 }, shape: 'wraith',
+    phases: [
+      { name: 'Watching', at: 1.0, attackInterval: 3.2, attacks: [atk('gaze', 'Gaze', 1.2, 1.8, 3), atk('descent', 'Descent', 1.9, 3.0, 1)], resist: { dark: 0.2, magic: 0.7, fire: 0.9 }, mechanic: 'blind', mechParam: 1, text: 'It has watched you all the way down. Now it watches from inside the dark. Count the blows.' },
+      { name: 'Counting', at: 0.6, attackInterval: 2.8, attacks: [atk('gaze', 'Gaze', 1.0, 2.0, 3), atk('descent', 'Descent', 1.6, 3.4, 2)], resist: { dark: 0.2, magic: 0.7 }, mechanic: 'staggerOnly', mechParam: 0.15, text: 'It braces on the last step. Only a broken stance moves it.' },
+      { name: 'Deeper', at: 0.3, attackInterval: 2.4, attacks: [atk('gaze', 'Gaze', 0.8, 2.2, 3), atk('descent', 'Descent', 1.3, 3.8, 2)], resist: { dark: 0.15, magic: 0.7 }, mechanic: 'enrage', mechParam: 0.016, text: 'It steps back into the dark, and the stair goes on. So must you.' },
+    ],
+    lore: 'Every stair has a bottom, and at the bottom of this one something waits that has never once been reached. When you strike it down the stair simply continues, and it is waiting again, one landing further, a little larger. It does not mind. It has all the depth in the world.',
+  },
 };

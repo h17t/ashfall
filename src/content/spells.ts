@@ -210,3 +210,25 @@ Object.assign(SPELLS, UPCOMING_SPELLS, {
     lore: 'The fire before it had a name, in your hand, for one moment. Everything it touches is fuel. Everything. Be careful what you point it at, and be quick.',
   },
 } satisfies Record<string, SpellDef>);
+
+// ---------------- Hexes (Dark Sigil) ----------------
+Object.assign(SPELLS, {
+  darkOrb: {
+    id: 'darkOrb', name: 'Dark Orb', school: 'hex', fp: 18, cooldown: 5, req: { int: 12, fth: 12 },
+    effect: { kind: 'damage', mult: 22, type: 'dark' },
+    source: { kind: 'sigil' },
+    lore: 'A sphere of the dark, thrown. It does not burn or cut. It removes. What it hits is somewhat less there afterwards.',
+  },
+  deadAgain: {
+    id: 'deadAgain', name: 'Dead Again', school: 'hex', fp: 36, cooldown: 40, req: { int: 16, fth: 16 },
+    effect: { kind: 'buff', buff: { souls: 2.0 }, duration: 20 },
+    source: { kind: 'sigil' },
+    lore: 'The hex that makes a corpse die a second time, and give up what it kept from the first. Twenty seconds of it are worth an hour of honest work, which is why it is a hex.',
+  },
+  numbness: {
+    id: 'numbness', name: 'Numbness', school: 'hex', fp: 28, cooldown: 45, req: { int: 14, fth: 14 },
+    effect: { kind: 'buff', buff: { taken: 0.55 }, duration: 20 },
+    source: { kind: 'sigil' },
+    lore: 'The dark, borrowed for a while, so that blows land on something that is not entirely you. It wears off. What was numb remembers all at once.',
+  },
+} satisfies Record<string, SpellDef>);

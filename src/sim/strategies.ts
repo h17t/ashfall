@@ -94,15 +94,32 @@ function bestOwnedWeapon(view: SimView): string {
   const s = view.state;
   let best = s.player.weapon;
   let bestScore = -1;
+  // Reading the boss: a regenerating lord needs an open wound. Prefer a status it cannot shrug off.
+  const enemy = s.encounter.enemy;
+  const boss = enemy?.isBoss ? BOSSES[enemy.id] : null;
+  const ph = boss ? boss.phases[enemy!.phase] : null;
+  const needsStatus = !!ph && ph.mechanic === 'regen';
+  const resists = (st: string) => (ph?.statusResist?.[st as 'bleed'] ?? 1) <= 0;
   for (const id of Object.keys(s.player.weapons)) {
     const br = weaponDamage(s, view.mods, id);
     const def = getWeapon(id);
+    if (def.archetype === 'catalyst') continue;
     // damage per stamina point, weighted towards raw hit for boss-killing
-    const score = br.total.toNumber() * (0.6 + 0.4 * (10 / def.stamina)) * (1 + def.stagger / 40);
+    let score = br.total.toNumber() * (0.6 + 0.4 * (10 / def.stamina)) * (1 + def.stagger / 40);
+    if (needsStatus) {
+      const inst = s.player.weapons[id];
+      const statuses = { ...(def.status ?? {}) } as Record<string, number>;
+      const inf = inst.infusion !== 'none' ? (BALANCE_INFUSION[inst.infusion]?.status as string | undefined) : undefined;
+      if (inf) statuses[inf] = (statuses[inf] ?? 0) + 20;
+      const usable = Object.keys(statuses).some((st) => !resists(st));
+      score *= usable ? 4 : 0.25;
+    }
     if (score > bestScore) { bestScore = score; best = id; }
   }
   return best;
 }
+import { BALANCE } from '@/content/balance';
+const BALANCE_INFUSION = BALANCE.weapon.infusion;
 
 export function makePolicy(params: PolicyParams): Strategy {
   const mem: PolicyMemory = { clickAcc: 0, lastTelegraphT: -1, dodgeDecided: false, bossDeathLevel: -1, bossDeathBoss: null, lastEcon: -10, lastNav: -10 };
@@ -215,7 +232,7 @@ export function makePolicy(params: PolicyParams): Strategy {
             if (!travelBlocked(s, nz, 0)) out.push({ type: 'travel', zone: nz, tier: 0 });
           } else if (tier >= 0 && zp.cleared >= tier && tier < lastTier) {
             // push when strong enough
-            const g = globalTier(zoneId, tier + 1);
+            const g = globalTier(zoneId, tier + 1, s.prestige.abyssDepth);
             if (p.level >= expectedLevel(g, s.prestige.kindles) - params.pushLead && !travelBlocked(s, zoneId, tier + 1)) out.push({ type: 'travel', zone: zoneId, tier: tier + 1 });
           } else if (tier >= 0 && zp.cleared >= lastTier && !bossDone) {
             // boss attempt gating
@@ -252,13 +269,13 @@ export const STRATEGIES: Record<string, () => Strategy> = {
     levelPlan: 'balanced', soulsReserve: 0, pushLead: 2, bossRetryLevels: 3, respectsMechanics: false,
   }),
   idle: () => makePolicy({
-    id: 'idle', description: 'Clicks for the first 8 minutes to bootstrap, then relies on auto-attack and the squad.',
-    clickRate: 2.5, clickUntil: 8 * 60, dodgeSkill: 0.3, perfectSkill: 0.1, riposteAware: false, estusAt: 0.4, retreatAt: 0,
-    levelPlan: 'balanced', soulsReserve: 0, pushLead: 0, bossRetryLevels: 4, respectsMechanics: false,
+    id: 'idle', description: 'Clicks for the first 8 minutes to bootstrap, then relies on auto-attack and the squad; only pushes when safely over-levelled.',
+    clickRate: 2.5, clickUntil: 8 * 60, dodgeSkill: 0.3, perfectSkill: 0.1, riposteAware: false, estusAt: 0.4, retreatAt: 0.3,
+    levelPlan: 'balanced', soulsReserve: 0, pushLead: -6, bossRetryLevels: 4, respectsMechanics: false,
   }),
   noclick: () => makePolicy({
     id: 'noclick', description: 'Never clicks. Measures the pure idle floor: auto-attack (from 6 min) and phantoms.',
-    clickRate: 0, dodgeSkill: 0.4, perfectSkill: 0.1, riposteAware: false, estusAt: 0.4, retreatAt: 0,
-    levelPlan: 'balanced', soulsReserve: 0, pushLead: 0, bossRetryLevels: 4, respectsMechanics: false,
+    clickRate: 0, dodgeSkill: 0.4, perfectSkill: 0.1, riposteAware: false, estusAt: 0.4, retreatAt: 0.3,
+    levelPlan: 'balanced', soulsReserve: 0, pushLead: -8, bossRetryLevels: 4, respectsMechanics: false,
   }),
 };

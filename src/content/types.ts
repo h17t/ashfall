@@ -134,6 +134,10 @@ export interface ZoneDef {
   lore: string;
   /** material family dropped here */
   materialTier: number;
+  /** endless zone: every boss kill descends one depth; tiers re-scale by depth × tier count */
+  endless?: boolean;
+  /** requires this sigil unlock as well as the boss */
+  requiresUnlock?: string;
 }
 
 export interface SpellDef {

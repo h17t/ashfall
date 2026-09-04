@@ -61,10 +61,11 @@ const zoneOffsets: Record<string, number> = {};
 /**
  * Global tier index for (zone, tier). tier -1 (boss) and -2 (secret boss) use the zone's last tier.
  */
-export function globalTier(zone: string, tier: number): number {
+export function globalTier(zone: string, tier: number, depth = 0): number {
   const z = getZone(zone);
-  if (tier < 0) return zoneOffsets[zone] + z.tiers.length - 1;
-  return zoneOffsets[zone] + Math.min(tier, z.tiers.length - 1);
+  const d = z.endless ? depth * z.tiers.length : 0;
+  if (tier < 0) return zoneOffsets[zone] + z.tiers.length - 1 + d;
+  return zoneOffsets[zone] + Math.min(tier, z.tiers.length - 1) + d;
 }
 
 export function zoneOffset(zone: string): number {
@@ -90,6 +91,7 @@ export function validateContent(): string[] {
     if (z.secretBoss && !BOSSES[z.secretBoss]) errs.push(`zone ${z.id} secret boss ${z.secretBoss} missing`);
     if (z.phantom && !PHANTOMS[z.phantom]) errs.push(`zone ${z.id} phantom ${z.phantom} missing`);
     if (z.requires && !BOSSES[z.requires]) errs.push(`zone ${z.id} requires ${z.requires} missing`);
+    if (z.requiresUnlock && !SIGIL_UNLOCKS[z.requiresUnlock]) errs.push(`zone ${z.id} requiresUnlock ${z.requiresUnlock} missing`);
     z.tiers.forEach((t, i) => t.enemies.forEach((e) => { if (!ENEMIES[e]) errs.push(`zone ${z.id} tier ${i} enemy ${e} missing`); }));
     if (!ZONE_ORDER.includes(z.id)) errs.push(`zone ${z.id} not in ZONE_ORDER`);
   }
