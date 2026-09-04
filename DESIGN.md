@@ -37,3 +37,15 @@ Enemy HP grows ×1.55 per global tier, souls ×1.5, damage ×1.2, level cost ×1
 ## Milestone 1 note
 
 Skeleton is in place and exceeds the M1 brief: the combat state shape for M3 (stagger, riposte, dodge, Estus, death, bloodstain, corpse run) was built at the same time because the enemy/player structs would have been rewritten otherwise. What is *not* here yet: the simulator, tests, level-up UI, weapon UI, zone navigation UI, bonfire, save system.
+
+## Milestone 2 — engine + simulator
+
+**Simulator shape.** `src/sim/harness.ts` drives `step()` at 10Hz with a `Strategy` that returns actions each tick. One policy function, five parameterizations (greedy / optimal / casual / idle / noclick), so every later system plugs into all strategies through `registerSimExtension`. 200 simulated hours take ~20s. Metrics: time to auto-attack, first death, each boss, each region, Kindle, Sigil; souls per hour; deaths; stalls (no progress event for 20 min); economy invariants each hour.
+
+**Why strategies gate boss attempts by level.** Real players who die to a boss go farm. The policy remembers the level at which it died to a boss and retries after +N levels (greedy 2, casual 3). Without that memory the sim throws itself at the boss forever and reports nonsense.
+
+**First tuning pass.** Enemy damage 9 → 20 (nobody died in the first hour). Boss HP 14× → 30× and boss damage 1.6× → 2.4× the tier baseline: the first boss must be a *wall*. Result: greedy beats Eskel at 12.5 min with no deaths (perfect dodges carry it), casual dies once at 21 min and wins at 31 min. That is the "feel clever about how you beat it" curve we want: the wall is skill-and-preparation, not a number.
+
+**Auto-attack unlock** is the earlier of: clearing the second tier, or 6 minutes of play. The time fallback exists so the no-click floor is not zero; pillar 6 says the unlock arrives inside 10 minutes and this guarantees it.
+
+**Tests.** 51 tests: formulas, damage, stamina, stagger/riposte, telegraphs/perfect dodge, Estus, death/bloodstain/corpse run, leveling, weapons, content integrity (references + placeholder scan), 12-seed random-action property test on economy invariants, and pacing tests that fail the build if the first boss leaves its window.

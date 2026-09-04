@@ -9,7 +9,7 @@ export const BALANCE = {
   enemy: {
     hpBase: 60,
     hpGrowth: 1.55, // per global tier
-    dmgBase: 9,
+    dmgBase: 20,
     dmgGrowth: 1.2,
     poiseBase: 26,
     poiseGrowth: 1.12,
@@ -17,11 +17,11 @@ export const BALANCE = {
     soulGrowth: 1.5,
     respawnDelay: 0.6,
     /** boss HP as multiple of its zone's last-tier baseline */
-    bossHpMult: 14,
-    bossDmgMult: 1.6,
+    bossHpMult: 30,
+    bossDmgMult: 2.4,
     bossPoiseMult: 4,
     bossSoulMult: 40,
-    secretBossHpMult: 22,
+    secretBossHpMult: 45,
     secretBossSoulMult: 70,
   },
 

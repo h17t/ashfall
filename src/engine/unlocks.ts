@@ -11,7 +11,7 @@ export function checkUnlocks(state: GameState, mods: Mods, events: GameEvent[]) 
   const f = state.flags;
   const first = ensureZone(state, ZONE_ORDER[0]);
   // Auto-attack: the ember learns your rhythm after the second tier of the first region.
-  if (!f.autoAttack && (first.cleared >= 1 || state.prestige.kindles > 0)) {
+  if (!f.autoAttack && (first.cleared >= 1 || state.prestige.kindles > 0 || state.stats.playTime >= 360)) {
     f.autoAttack = true;
     state.automation.unlocked.push('autoAttack');
     state.automation.autoAttack = true;

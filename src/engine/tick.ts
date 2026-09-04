@@ -42,6 +42,10 @@ export function advance(state: GameState, seconds: number, actions: Action[] = [
   const all: GameEvent[] = [];
   let first = true;
   let remaining = seconds;
+  if (seconds <= 0) {
+    // zero-length step: apply actions without advancing time
+    return step(state, 0, actions).events;
+  }
   while (remaining > 1e-9) {
     const dt = Math.min(BALANCE.tick, remaining);
     const r = step(state, dt, first ? actions : []);
