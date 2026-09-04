@@ -123,7 +123,7 @@ function summarize(s: any, id: string) {
   if (!owned) delete s.player.weapons[id];
   const grades: Record<string, string> = {};
   for (const p of b.scalingParts) grades[p.stat] = p.grade;
-  return { total: b.total.toString(), base: b.base, reinforce: b.reinforce, scaling: b.scaling, parts: b.scalingParts, infusion: b.infusion, reqPenalty: b.reqPenalty, buffs: b.buffs, mods: b.mods, type: b.type, crit: b.crit, riposte: b.riposte, grades };
+  return { total: b.total.toString(), base: b.base, reinforce: b.reinforce, scaling: b.scaling, parts: b.scalingParts, infusion: b.infusion, reqPenalty: b.reqPenalty, buffs: b.buffs, mods: b.mods, level: b.level, type: b.type, crit: b.crit, riposte: b.riposte, grades };
 }
 
 function DamageTip({ b }: { b: ReturnType<typeof summarize> }) {
@@ -136,6 +136,7 @@ function DamageTip({ b }: { b: ReturnType<typeof summarize> }) {
       {b.reqPenalty !== 1 && <div className="text-blood-500">× unmet requirement {b.reqPenalty}</div>}
       {b.buffs !== 1 && <div className="text-ember-400">× buffs {b.buffs.toFixed(2)}</div>}
       {b.mods !== 1 && <div className="text-ember-400">× permanent bonuses {b.mods.toFixed(2)}</div>}
+      <div>× soul level {b.level.toFixed(2)} (+2.5% per level)</div>
       <div className="border-t border-ash-700 mt-1 pt-1">= {fmt(D(b.total))} per hit (±8%)</div>
     </div>
   );

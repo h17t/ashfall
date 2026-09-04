@@ -79,6 +79,11 @@ export function playerHpMax(vig: number, level: number, hpMult: number): number 
   return Math.floor(base * Math.pow(p.hpPerLevel, Math.max(0, level - 1)) * hpMult);
 }
 
+/** Ember hardening for damage: every soul level multiplies damage. Stats and grades decide *which* damage. */
+export function levelDamageMult(level: number): number {
+  return Math.pow(BALANCE.player.dmgPerLevel, Math.max(0, level - 1));
+}
+
 export function playerStaminaMax(end: number): number {
   const p = BALANCE.player;
   return Math.floor(p.staminaBase + statCurve(end) * 40 * p.staminaPerEnd);

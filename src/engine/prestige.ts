@@ -20,7 +20,8 @@ export function humanityPreview(state: GameState, mods: Mods = computeMods(state
   if (souls.lte(0)) return ZERO;
   const base = souls.div(b.humanityDivisor).pow(b.humanityExponent);
   const bossBonus = Math.pow(b.humanityPerBoss, state.stats.cycleBosses);
-  const depth = 1 + state.stats.cycleDeepest * 0.04;
+  // Depth compounds: pushing one tier deeper before kindling is worth ~6% more Humanity.
+  const depth = Math.pow(1.06, state.stats.cycleDeepest);
   return safe(base.mul(bossBonus).mul(depth).mul(mods.humanityMult).floor());
 }
 

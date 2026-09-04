@@ -8,7 +8,7 @@ import { playerHpMax, playerStaminaMax, playerFpMax } from './formulas';
 export const SAVE_VERSION = 1;
 
 export function newZoneProgress(tierCount: number): ZoneProgress {
-  return { kills: new Array(tierCount).fill(0), cleared: -1, bossKills: 0, secretKills: 0, secretFound: false };
+  return { kills: new Array(tierCount).fill(0), cleared: -1, bossKills: 0, secretKills: 0, cycleKills: 0, secretFound: false };
 }
 
 export function newPlayer(): PlayerState {

@@ -136,3 +136,185 @@ export const ENEMIES: Record<string, EnemyDef> = {
     lore: 'What rises when a pyre is put out before it is finished. It has no body to bleed and no blood to poison. It has only a grudge, and grudges burn very well.',
   },
 };
+
+// ---------------- Region 2: The Drowned Mire ----------------
+Object.assign(ENEMIES, {
+  bogLeech: {
+    id: 'bogLeech', name: 'Bog Leech', hpMult: 0.6, dmgMult: 0.7, poiseMult: 0.4, attackInterval: 2.4,
+    attacks: [A.bite(0.6), A.spit(0.5)], resist: { fire: 1.4 }, statusResist: { poison: 0, bleed: 1.5 }, soulMult: 0.7,
+    drops: { shard: 0.06, largeShard: 0.02 }, shape: 'beast',
+    lore: 'Grown fat on the drowned. It has no eyes and needs none; it knows where you are by the warmth, and it has never once been wrong.',
+  },
+  mireHollow: {
+    id: 'mireHollow', name: 'Mire Hollow', hpMult: 1.0, dmgMult: 1.0, poiseMult: 1.0, attackInterval: 3.2,
+    attacks: [A.slash(1.0), A.spit(0.7)], resist: { fire: 1.3 }, statusResist: { poison: 0.2 }, soulMult: 1.0,
+    drops: { shard: 0.1, largeShard: 0.04 }, shape: 'humanoid',
+    lore: 'A pilgrim who reached the Mire and lay down in it. The water kept what the fire would have taken. It still has most of a face.',
+  },
+  rottingKnight: {
+    id: 'rottingKnight', name: 'Rotting Knight', hpMult: 1.7, dmgMult: 1.3, poiseMult: 2.4, attackInterval: 4.0,
+    attacks: [A.heavy(1.9), A.slash(1.1)], resist: { physical: 0.85, fire: 1.3 }, statusResist: { poison: 0, bleed: 0.6 }, soulMult: 1.6,
+    drops: { largeShard: 0.1, shard: 0.08 }, shape: 'knight',
+    lore: 'Armour holds a knight together long after the knight has stopped holding anything. The rot inside has learned to swing a sword. It swings it badly, and very hard.',
+  },
+  drownedChorister: {
+    id: 'drownedChorister', name: 'Drowned Chorister', hpMult: 0.9, dmgMult: 1.4, poiseMult: 0.7, attackInterval: 3.8,
+    attacks: [A.wail(1.3), A.jab(0.5)], resist: { physical: 0.7, magic: 1.3, lightning: 0.6 }, statusResist: { bleed: 0, frost: 1.4 }, soulMult: 1.5,
+    drops: { largeShard: 0.08, coal: 0.02 }, shape: 'wraith',
+    lore: 'The Sunken Chapel\'s choir, still singing. The water carries the hymn a long way. Those who follow it arrive at the choir, and then, some time later, join it.',
+  },
+  fenStalker: {
+    id: 'fenStalker', name: 'Fen Stalker', hpMult: 1.1, dmgMult: 1.5, poiseMult: 0.9, attackInterval: 2.6,
+    attacks: [A.lunge(1.5), A.bite(0.8)], resist: { magic: 0.8 }, statusResist: { frost: 1.3 }, soulMult: 1.4,
+    drops: { largeShard: 0.09, shard: 0.05 }, shape: 'beast',
+    lore: 'Something that was a hound, before the Mire, and is now mostly teeth and patience. It waits under the reeds. It can wait longer than you can stand still.',
+  },
+  rotwoodTreant: {
+    id: 'rotwoodTreant', name: 'Rotwood Warden', hpMult: 2.2, dmgMult: 1.6, poiseMult: 3.0, attackInterval: 4.6,
+    attacks: [A.heavy(2.2), { id: 'sweep', name: 'Root Sweep', windup: 1.4, mult: 1.4, weight: 2 }], resist: { physical: 0.8, fire: 1.6, magic: 0.9 }, statusResist: { poison: 0, bleed: 0.4, frost: 1.2 }, soulMult: 2.2,
+    drops: { largeShard: 0.14, coal: 0.03 }, shape: 'knight',
+    lore: 'A tree that drank from the Mire for a century and grew a grudge. It moves slowly, which is a mercy, and hits like a falling tree, which is not.',
+  },
+  // ---------------- Region 3: The Archive of Null ----------------
+  archiveScribe: {
+    id: 'archiveScribe', name: 'Archive Scribe', hpMult: 0.7, dmgMult: 1.3, poiseMult: 0.5, attackInterval: 3.4,
+    attacks: [{ id: 'bolt', name: 'Soul Bolt', windup: 1.2, mult: 1.3, weight: 3 }, A.jab(0.4)], resist: { magic: 0.6, physical: 1.1 }, statusResist: {}, soulMult: 1.1,
+    drops: { largeShard: 0.08, coal: 0.02 }, shape: 'robed',
+    lore: 'Copyists who copied until the copying was all that was left of them. Their bolts are quotations. They have not had an original thought in an age, and they resent yours.',
+  },
+  boundTome: {
+    id: 'boundTome', name: 'Bound Tome', hpMult: 0.8, dmgMult: 1.1, poiseMult: 0.6, attackInterval: 2.8,
+    attacks: [{ id: 'snap', name: 'Snap', windup: 0.7, mult: 0.9, weight: 3 }, { id: 'page', name: 'Page Storm', windup: 1.3, mult: 1.4, weight: 1 }], resist: { magic: 0.3, fire: 1.8, physical: 1.0 }, statusResist: { bleed: 0, poison: 0 }, soulMult: 1.2,
+    drops: { largeShard: 0.08 }, shape: 'wraith',
+    lore: 'A book chained shut, which is not the same as a book closed. Whatever is written inside wants very badly to be read, and has found a way to turn its own pages.',
+  },
+  nullCustodian: {
+    id: 'nullCustodian', name: 'Null Custodian', hpMult: 1.9, dmgMult: 1.3, poiseMult: 2.8, attackInterval: 4.2,
+    attacks: [A.heavy(1.9), A.slash(1.0)], resist: { physical: 0.6, magic: 1.3, lightning: 1.2 }, statusResist: { poison: 0.5, frost: 0.7 }, soulMult: 1.8,
+    drops: { largeShard: 0.12, chunk: 0.02 }, shape: 'shield',
+    lore: 'Armoured in plates inscribed with the one word the Archive was built to protect. No one may read it. The custodians have long since stopped being able to.',
+  },
+  crystalHollow: {
+    id: 'crystalHollow', name: 'Crystal Hollow', hpMult: 1.2, dmgMult: 1.4, poiseMult: 1.2, attackInterval: 3.4,
+    attacks: [{ id: 'shard', name: 'Crystal Shard', windup: 1.0, mult: 1.3, weight: 3 }, A.slash(1.0)], resist: { magic: 0.5, physical: 0.9, fire: 1.3 }, statusResist: { frost: 0, bleed: 0.5 }, soulMult: 1.5,
+    drops: { largeShard: 0.1, chunk: 0.03 }, shape: 'humanoid',
+    lore: 'Sorcerers who studied the crystal until the crystal studied them back. They no longer feel the cold. They are, in the most literal sense, the cold.',
+  },
+  silencedScholar: {
+    id: 'silencedScholar', name: 'Silenced Scholar', hpMult: 1.0, dmgMult: 1.7, poiseMult: 0.8, attackInterval: 3.8,
+    attacks: [{ id: 'unword', name: 'Unword', windup: 1.6, mult: 2.0, weight: 2 }, A.jab(0.5)], resist: { magic: 0.7, dark: 0.5 }, statusResist: { bleed: 0.8 }, soulMult: 1.7,
+    drops: { largeShard: 0.1, chunk: 0.03, coal: 0.03 }, shape: 'robed',
+    lore: 'They read the word. The Archive removed their mouths, as it must. It did not think to remove their hands, and the hands remember how to write it in the air.',
+  },
+  // ---------------- Region 4: The Sanctum of the Vigil ----------------
+  vigilAcolyte: {
+    id: 'vigilAcolyte', name: 'Vigil Acolyte', hpMult: 0.9, dmgMult: 1.1, poiseMult: 0.8, attackInterval: 3.2,
+    attacks: [A.slash(1.0), { id: 'spark', name: 'Spark', windup: 1.0, mult: 1.2, weight: 2 }], resist: { lightning: 0.5 }, statusResist: {}, soulMult: 1.0,
+    drops: { largeShard: 0.06, chunk: 0.04 }, shape: 'robed',
+    lore: 'Initiates of the Vigil, keeping a watch that was supposed to last a night and has lasted an age. They are very tired, and very devout, and both make them dangerous.',
+  },
+  sanctumKnight: {
+    id: 'sanctumKnight', name: 'Sanctum Knight', hpMult: 1.8, dmgMult: 1.5, poiseMult: 2.6, attackInterval: 3.8,
+    attacks: [{ id: 'thrust', name: 'Lightning Thrust', windup: 1.1, mult: 1.6, weight: 3 }, A.heavy(2.0)], resist: { lightning: 0.4, physical: 0.8, dark: 1.3 }, statusResist: { poison: 0.5 }, soulMult: 1.7,
+    drops: { chunk: 0.08, largeShard: 0.06 }, shape: 'knight',
+    lore: 'Knights sworn to the Lantern. Their spears carry the storm. They believe that when the Vigil ends the sun will rise, and they intend to be standing when it does.',
+  },
+  lanternBearer: {
+    id: 'lanternBearer', name: 'Lantern Bearer', hpMult: 1.1, dmgMult: 1.2, poiseMult: 1.0, attackInterval: 3.6,
+    attacks: [{ id: 'flare', name: 'Lantern Flare', windup: 1.4, mult: 1.5, weight: 2 }, A.jab(0.6)], resist: { lightning: 0.5, fire: 0.7, dark: 1.5 }, statusResist: { frost: 0.6 }, soulMult: 1.5,
+    drops: { chunk: 0.06, coal: 0.03 }, shape: 'robed',
+    lore: 'Each carries a lantern lit from the Warden\'s own. The light does not warm. It sees. Those it sees, it does not forget, and it tells the knights.',
+  },
+  stormGargoyle: {
+    id: 'stormGargoyle', name: 'Storm Gargoyle', hpMult: 1.3, dmgMult: 1.4, poiseMult: 1.4, attackInterval: 2.6,
+    attacks: [A.lunge(1.3), { id: 'tail', name: 'Tail Lash', windup: 0.8, mult: 1.0, weight: 3 }], resist: { physical: 0.7, lightning: 0.3 }, statusResist: { frost: 0, bleed: 0, poison: 0 }, soulMult: 1.6,
+    drops: { chunk: 0.08 }, shape: 'beast',
+    lore: 'Stone that the storm got into. It perches on the Sanctum walls and comes down on anything the lanterns point at. It does not bleed, poison, or freeze. It is, after all, a wall.',
+  },
+  deaconOfStorms: {
+    id: 'deaconOfStorms', name: 'Deacon of Storms', hpMult: 1.4, dmgMult: 1.9, poiseMult: 1.1, attackInterval: 4.2,
+    attacks: [{ id: 'bolt', name: 'Storm Bolt', windup: 1.7, mult: 2.4, weight: 2 }, { id: 'spark', name: 'Spark', windup: 0.9, mult: 1.0, weight: 2 }], resist: { lightning: 0.3, dark: 1.4 }, statusResist: {}, soulMult: 1.9,
+    drops: { chunk: 0.09, coal: 0.03 }, shape: 'robed',
+    lore: 'Priests who call the storm down and are, in return, allowed to keep standing near it. Their sermons are short and mostly thunder.',
+  },
+  silverSentinel: {
+    id: 'silverSentinel', name: 'Silver Sentinel', hpMult: 2.6, dmgMult: 1.6, poiseMult: 3.6, attackInterval: 4.8,
+    attacks: [A.heavy(2.4), { id: 'sweep', name: 'Halberd Sweep', windup: 1.5, mult: 1.6, weight: 2 }], resist: { physical: 0.55, lightning: 0.6, magic: 1.1, dark: 1.2 }, statusResist: { poison: 0.3, bleed: 0.5 }, soulMult: 2.4,
+    drops: { chunk: 0.14, slab: 0.005 }, shape: 'shield',
+    lore: 'Hollow suits of silver, animated by the Vigil\'s oath alone. Nothing inside to poison or bleed. Only the oath, which is stubborn, and the halberd, which is sharp.',
+  },
+  // ---------------- Region 5: The Deep ----------------
+  abyssCrawler: {
+    id: 'abyssCrawler', name: 'Abyss Crawler', hpMult: 0.8, dmgMult: 1.2, poiseMult: 0.6, attackInterval: 2.2,
+    attacks: [A.bite(0.9), A.lunge(1.3)], resist: { dark: 0.4, lightning: 1.3 }, statusResist: { bleed: 1.3 }, soulMult: 1.0,
+    drops: { chunk: 0.06 }, shape: 'beast',
+    lore: 'What humanity becomes when it has nothing left to be human about. Many legs. Many eyes, none of them looking at anything in particular. It is very fast in the dark.',
+  },
+  humanitySprite: {
+    id: 'humanitySprite', name: 'Humanity Sprite', hpMult: 0.5, dmgMult: 1.6, poiseMult: 0.3, attackInterval: 2.0,
+    attacks: [{ id: 'cling', name: 'Cling', windup: 0.6, mult: 1.2, weight: 3 }], resist: { physical: 0.5, dark: 0, magic: 0.8 }, statusResist: { bleed: 0, poison: 0, frost: 0 }, soulMult: 2.2,
+    drops: { chunk: 0.05, darkEmber: 0.003 }, shape: 'wraith',
+    lore: 'A small black shape with a whiteness at its centre. It wants to be held. Those who hold it are found later, smiling, and empty. It is worth a great many souls, which should tell you something.',
+  },
+  deepHollow: {
+    id: 'deepHollow', name: 'Deep Hollow', hpMult: 1.2, dmgMult: 1.3, poiseMult: 1.1, attackInterval: 3.0,
+    attacks: [A.slash(1.1), { id: 'grasp', name: 'Grasp', windup: 1.2, mult: 1.6, weight: 2 }], resist: { dark: 0.5, fire: 0.8 }, statusResist: { poison: 0.5 }, soulMult: 1.3,
+    drops: { chunk: 0.09, largeShard: 0.05 }, shape: 'humanoid',
+    lore: 'Hollows that went down instead of up. The dark did not take them. It kept them, the way a cellar keeps a thing, and it has had a long time to make adjustments.',
+  },
+  shadowOfTheLost: {
+    id: 'shadowOfTheLost', name: 'Shadow of the Lost', hpMult: 1.4, dmgMult: 1.5, poiseMult: 0.9, attackInterval: 3.4,
+    attacks: [A.wail(1.4), { id: 'reach', name: 'Reach', windup: 1.0, mult: 1.2, weight: 2 }], resist: { magic: 0.3, dark: 0.3, physical: 1.0, fire: 1.4 }, statusResist: { frost: 0, bleed: 0 }, soulMult: 1.8,
+    drops: { chunk: 0.1, coal: 0.03 }, shape: 'wraith',
+    lore: 'Not a ghost. The shape a person leaves in the dark when the dark closes over them. Spells pass through it as through smoke. Fire, which the dark remembers, does not.',
+  },
+  paleGaoler: {
+    id: 'paleGaoler', name: 'Pale Gaoler', hpMult: 2.0, dmgMult: 1.7, poiseMult: 2.8, attackInterval: 4.4,
+    attacks: [{ id: 'brand', name: 'Brand', windup: 1.5, mult: 2.0, weight: 2 }, A.heavy(2.2)], resist: { physical: 0.7, dark: 0.6, lightning: 1.2 }, statusResist: { poison: 0.4, bleed: 0.7 }, soulMult: 2.1,
+    drops: { chunk: 0.12, slab: 0.006 }, shape: 'knight',
+    lore: 'Keepers of the Deep\'s cells. Their brands mark the prisoner, and the mark is what the dark uses to find them again. Nobody has ever been released. Nobody has ever asked.',
+  },
+  deepKnight: {
+    id: 'deepKnight', name: 'Knight of the Deep', hpMult: 2.4, dmgMult: 1.9, poiseMult: 3.2, attackInterval: 4.0,
+    attacks: [{ id: 'darkthrust', name: 'Dark Thrust', windup: 1.1, mult: 1.9, weight: 3 }, A.heavy(2.6)], resist: { dark: 0.3, physical: 0.75, lightning: 1.3 }, statusResist: { bleed: 0.6 }, soulMult: 2.6,
+    drops: { chunk: 0.14, slab: 0.008, coal: 0.03 }, shape: 'knight',
+    lore: 'Knights who came to end the dark and were ended by it, and then rose to guard the thing they came to kill. Their swords are wet with a darkness that never dries.',
+  },
+  // ---------------- Region 6: The Kiln ----------------
+  kilnKnight: {
+    id: 'kilnKnight', name: 'Kiln Knight', hpMult: 2.0, dmgMult: 1.7, poiseMult: 2.8, attackInterval: 3.6,
+    attacks: [{ id: 'cinder', name: 'Cinder Slash', windup: 1.0, mult: 1.7, weight: 3 }, A.heavy(2.4)], resist: { fire: 0.3, physical: 0.8 }, statusResist: { frost: 0.5, bleed: 0.8 }, soulMult: 2.0,
+    drops: { chunk: 0.12, slab: 0.008 }, shape: 'knight',
+    lore: 'The Lord\'s own guard, standing in the fire so long the fire stopped noticing them. Their armour glows at the joints. They do not feel it. They feel very little now, except duty.',
+  },
+  emberDrake: {
+    id: 'emberDrake', name: 'Ember Drake', hpMult: 1.6, dmgMult: 1.9, poiseMult: 1.5, attackInterval: 3.0,
+    attacks: [{ id: 'breath', name: 'Ember Breath', windup: 1.5, mult: 2.2, weight: 2 }, A.bite(1.1), { id: 'tail', name: 'Tail Lash', windup: 0.8, mult: 1.2, weight: 2 }], resist: { fire: 0.2, magic: 0.9 }, statusResist: { frost: 1.5, poison: 0.4 }, soulMult: 2.2,
+    drops: { chunk: 0.12, coal: 0.04 }, shape: 'beast',
+    lore: 'What is left of the dragons: small, furious, and on fire. They nest in the Kiln because it is the only place still hot enough to feel like home.',
+  },
+  pyreGolem: {
+    id: 'pyreGolem', name: 'Pyre Golem', hpMult: 3.0, dmgMult: 2.0, poiseMult: 4.0, attackInterval: 5.0,
+    attacks: [A.heavy(2.8), { id: 'slam', name: 'Slam', windup: 2.0, mult: 3.2, weight: 1 }], resist: { physical: 0.5, fire: 0.4, magic: 1.2 }, statusResist: { poison: 0, bleed: 0, frost: 1.3 }, soulMult: 2.8,
+    drops: { chunk: 0.16, slab: 0.012 }, shape: 'shield',
+    lore: 'Built from the Kiln\'s own bricks by hands that wanted a guardian that would never tire. It never has. It is not clever, and it does not need to be. It is a wall that walks.',
+  },
+  ashWraith: {
+    id: 'ashWraith', name: 'Ash Wraith', hpMult: 1.4, dmgMult: 1.6, poiseMult: 0.9, attackInterval: 2.8,
+    attacks: [A.wail(1.5), { id: 'engulf', name: 'Engulf', windup: 1.2, mult: 1.9, weight: 2 }], resist: { physical: 0.5, fire: 0.6, magic: 1.2, dark: 1.3 }, statusResist: { bleed: 0, poison: 0 }, soulMult: 2.0,
+    drops: { chunk: 0.1, coal: 0.04 }, shape: 'wraith',
+    lore: 'The ash of everything the Kiln has burned, given a shape by wanting one. It is many people. It does not agree with itself about much, except that you should be ash too.',
+  },
+  flameShepherd: {
+    id: 'flameShepherd', name: 'Flame Shepherd', hpMult: 1.8, dmgMult: 2.2, poiseMult: 1.6, attackInterval: 4.0,
+    attacks: [{ id: 'crook', name: 'Crook', windup: 1.1, mult: 1.6, weight: 3 }, { id: 'kindling', name: 'Kindling', windup: 1.8, mult: 2.8, weight: 1 }], resist: { fire: 0.3, dark: 0.7, lightning: 1.2 }, statusResist: { frost: 0.4 }, soulMult: 2.5,
+    drops: { chunk: 0.12, slab: 0.01, coal: 0.05 }, shape: 'robed',
+    lore: 'They tend the Lord\'s fire the way a shepherd tends a flock, with a crook and no sentiment. New fuel is brought to them. They do not ask where it came from. Sometimes it asks them.',
+  },
+  cinderLordAsh: {
+    id: 'cinderLordAsh', name: 'Ash of the Lord', hpMult: 2.6, dmgMult: 2.4, poiseMult: 3.0, attackInterval: 3.4,
+    attacks: [{ id: 'cinder', name: 'Cinder Slash', windup: 0.9, mult: 1.9, weight: 3 }, { id: 'kindling', name: 'Kindling', windup: 1.6, mult: 3.0, weight: 1 }], resist: { fire: 0.2, physical: 0.7, dark: 0.8 }, statusResist: { frost: 0.5, poison: 0.5 }, soulMult: 3.2,
+    drops: { chunk: 0.15, slab: 0.015, coal: 0.05 }, shape: 'warden',
+    lore: 'Pieces of the Lord that fell off along the way and kept walking. Each is a little of him: the pride, the fire, the certainty. None of them is enough to be him. All of them think they are.',
+  },
+} satisfies Record<string, EnemyDef>);

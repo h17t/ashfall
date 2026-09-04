@@ -26,12 +26,15 @@ export const Encounter = memo(function Encounter() {
   const attackId = useSel((s) => s.encounter.enemy?.attackId ?? '');
   const zoneName = useSel((s) => getZone(s.encounter.zone).name);
   const tier = useSel((s) => s.encounter.tier);
-  const tierName = useSel((s) => { const z = getZone(s.encounter.zone); return s.encounter.tier >= 0 ? z.tiers[s.encounter.tier].name : s.encounter.tier === -1 ? 'Boss Arena' : 'A hidden place'; });
+  const tierName = useSel((s) => { const z = getZone(s.encounter.zone); return s.encounter.tier >= 0 ? z.tiers[s.encounter.tier].name : s.encounter.tier === -1 ? 'Boss Arena' : s.encounter.tier === -2 ? 'A hidden place' : 'Something new walks the road'; });
   const deathScreen = useSel((s) => s.deathScreen > 0);
   const phaseName = useSel((s) => (s.encounter.enemy?.isBoss ? getBoss(s.encounter.enemy.id).phases[s.encounter.enemy.phase].name : ''));
   const bleed = useSel((s) => s.encounter.enemy?.statuses.bleed.buildup ?? 0);
   const poison = useSel((s) => s.encounter.enemy?.statuses.poison.active ?? 0);
   const frost = useSel((s) => s.encounter.enemy?.statuses.frost.active ?? 0);
+  const hymn = useSel((s) => s.encounter.enemy?.mech.hymn === 1);
+  const blind = useSel((s) => s.encounter.enemy?.mech.blind === 1);
+  const mechanicText = useSel((s) => (s.encounter.enemy?.isBoss ? getBoss(s.encounter.enemy.id).phases[s.encounter.enemy.phase].text : ''));
 
   const [shake, setShake] = useState(0);
   const [hurt, setHurt] = useState(false);
@@ -79,7 +82,15 @@ export const Encounter = memo(function Encounter() {
             Riposte
           </div>
         )}
-        {telegraph && !staggered && (
+        {hymn && !staggered && (
+          <div className="absolute inset-x-0 top-12 text-center font-display text-xl tracking-[0.3em] text-purple-300 uppercase" style={{ textShadow: '0 0 16px rgba(180,140,255,0.8)' }}>
+            The hymn sounds — hold your blade
+          </div>
+        )}
+        {telegraph && blind && !staggered && (
+          <div className="absolute inset-x-0 bottom-3 text-center text-[10px] uppercase tracking-[0.3em] text-ash-400">…something moves in the dark…</div>
+        )}
+        {telegraph && !blind && !staggered && (
           <div className="absolute inset-x-0 bottom-3 px-8">
             <div className="text-center text-[10px] uppercase tracking-[0.3em] text-blood-500 mb-1">{attackId} · {attackDmg} dmg · {attackPct}% of your HP · dodge!</div>
             <div className="h-1.5 bg-ash-900 border border-blood-600 rounded-sm overflow-hidden">
@@ -104,6 +115,7 @@ export const Encounter = memo(function Encounter() {
           {frost > 0 && <span className="text-sky-300">Frostbitten {frost.toFixed(0)}s</span>}
           {tier >= 0 && <TierProgress />}
         </div>
+        {isBoss && mechanicText && <div className="text-[11px] italic text-bone-400 mt-1">{mechanicText}</div>}
       </div>
       {deathScreen && <DeathOverlay />}
     </div>

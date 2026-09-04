@@ -110,6 +110,8 @@ export interface BossDef {
   secretCondition?: { kind: 'kills'; zone: string; count: number } | { kind: 'covenant'; covenant: string } | { kind: 'item'; item: string };
   /** for NG+ cycle bosses: appears from this kindle count */
   cycle?: number;
+  /** cycle bosses drop Dark Embers instead of a boss soul */
+  noSoul?: boolean;
 }
 
 export interface ZoneTier {

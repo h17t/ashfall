@@ -17,14 +17,18 @@ registerSimExtension((view, params, mem, out) => {
   // Players kindle when the road runs out (every open region's lord is dead and nothing has
   // happened for a while) or when the gain would double their Humanity.
   const gain = humanityPreview(s);
+  // Progress memory: deepest tier or lords this cycle moving forward resets the "stuck" clock.
+  const progressKey = s.stats.cycleDeepest * 100 + s.stats.cycleBosses;
+  if (progressKey !== ((mem.progressKey as number) ?? -1)) { mem.progressKey = progressKey; mem.lastAdvanceT = view.t; }
+  const stuckFor = view.t - ((mem.lastAdvanceT as number) ?? view.t);
   const allBossesDead = s.unlockedZones.every((z) => (s.zones[z]?.bossKills ?? 0) > 0);
-  const lastBossAt = (mem.lastBossKillT as number) ?? 0;
-  if (s.stats.cycleBosses !== ((mem.cycleBossesSeen as number) ?? 0)) { mem.cycleBossesSeen = s.stats.cycleBosses; mem.lastBossKillT = view.t; }
-  const roadRanOut = allBossesDead && view.t - lastBossAt > 15 * 60;
-  const doubling = gain.gte(4) && gain.gte(s.prestige.humanityTotal.mul(1.0).add(1));
-  if (!canKindle(s) && (doubling || (roadRanOut && gain.gte(2)))) {
+  // Players kindle when they are stuck (no new tier or lord for 45 min, or the road is fully cleared and 15 min pass)
+  // and the gain is worth having; or, late, when it would double their Humanity after four lords.
+  const stuck = (stuckFor > 45 * 60 || (allBossesDead && stuckFor > 15 * 60)) && gain.gte(2);
+  const doubling = s.stats.cycleBosses >= 4 && gain.gte(4) && gain.gte(s.prestige.humanityTotal.add(1));
+  if (!canKindle(s) && (doubling || stuck)) {
     out.push({ type: 'kindle' });
-    mem.cycleBossesSeen = 0;
+    mem.progressKey = -1;
     return;
   }
   // spend humanity by priority

@@ -4,10 +4,10 @@
  */
 import { D, ZERO, safe } from './num';
 import { BALANCE } from '@/content/balance';
-import { getZone, getWeapon, getBoss, getSpell, reinforceMaterial, WEAPONS, MATERIALS } from '@/content';
+import { getZone, getWeapon, getBoss, getSpell, reinforceMaterial, cycleBossFor, WEAPONS, MATERIALS } from '@/content';
 import type { GameState, GameEvent, Action, StatKey } from './types';
 import { STAT_KEYS } from './types';
-import { levelCost, reinforceCost, statCurve, reinforceMult } from './formulas';
+import { levelCost, reinforceCost, statCurve, reinforceMult, levelDamageMult } from './formulas';
 import { computeMods, type Mods } from './mods';
 import { playerAttack, playerDodge, playerEstus, restAtBonfire, refreshPlayerMaxes, recoverBloodstain, damageEnemy, addStagger, applyStatus, weaponDamage } from './combat';
 import { newZoneProgress } from './state';
@@ -32,6 +32,13 @@ export function travelBlocked(state: GameState, zone: string, tier: number): str
   }
   if (tier === -2) {
     if (!z.secretBoss || !zp.secretFound) return 'Nothing waits there. Yet.';
+    return null;
+  }
+  if (tier === -3) {
+    const cb = cycleBossFor(zone);
+    if (!cb || state.prestige.kindles < (cb.cycle ?? 99)) return 'Nothing stirs there in this cycle.';
+    if (zp.bossKills <= 0) return 'It waits for the region\'s lord to fall first.';
+    if (zp.cycleKills > 0) return 'Already put down this cycle.';
     return null;
   }
   if (tier < 0 || tier >= z.tiers.length) return 'No such place.';
@@ -62,13 +69,17 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
       if (blocked) return err(blocked);
       const enc = state.encounter;
       const changingZone = enc.zone !== action.zone;
-      enc.zone = action.zone;
+      if (changingZone) {
+        // Arriving in a new region lights its bonfire and rests there before setting out.
+        enc.zone = action.zone;
+        enc.tier = 0;
+        restAtBonfire(state, mods, events);
+      }
       enc.tier = action.tier;
       enc.enemy = null;
       enc.respawnIn = 0.4;
       enc.streak = 0;
       enc.t = 0;
-      if (changingZone) restAtBonfire(state, mods, events);
       return;
     }
     case 'abandonBloodstain':
@@ -248,7 +259,7 @@ export function castSpell(state: GameState, mods: Mods, events: GameEvent[], id:
   const power = spellPower(state, mods, id);
   const wd = weaponDamage(state, mods);
   // spells scale from the weapon-independent "base strike" of the current tier so they stay relevant
-  const baseStrike = D(getWeapon(p.weapon).base).mul(reinforceMult(p.weapons[p.weapon]?.level ?? 0)).mul(mods.dmg);
+  const baseStrike = D(getWeapon(p.weapon).base).mul(reinforceMult(p.weapons[p.weapon]?.level ?? 0)).mul(mods.dmg).mul(levelDamageMult(p.level));
   switch (eff.kind) {
     case 'damage': {
       const dmg = baseStrike.mul(eff.mult).mul(power).mul(wd.buffs);

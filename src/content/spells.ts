@@ -125,7 +125,7 @@ export const SPELLS: Record<string, SpellDef> = {
   },
 };
 
-/** Spells whose sources (regions 2–6 bosses and drops) ship in Milestone 10; merged into SPELLS then. */
+/** Spells sourced from Regions 2–6 bosses and drops (merged into SPELLS below). */
 export const UPCOMING_SPELLS: Record<string, SpellDef> = {
   soulGreatsword: {
     id: 'soulGreatsword', name: 'Soul Greatsword', school: 'sorcery', fp: 30, cooldown: 12, req: { int: 22 },
@@ -164,3 +164,49 @@ export const UPCOMING_SPELLS: Record<string, SpellDef> = {
     lore: 'Fire from below the fire. It gives no light and takes the light of whatever it touches. The Keeper carried it for an age without once being warmed.',
   },
 };
+
+// ---------------- Boss-soul spells of Regions 2–6 ----------------
+Object.assign(SPELLS, UPCOMING_SPELLS, {
+  rotBloom: {
+    id: 'rotBloom', name: 'Rot Bloom', school: 'pyromancy', fp: 20, cooldown: 11, req: {},
+    effect: { kind: 'status', status: 'poison', amount: 130 },
+    source: { kind: 'bossSoul', boss: 'mireMother' },
+    lore: 'Mother Nettle\'s love, bottled. It opens in the enemy like a flower in a wound. Nothing that is poisoned by it stops being poisoned quickly.',
+  },
+  drowningHymn: {
+    id: 'drowningHymn', name: 'Drowning Hymn', school: 'miracle', fp: 30, cooldown: 45, req: { fth: 16 },
+    effect: { kind: 'buff', buff: { souls: 1.4, hpRegen: 4 }, duration: 30 },
+    source: { kind: 'bossSoul', boss: 'choirMaster' },
+    lore: 'The hymn the choir finished as the water closed. Sung over the dying it steadies the singer and draws out what the dying leave behind. It is, the Choir-Master would insist, a comfort.',
+  },
+  unwriting: {
+    id: 'unwriting', name: 'Unwriting', school: 'sorcery', fp: 32, cooldown: 14, req: { int: 24 },
+    effect: { kind: 'staggerBomb', amount: 140, mult: 30 },
+    source: { kind: 'bossSoul', boss: 'theUnwritten' },
+    lore: 'Removes, briefly, the enemy\'s certainty that it is standing. Most things fall over when reminded. It does not last, but nothing needs to.',
+  },
+  lanternLight: {
+    id: 'lanternLight', name: 'Lantern Light', school: 'miracle', fp: 44, cooldown: 80, req: { fth: 26 },
+    effect: { kind: 'squadBuff', mult: 1.8, duration: 30 },
+    source: { kind: 'bossSoul', boss: 'saintOrvane' },
+    lore: 'Orvane\'s lantern, lit in the palm. Everyone it shines on fights as if the night were nearly over. Phantoms especially. They have been waiting the longest.',
+  },
+  stormCall: {
+    id: 'stormCall', name: 'Storm Call', school: 'miracle', fp: 48, cooldown: 18, req: { fth: 32 },
+    effect: { kind: 'damage', mult: 85, type: 'lightning' },
+    source: { kind: 'bossSoul', boss: 'deaconUnburied' },
+    lore: 'The Deacon\'s last sermon, delivered by the sky. It is short. It is mostly one word, and the word is loud.',
+  },
+  wanderersStep: {
+    id: 'wanderersStep', name: 'Wanderer\'s Step', school: 'sorcery', fp: 26, cooldown: 50, req: { int: 14 },
+    effect: { kind: 'buff', buff: { dmg: 1.3, stamRegen: 1.5 }, duration: 30 },
+    source: { kind: 'bossSoul', boss: 'namelessWanderer' },
+    lore: 'How the Wanderer walked so far: lightly, and without stopping. For a while your feet remember it. Swings cost less. Blows land harder. The road feels shorter than it is.',
+  },
+  firstFlame: {
+    id: 'firstFlame', name: 'First Flame', school: 'pyromancy', fp: 70, cooldown: 25, req: {},
+    effect: { kind: 'damage', mult: 240, type: 'fire' },
+    source: { kind: 'bossSoul', boss: 'firstEmber' },
+    lore: 'The fire before it had a name, in your hand, for one moment. Everything it touches is fuel. Everything. Be careful what you point it at, and be quick.',
+  },
+} satisfies Record<string, SpellDef>);

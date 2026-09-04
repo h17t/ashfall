@@ -64,3 +64,10 @@ export function reinforceMaterial(level: number): { id: string; count: number } 
   if (level < 9) return { id: 'chunk', count: level - 5 };
   return { id: 'slab', count: 1 };
 }
+
+MATERIALS.darkEmber = {
+  id: 'darkEmber',
+  name: 'Dark Ember',
+  tier: 0,
+  lore: 'An ember that gives no light and is warm anyway. Held, it becomes Humanity at once; no Kindling required. The things that carry them did not come by them honestly.',
+};

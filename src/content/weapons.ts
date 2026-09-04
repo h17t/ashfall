@@ -175,3 +175,121 @@ WEAPONS.pyromancyFlame = {
   region: 2,
   lore: 'A flame that lives in the palm and feeds on souls. It grows with what you pour into it, and asks nothing of your mind or your faith. Owning it opens one attunement slot; wielding it channels pyromancy: +25% power.',
 };
+
+// ---------------- Region 2: The Drowned Mire ----------------
+Object.assign(WEAPONS, {
+  rotwoodClub: {
+    id: 'rotwoodClub', name: 'Rotwood Club', archetype: 'heavy', base: 62, damageType: 'physical', stamina: 18, stagger: 15, riposteMult: 2.4, crit: 0,
+    scaling: { str: 'C' }, req: { str: 16 }, status: { poison: 12 }, infusable: true, source: { kind: 'shop', cost: 2600, region: 2 }, speed: 0.7, region: 2,
+    lore: 'A branch of the Rotwood, still wet. Whatever it hits, the Mire gets into. It is not a subtle weapon, and the Mire is not a subtle place.',
+  },
+  fenRapier: {
+    id: 'fenRapier', name: 'Fen Rapier', archetype: 'fast', base: 30, damageType: 'physical', stamina: 6, stagger: 4, riposteMult: 4.5, crit: 0.08,
+    scaling: { dex: 'B' }, req: { dex: 18 }, infusable: true, source: { kind: 'shop', cost: 2400, region: 2 }, speed: 1.5, region: 2,
+    lore: 'A duelling blade from a court that sank. The etiquette of its use survives in the wrist: strike, withdraw, strike. The court itself does not.',
+  },
+  drownedHalberd: {
+    id: 'drownedHalberd', name: 'Drowned Halberd', archetype: 'hybrid', base: 52, damageType: 'physical', stamina: 12, stagger: 10, riposteMult: 3, crit: 0.03,
+    scaling: { str: 'C', dex: 'D' }, req: { str: 14, dex: 12 }, infusable: true, source: { kind: 'drop', zone: 'mire', tier: 3, chance: 0.05 }, speed: 1.0, region: 2,
+    lore: 'Carried by the Rotting Knights, who have forgotten how to hold it properly and so hold it very tightly. Pried from a hand that took some prying.',
+  },
+  mothersThorn: {
+    id: 'mothersThorn', name: 'Mother\'s Thorn', archetype: 'fast', base: 38, damageType: 'physical', stamina: 6, stagger: 5, riposteMult: 4.5, crit: 0.05,
+    scaling: { dex: 'B', int: 'E' }, req: { dex: 20 }, status: { poison: 22 }, infusable: false, source: { kind: 'bossSoul', boss: 'mireMother' }, speed: 1.5, region: 2,
+    lore: 'A thorn from the crown of Mother Nettle, long as a forearm and hollow. Whatever it pierces, the Mire drinks from. It is, technically, a gift. She would have wanted you to have it.',
+  },
+  bellHammer: {
+    id: 'bellHammer', name: 'Bell-Hammer', archetype: 'heavy', base: 78, damageType: 'lightning', stamina: 20, stagger: 18, riposteMult: 2.6, crit: 0,
+    scaling: { str: 'B', fth: 'D' }, req: { str: 20, fth: 10 }, infusable: false, source: { kind: 'bossSoul', boss: 'choirMaster' }, speed: 0.62, region: 2,
+    lore: 'The Choir-Master\'s tuning hammer, which struck the chapel bell to give the choir their note. The bell is under the water now. The hammer still rings when it lands, and the note is still true.',
+  },
+  // ---------------- Region 3: The Archive of Null ----------------
+  scholarsEstoc: {
+    id: 'scholarsEstoc', name: 'Scholar\'s Estoc', archetype: 'fast', base: 130, damageType: 'magic', stamina: 7, stagger: 5, riposteMult: 4, crit: 0.06,
+    scaling: { dex: 'C', int: 'C' }, req: { dex: 18, int: 16 }, infusable: true, source: { kind: 'shop', cost: 40000, region: 3 }, speed: 1.4, region: 3,
+    lore: 'The Archive\'s scholars were forbidden weapons. They were not forbidden pens. This is the point to which the argument was eventually taken.',
+  },
+  custodianGreatmace: {
+    id: 'custodianGreatmace', name: 'Custodian\'s Greatmace', archetype: 'heavy', base: 300, damageType: 'physical', stamina: 21, stagger: 20, riposteMult: 2.4, crit: 0,
+    scaling: { str: 'B' }, req: { str: 26 }, infusable: true, source: { kind: 'shop', cost: 48000, region: 3 }, speed: 0.6, region: 3,
+    lore: 'Issued to the custodians for the removal of unauthorised readers. Its head is inscribed with the shelf number of the word. Nobody can read it anymore, which is the intention.',
+  },
+  crystalSword: {
+    id: 'crystalSword', name: 'Crystal Straight Sword', archetype: 'hybrid', base: 220, damageType: 'magic', stamina: 10, stagger: 8, riposteMult: 3, crit: 0.03,
+    scaling: { int: 'B', dex: 'D' }, req: { int: 20 }, status: { frost: 10 }, infusable: false, source: { kind: 'drop', zone: 'archive', tier: 3, chance: 0.05 }, speed: 1.1, region: 3,
+    lore: 'A sword grown rather than forged, in the Crystal Cloister, from a seed of soul. It is cold to hold and colder to be held by. It chips. The chips grow back.',
+  },
+  nullBlade: {
+    id: 'nullBlade', name: 'Null Blade', archetype: 'hybrid', base: 290, damageType: 'magic', stamina: 11, stagger: 9, riposteMult: 3.2, crit: 0.04,
+    scaling: { int: 'A', dex: 'D' }, req: { int: 24 }, infusable: false, source: { kind: 'bossSoul', boss: 'archivistNull' }, speed: 1.1, region: 3,
+    lore: 'The Archivist\'s letter-opener, if a letter could be a person. Its edge is the word, and the word unmakes. He never drew it on a reader. He never had to.',
+  },
+  unwrittenEdge: {
+    id: 'unwrittenEdge', name: 'Unwritten Edge', archetype: 'fast', base: 170, damageType: 'magic', stamina: 6, stagger: 5, riposteMult: 5, crit: 0.1,
+    scaling: { int: 'B', dex: 'C' }, req: { int: 18, dex: 20 }, status: { frost: 18 }, infusable: false, source: { kind: 'bossSoul', boss: 'theUnwritten' }, speed: 1.6, region: 3,
+    lore: 'A blade with no outline, from a thing with no outline. It cuts the way a missing word cuts a sentence: you do not see the wound, only what is no longer there.',
+  },
+  // ---------------- Region 4: The Sanctum of the Vigil ----------------
+  sanctumSpear: {
+    id: 'sanctumSpear', name: 'Sanctum Spear', archetype: 'hybrid', base: 1100, damageType: 'lightning', stamina: 10, stagger: 9, riposteMult: 3, crit: 0.03,
+    scaling: { dex: 'C', fth: 'C' }, req: { dex: 22, fth: 20 }, infusable: true, source: { kind: 'shop', cost: 650000, region: 4 }, speed: 1.1, region: 4,
+    lore: 'The spear of the Sanctum Knights, blessed to carry the storm. Thunder rides in the haft and gets out through the point. The knights say it sings. They have been awake a long time.',
+  },
+  vigilMaul: {
+    id: 'vigilMaul', name: 'Vigil Maul', archetype: 'heavy', base: 1500, damageType: 'physical', stamina: 22, stagger: 22, riposteMult: 2.4, crit: 0,
+    scaling: { str: 'A' }, req: { str: 34 }, infusable: true, source: { kind: 'shop', cost: 800000, region: 4 }, speed: 0.58, region: 4,
+    lore: 'Made for breaking the silver sentinels when their oaths went wrong. Heavy enough that the swing takes a while, and a sentinel does not move much anyway.',
+  },
+  lanternBlade: {
+    id: 'lanternBlade', name: 'Lantern-Blade', archetype: 'hybrid', base: 1350, damageType: 'lightning', stamina: 11, stagger: 10, riposteMult: 3.2, crit: 0.04,
+    scaling: { fth: 'A', dex: 'D' }, req: { fth: 26, dex: 16 }, infusable: false, source: { kind: 'bossSoul', boss: 'saintOrvane' }, speed: 1.1, region: 4,
+    lore: 'Orvane\'s lantern, reforged with its light inside the steel. It still finds you. Now it finds them.',
+  },
+  stormTalisman: {
+    id: 'stormTalisman', name: 'Storm Talisman', archetype: 'catalyst', base: 400, damageType: 'lightning', stamina: 8, stagger: 4, riposteMult: 2, crit: 0,
+    scaling: { fth: 'S' }, req: { fth: 24 }, infusable: false, source: { kind: 'bossSoul', boss: 'deaconUnburied' }, speed: 1.0, region: 4,
+    lore: 'The Deacon\'s talisman, struck by lightning so many times that the lightning lives in it now. Wielding it channels miracles at half again their power. It hums. It is not a comfortable hum.',
+  },
+  // ---------------- Region 5: The Deep ----------------
+  paleDagger: {
+    id: 'paleDagger', name: 'Pale Dagger', archetype: 'fast', base: 3200, damageType: 'physical', stamina: 5, stagger: 4, riposteMult: 5.5, crit: 0.12,
+    scaling: { dex: 'A' }, req: { dex: 30 }, status: { bleed: 20 }, infusable: true, source: { kind: 'shop', cost: 9000000, region: 5 }, speed: 1.7, region: 5,
+    lore: 'The gaolers\' knife, white as the things they keep. It goes in between things. It is very good at the throat, and at other places where a riposte finds purchase.',
+  },
+  abyssGreatsword: {
+    id: 'abyssGreatsword', name: 'Abyss Greatsword', archetype: 'heavy', base: 7500, damageType: 'dark', stamina: 20, stagger: 19, riposteMult: 2.6, crit: 0,
+    scaling: { str: 'B', dex: 'B' }, req: { str: 30, dex: 22 }, infusable: false, source: { kind: 'drop', zone: 'deep', tier: 4, chance: 0.04 }, speed: 0.65, region: 5,
+    lore: 'A Knight of the Deep\'s sword, black to the hilt and wet. The dark does not dry. Neither does the knight\'s grudge, which came with it.',
+  },
+  keepersBlackblade: {
+    id: 'keepersBlackblade', name: 'Keeper\'s Blackblade', archetype: 'hybrid', base: 6200, damageType: 'dark', stamina: 12, stagger: 11, riposteMult: 3.2, crit: 0.04,
+    scaling: { int: 'B', fth: 'B', str: 'D' }, req: { int: 22, fth: 22 }, infusable: false, source: { kind: 'bossSoul', boss: 'keeperOfTheDeep' }, speed: 1.05, region: 5,
+    lore: 'The Keeper\'s sword, which stood between the world and what sleeps for an age. It is heavy with the weight of that. It cuts with the dark\'s own edge, and the dark does not care what it cuts.',
+  },
+  wanderersTwinblades: {
+    id: 'wanderersTwinblades', name: 'Wanderer\'s Twinblades', archetype: 'fast', base: 4200, damageType: 'physical', stamina: 7, stagger: 6, riposteMult: 5, crit: 0.1,
+    scaling: { dex: 'S' }, req: { dex: 36 }, status: { bleed: 14 }, infusable: false, source: { kind: 'bossSoul', boss: 'namelessWanderer' }, speed: 1.8, region: 5,
+    lore: 'Two blades, one for each hand, worn to the tang by a hollow who walked further than you have. They are yours now. It walked further. Remember that.',
+  },
+  // ---------------- Region 6: The Kiln ----------------
+  kilnGreatsword: {
+    id: 'kilnGreatsword', name: 'Kiln Greatsword', archetype: 'heavy', base: 38000, damageType: 'fire', stamina: 24, stagger: 24, riposteMult: 2.5, crit: 0,
+    scaling: { str: 'S' }, req: { str: 40 }, infusable: true, source: { kind: 'shop', cost: 160000000, region: 6 }, speed: 0.55, region: 6,
+    lore: 'Forged in the First Flame and never cooled. The Kiln Knights carry it. It weighs what a door weighs, and it opens things the way a door does not.',
+  },
+  cinderKatana: {
+    id: 'cinderKatana', name: 'Cinder Katana', archetype: 'fast', base: 21000, damageType: 'fire', stamina: 7, stagger: 6, riposteMult: 5, crit: 0.1,
+    scaling: { dex: 'A', fth: 'E' }, req: { dex: 34 }, status: { bleed: 16 }, infusable: true, source: { kind: 'drop', zone: 'kiln', tier: 3, chance: 0.04 }, speed: 1.7, region: 6,
+    lore: 'A blade from an eastern land that burned with everything else. The edge is a line of ash that never stops glowing. It draws, cuts, and sheathes in the time it takes an ember to fall.',
+  },
+  lordsEmberSword: {
+    id: 'lordsEmberSword', name: 'Lord\'s Ember-Sword', archetype: 'hybrid', base: 34000, damageType: 'fire', stamina: 13, stagger: 13, riposteMult: 3.4, crit: 0.05,
+    scaling: { str: 'A', dex: 'A', fth: 'C' }, req: { str: 30, dex: 30, fth: 18 }, infusable: false, source: { kind: 'bossSoul', boss: 'lordOfCinders' }, speed: 1.05, region: 6,
+    lore: 'The sword the Lord planted in the Kiln floor and leaned on for an age. It is mostly fire now. So was he. Holding it is like holding a decision that was made a very long time ago.',
+  },
+  firstBlade: {
+    id: 'firstBlade', name: 'The First Blade', archetype: 'hybrid', base: 42000, damageType: 'fire', stamina: 12, stagger: 14, riposteMult: 3.6, crit: 0.08,
+    scaling: { str: 'S', dex: 'S' }, req: { str: 40, dex: 40 }, infusable: false, source: { kind: 'bossSoul', boss: 'firstEmber' }, speed: 1.1, region: 6,
+    lore: 'Not the first blade ever made. The blade the first fire made, when it wanted a shape to be dangerous in. Everything since has been an imitation. Including, arguably, you.',
+  },
+} satisfies Record<string, WeaponDef>);

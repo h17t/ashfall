@@ -133,3 +133,26 @@ Simulator: strategies now buy a catalyst, learn and cast, and swear by play styl
 **Variants.** NG+ enemies roll modifiers (Ashen, Hollowed, Abyssal, Ancient, Ember-touched) with a chance that rises per cycle, each changing how the fight plays (poise, damage, attack speed, telegraph length) rather than only its size. Cycle-exclusive bosses hook in through `BossDef.cycle` and ship with Milestone 10's regions.
 
 **A found rule.** Resting at a bonfire now leaves a boss arena and returns you to the last tier. Before that fix the simulator's casual player retreated from Eskel's third phase, watched him reset, and walked back in for 50 minutes without ever going to level up. Real players do this too. The fog gate must be crossed deliberately every time.
+
+## Milestone 10 — content build-out
+
+**The spine.** Six regions, 32 tiers, 38 enemies, 17 bosses (6 lords, 6 secret, 5 cycle-exclusive), 32 weapons, 22 spells, 6 phantoms. Every item has its own lore; `validateContent()` scans all shipped text for placeholder words and fails the build on any.
+
+**Regions as arguments.** Each region makes a case for a different build:
+- *Mire* (R2): poison everywhere, Rotting Knights immune to it, Mother Nettle regenerates unless bled/frozen. Teaches status as a tool, not a bonus. Home of the Rot Wardens and Ghrelt (stagger).
+- *Archive* (R3): magic-resistant Bound Tomes next to physical-resistant Custodians; Archivist Null is immune while reciting (stagger-only at 0%) and has a 2.2s "Unmaking" you must dodge. Teaches stagger + resist reading. Vesna (buffer).
+- *Sanctum* (R4): lightning knights and Silver Sentinels with no blood to bleed. Saint Orvane's *Lantern* phase punishes hitting during the glow (hymn mechanic). Teaches restraint. Corvo (status).
+- *Deep* (R5): the Keeper turns the lights out — telegraphs vanish, dodge on rhythm; auto-dodge fails there on purpose. Humanity Sprites drop Dark Embers. Ysolde (dps).
+- *Kiln* (R6): everything at once; the Lord of Cinders has four phases (dodge → backdraft → stagger-only → enrage). The First Ember (secret) is blind + regen + enrage, the true final exam.
+
+**Mechanics, now six.** regen, backdraft, staggerOnly, plus *enrage* (attack interval shrinks over the phase, floor 40%), *hymn* (alternating 5s windows where hits reflect 4–6% of your max HP; staggering silences it), *blind* (hidden telegraph; auto-dodge disabled; the simulator's players dodge at half skill). Every lord uses at least two, so "bigger HP bar" never describes a boss.
+
+**Cycle bosses.** One per region for NG+1…5 (Captain Vell, the Choir of Teeth, the Custodian Prime, the Twin Sentinels, the Drowned Sun), each with two phases and its own mechanic pairing. They open at a third arena tier after the region's lord falls, once per cycle, and drop *Dark Embers* (instant Humanity), slabs and Soul Vessels instead of a boss soul. Early NG+ is discovery.
+
+**Weapon curve.** Base damage ×~4–5 per region (11 → 62 → 300 → 1,500 → 7,500 → 38,000), shop prices at roughly 100 kills of the region's first tier, boss-soul weapons above the shop tier with an unusual scaling pair (Bell-Hammer STR/FTH lightning, Keeper's Blackblade INT/FTH dark). Catalysts scale into the late game through the Storm Talisman (miracles ×1.5).
+
+**The big balance finding.** The first 40-hour run showed players at soul level 95 stalled in Region 2: stats past the soft caps stopped turning souls into power while enemy HP kept compounding ×1.55 per tier. Fix: *every* soul level multiplies damage by 1.025 (as it already did HP by 1.035). Stats and grades decide *what* a level buys; the level always buys something. With that, greedy clears all six lords in 8.2h, casual in 9.8h, and souls/hour rise monotonically through 40 hours and 14 Kindles. Levels 4 per tier × 1.025 ≈ ×1.10 per tier; reinforcement and the region weapon step supply the rest.
+
+**Humanity now compounds with depth** (×1.06 per deepest tier instead of +4%): the simulator's players were kindling at 40 minutes after three quick lords; now the first Kindle lands at 2.4h (skilled), 3.2h (casual), 3.5h (idle). Region cadence for a skilled player: 9m, 35m, 1.1h, 3.5h, 4.5h, 7h. The R3→R4 step is the long one; Milestone 12 will look at it.
+
+**Late-game stall (expected).** Past ~22 hours the greedy run sits at level ~200 on the Kiln floor in NG+14 waiting for levels that cost hours each. That is precisely the horizon the Dark Sigil (NG+5) and the Age of Dark exist for; Milestone 11 builds them.

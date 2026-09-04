@@ -3,24 +3,16 @@
 Kept accurate enough that a fresh session can resume mid-milestone. Update before stopping, every time.
 
 ## Status
-- Current milestone: **10 — Content build-out**
-- Last completed: Milestone 9 (Kindling, Humanity tree, NG+ variants, automation nodes).
+- Current milestone: **11 — Deep meta**
+- Last completed: Milestone 10 (six regions, 17 bosses, 32 weapons, 22 spells, 6 phantoms, six boss mechanics, cycle bosses).
 
-## Milestone 10 checklist
-Six regions, each 4–6 tiers, a boss and a secret boss; ~20 weapons; full spell set live; 4 more phantoms; infusions/statuses exercised by bosses.
-- [ ] Region 2 — The Drowned Mire (poison, rot; Rot Wardens' home). Boss: the Mire Mother (heals unless status). Secret: ?
-- [ ] Region 3 — The Archive of Null (sorcery; Archivist Null: punishes spell spam / must be staggered). Secret boss.
-- [ ] Region 4 — The Sanctum of the Vigil (miracles; lightning knights). Boss with a "no over-click" or "only during riposte" mechanic.
-- [ ] Region 5 — The Deep (dark; Keeper of the Deep: Black Flame). Secret boss.
-- [ ] Region 6 — The Kiln (Lord of Cinders: final boss, 4 phases). Secret boss: The First Ember?
-- [ ] Cycle bosses (NG+1..NG+5): one new boss per cycle appearing in a region
-- [ ] Weapons: reach 20 across archetypes with Region 2–6 shop/drop/boss sources
-- [ ] Merge `UPCOMING_SPELLS` into `SPELLS`
-- [ ] Phantoms: stagger (R2), buffer (R3), status (R4), plus R5 dps/hybrid
-- [ ] Materials: large shards R2–4, chunks R4–6, slabs from bosses; coal drops per region
-- [ ] New boss mechanics in engine: 'noClickWindow' (punishes clicking during a phase), 'riposteOnly', 'enrage' (timer), 'summon' (adds), 'shield' (immune until X)
-- [ ] Simulator to 40h; tune first Kindle to 3–7h, region cadence ~90 min
-- [ ] Tests: content integrity for all regions; every boss has ≥2 phases + mechanic; every weapon reachable
+## Milestone 11 checklist
+- [ ] Dark Sigil (unlock at NG+5): resets Humanity + tree (keeping `keepTree` fraction if bought) for Sigil Marks = f(humanityTotal, kindles)
+- [ ] Sigil unlock content (`SIGIL_UNLOCKS`): 6th phantom slot, Hex school + Abyssal Chime + 3 hexes, automation tier (auto-kindle, auto-spells, auto-covenant), new region hook (the Abyss: endless scaling tiers), NG+ scaling reduction, humanity mult, keep tree
+- [ ] Age of Dark (after 3 sigils): Dark Level meta — converts Sigil Marks into permanent ×1.5 souls/dmg per level with rising cost; unlocks auto-Sigil; the Abyss region scales forever with a "Dark Depth" record
+- [ ] Automation ladder complete: auto-attack, auto-riposte, auto-dodge, auto-estus, auto-level, auto-advance, auto-spells, auto-kindle, auto-sigil, auto-covenant
+- [ ] UI: Sigil panel, Age of Dark panel, Abyss on the map
+- [ ] Sim extension + 200h run; tests for sigil math and resets
 
 ## Deferred / known gaps
 - Level-up UI, weapon panel, zone/tier navigation UI (Milestone 4/5)

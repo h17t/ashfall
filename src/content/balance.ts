@@ -37,7 +37,8 @@ export const BALANCE = {
   player: {
     hpBase: 100,
     hpPerVig: 14, // per curve-point (see statCurve, 0..~1.15 -> scaled by 40)
-    hpPerLevel: 1.035, // multiplicative per soul level ("ember hardening")
+    hpPerLevel: 1.035, // multiplicative HP per soul level ("ember hardening")
+    dmgPerLevel: 1.025, // multiplicative damage per soul level: levels always pay, stats decide how
     staminaBase: 60,
     staminaPerEnd: 1.6,
     staminaRegenBase: 18,

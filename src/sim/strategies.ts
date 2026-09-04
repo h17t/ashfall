@@ -127,8 +127,10 @@ export function makePolicy(params: PolicyParams): Strategy {
             if (Math.abs(key - mem.lastTelegraphT) > 0.05) {
               mem.lastTelegraphT = key;
               mem.dodgeDecided = view.rand() < params.dodgeSkill;
+              mem.blindRolled = false;
             }
           }
+          if (mem.dodgeDecided && enemy.mech.blind === 1 && !mem.blindRolled) { mem.blindRolled = true; if (view.rand() < 0.5) mem.dodgeDecided = false; }
           if (mem.dodgeDecided && p.dodgeCd <= 0) {
             const perfect = view.rand() < params.perfectSkill;
             const threshold = perfect ? 0.2 : 0.5;
@@ -150,7 +152,8 @@ export function makePolicy(params: PolicyParams): Strategy {
           // learned players ease off during Backdraft
           if (params.respectsMechanics && enemy.isBoss) {
             const ph = BOSSES[enemy.id]?.phases[enemy.phase];
-            if (ph?.mechanic === 'backdraft' && enemy.riposte <= 0) rate = Math.min(rate, 2.8);
+            if (ph?.mechanic === 'backdraft' && enemy.riposte <= 0) rate = Math.min(rate, (ph.mechParam ?? 7) / 2.2);
+            if (ph?.mechanic === 'hymn' && enemy.mech.hymn === 1 && enemy.riposte <= 0) rate = 0;
           }
           mem.clickAcc += rate * dt;
           const w = getWeapon(p.weapon);

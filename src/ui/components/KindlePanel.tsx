@@ -26,7 +26,7 @@ export const KindlePanel = memo(function KindlePanel() {
       <div className="border border-ash-700 rounded-sm p-2 text-[12px] flex flex-col gap-1">
         <div className="flex justify-between"><span className="text-bone-400">Humanity held</span><span className="font-num text-ember-400">{fmt(D(humanity))}</span><span className="text-bone-400">of {fmt(D(total))} ever</span></div>
         <div className="flex justify-between"><span className="text-bone-400">This cycle</span><span className="font-num text-bone-200">{fmt(D(cycleSouls))} souls · {cycleBosses} lords · {cycleTime} min</span></div>
-        <Tooltip tip="Humanity = (cycle souls ÷ 5,000)^0.42 × 1.15 per lord felled × (1 + 4% per deepest tier) × your Humanity bonuses. The curve is sub-linear: kindling twice as often gathers more than waiting twice as long.">
+        <Tooltip tip="Humanity = (cycle souls ÷ 5,000)^0.42 × 1.15 per lord felled × 1.06 per tier of depth reached × your Humanity bonuses. The curve is sub-linear: kindling twice as often gathers more than waiting twice as long.">
           <div className="flex justify-between cursor-help"><span className="text-bone-400">Kindling now gathers</span><span className="font-num text-ember-400 text-base">+{fmt(D(preview))} Humanity</span></div>
         </Tooltip>
       </div>

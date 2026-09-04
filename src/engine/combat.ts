@@ -5,11 +5,11 @@
 import { D, Decimal, ZERO, safe, decMin } from './num';
 import { rand, chance, pick } from './rng';
 import { BALANCE } from '@/content/balance';
-import { getEnemy, getZone, getBoss, getWeapon, getSpell, globalTier, nextZone, BOSSES, WEAPONS } from '@/content';
+import { getEnemy, getZone, getBoss, getWeapon, getSpell, globalTier, nextZone, cycleBossFor, BOSSES, WEAPONS } from '@/content';
 const getSpellSchool = (id: string) => getSpell(id).school;
 import type { AttackPattern, BossPhase, EnemyDef } from '@/content/types';
 import type { GameState, GameEvent, EnemyInstance, StatusKey, DamageType, Buff, StatKey } from './types';
-import { tierHp, tierDmg, tierPoise, tierSouls, reinforceMult, gradeCoef, statCurve, critChance, playerHpMax, playerStaminaMax, playerStaminaRegen, playerFpMax } from './formulas';
+import { tierHp, tierDmg, tierPoise, tierSouls, reinforceMult, gradeCoef, statCurve, critChance, playerHpMax, playerStaminaMax, playerStaminaRegen, playerFpMax, levelDamageMult } from './formulas';
 import type { Mods } from './mods';
 import { addRep } from './covenants';
 
@@ -48,6 +48,7 @@ export interface DamageBreakdown {
   reqPenalty: number;
   buffs: number;
   mods: number;
+  level: number;
   total: Decimal;
   type: DamageType;
   crit: number;
@@ -100,7 +101,8 @@ export function weaponDamage(state: GameState, mods: Mods, weaponId = state.play
   }
   const reinforce = reinforceMult(level);
   const buffs = buffMult(p.buffs, 'dmg');
-  const total = D(def.base).mul(reinforce).mul(1 + scalingSum).mul(infusionMult).mul(reqPenalty).mul(buffs).mul(mods.dmg);
+  const levelMult = levelDamageMult(p.level);
+  const total = D(def.base).mul(reinforce).mul(1 + scalingSum).mul(infusionMult).mul(reqPenalty).mul(buffs).mul(mods.dmg).mul(levelMult);
   return {
     base: def.base,
     reinforce,
@@ -110,6 +112,7 @@ export function weaponDamage(state: GameState, mods: Mods, weaponId = state.play
     reqPenalty,
     buffs,
     mods: mods.dmg,
+    level: levelMult,
     total: safe(total),
     type,
     crit: critChance(p.stats.dex, mods.critBonus + def.crit),
@@ -146,11 +149,12 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
   const ng = ngLevel(state, mods);
   enc.t = 0;
   if (enc.tier < 0) {
-    const bossId = enc.tier === -1 ? zone.boss : zone.secretBoss!;
+    const bossId = enc.tier === -1 ? zone.boss : enc.tier === -2 ? zone.secretBoss! : cycleBossFor(enc.zone)!.id;
     const boss = getBoss(bossId);
-    const secret = boss.secret;
+    const secret = boss.secret || enc.tier === -3;
     const hp = tierHp(g, ng).mul(secret ? BALANCE.enemy.secretBossHpMult : BALANCE.enemy.bossHpMult).mul(boss.hpMult).floor();
-    const alreadyKilled = state.prestige.bossesEverKilled.includes(bossId) && (enc.tier === -1 ? state.zones[enc.zone]?.bossKills : state.zones[enc.zone]?.secretKills) > 0;
+    const killsThisCycle = enc.tier === -1 ? state.zones[enc.zone]?.bossKills : enc.tier === -2 ? state.zones[enc.zone]?.secretKills : state.zones[enc.zone]?.cycleKills;
+    const alreadyKilled = state.prestige.bossesEverKilled.includes(bossId) && (killsThisCycle ?? 0) > 0;
     const souls = tierSouls(g, ng).mul(secret ? BALANCE.enemy.secretBossSoulMult : BALANCE.enemy.bossSoulMult).mul(boss.soulMult).mul(alreadyKilled ? 0.25 : 1).floor();
     enc.enemy = {
       id: bossId,
@@ -168,10 +172,11 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
       attackDamage: 0,
       attackId: '',
       statuses: emptyStatuses(),
-      mech: {},
+      mech: { phaseStart: 0 },
       variants: [],
       souls,
     };
+    applyPhaseMech(enc.enemy);
     events.push({ type: 'bossPhase', phase: 0, name: boss.phases[0].name });
     return;
   }
@@ -275,6 +280,10 @@ export function damageEnemy(
   if (ph?.mechanic === 'staggerOnly' && enemy.riposte <= 0 && source !== 'dot') {
     d = d.mul(ph.mechParam ?? 0.15);
   }
+  if (ph?.mechanic === 'hymn' && (source === 'player' || source === 'spell') && enemy.mech.hymn === 1 && enemy.riposte <= 0) {
+    hurtPlayer(state, mods, events, Math.round(state.player.hpMax * (ph.mechParam ?? 0.04)), 'hymn');
+    if (state.encounter.enemy !== enemy) return ZERO; // the reflection killed the player
+  }
   if (ph?.mechanic === 'backdraft' && source === 'player') {
     // hits within the window count; exceeding the cap retaliates
     const now = state.encounter.t;
@@ -286,6 +295,7 @@ export function damageEnemy(
       hurtPlayer(state, mods, events, burn, 'backdraft');
       enemy.mech.bdCount = 0;
       enemy.mech.bdStart = now;
+      if (state.encounter.enemy !== enemy) return ZERO; // the backdraft killed the player
     }
   }
   d = safe(d.floor());
@@ -296,13 +306,12 @@ export function damageEnemy(
     enemy.hp = ZERO;
     onKill(state, mods, events);
   } else if (enemy.isBoss) {
-    checkPhase(state, events);
+    checkPhase(state, enemy, events);
   }
   return d;
 }
 
-function checkPhase(state: GameState, events: GameEvent[]) {
-  const enemy = state.encounter.enemy!;
+function checkPhase(state: GameState, enemy: EnemyInstance, events: GameEvent[]) {
   const boss = getBoss(enemy.id);
   const frac = enemy.hp.div(enemy.hpMax).toNumber();
   let target = enemy.phase;
@@ -315,8 +324,18 @@ function checkPhase(state: GameState, events: GameEvent[]) {
     enemy.attackIn = boss.phases[target].attackInterval * 0.6;
     enemy.stagger = 0;
     enemy.riposte = 0;
+    enemy.mech.phaseStart = state.encounter.t;
+    applyPhaseMech(enemy);
     events.push({ type: 'bossPhase', phase: target, name: boss.phases[target].name });
   }
+}
+
+/** Set the UI-visible mechanic flags for the current phase. */
+function applyPhaseMech(enemy: EnemyInstance) {
+  const ph = currentPhase(enemy);
+  enemy.mech.blind = ph?.mechanic === 'blind' ? 1 : 0;
+  enemy.mech.hymn = 0;
+  enemy.mech.hymnCycle = ph?.mechanic === 'hymn' ? 1 : 0;
 }
 
 export function addStagger(state: GameState, mods: Mods, events: GameEvent[], amount: number) {
@@ -524,7 +543,7 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
   const dropMult = mods.materialMult * Math.pow(BALANCE.ng.dropGrowth, state.prestige.kindles);
   for (const [mat, ch] of Object.entries(dropTable)) {
     if (enemy.isBoss) {
-      const already = enc.tier === -1 ? zp.bossKills > 0 : zp.secretKills > 0;
+      const already = enc.tier === -1 ? zp.bossKills > 0 : enc.tier === -2 ? zp.secretKills > 0 : zp.cycleKills > 0;
       if (already && ch >= 1 && (mat === 'estusShard' || mat === 'soulVessel' || mat === 'slab' || mat === 'coal')) continue;
       const n = Math.max(1, Math.floor(ch * (mat === 'estusShard' || mat === 'soulVessel' || mat === 'coal' ? 1 : dropMult)));
       drops[mat] = n;
@@ -535,7 +554,15 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
       if (n > 0) drops[mat] = n;
     }
   }
-  for (const [mat, n] of Object.entries(drops)) state.materials[mat] = (state.materials[mat] ?? 0) + n;
+  for (const [mat, n] of Object.entries(drops)) {
+    if (mat === 'darkEmber') {
+      state.prestige.humanity = state.prestige.humanity.add(n);
+      state.prestige.humanityTotal = state.prestige.humanityTotal.add(n);
+      events.push({ type: 'notice', text: `${n} Dark Ember${n > 1 ? 's' : ''} crumble into Humanity in your palm.` });
+      continue;
+    }
+    state.materials[mat] = (state.materials[mat] ?? 0) + n;
+  }
   // weapon drops
   for (const w of Object.values(WEAPONS)) {
     if (w.source.kind === 'drop' && w.source.zone === enc.zone && w.source.tier === enc.tier && !state.player.weapons[w.id]) {
@@ -550,13 +577,13 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
 
   if (enemy.isBoss) {
     const bossId = enemy.id;
-    if (enc.tier === -1) zp.bossKills++; else zp.secretKills++;
+    if (enc.tier === -1) zp.bossKills++; else if (enc.tier === -2) zp.secretKills++; else zp.cycleKills++;
     state.stats.bossKills++;
     state.stats.cycleBosses++;
     const first = !state.prestige.bossesEverKilled.includes(bossId);
     if (first) state.prestige.bossesEverKilled.push(bossId);
-    const firstThisCycle = (enc.tier === -1 ? zp.bossKills : zp.secretKills) === 1;
-    if (firstThisCycle) {
+    const firstThisCycle = (enc.tier === -1 ? zp.bossKills : enc.tier === -2 ? zp.secretKills : zp.cycleKills) === 1;
+    if (firstThisCycle && !getBoss(bossId).noSoul) {
       const remembered = state.bossSoulChoices[bossId];
       const bossDef = getBoss(bossId);
       if (remembered === 'weapon' && !state.player.weapons[bossDef.soulWeapon]) {
@@ -691,6 +718,8 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
       st.buildup = Math.max(0, st.buildup - BALANCE.status.decay * dt);
     }
   }
+  // hymn windows: 5s sounding / 5s silent, from the phase start
+  if (enemy.mech.hymnCycle === 1) enemy.mech.hymn = Math.floor((enc.t - (enemy.mech.phaseStart ?? 0)) / 5) % 2 === 0 ? 1 : 0;
   // boss regen mechanic (Hanged Pilgrim): heals unless bleeding/poisoned
   const ph = currentPhase(enemy);
   if (ph?.mechanic === 'regen') {
@@ -715,15 +744,15 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
     const slow = enemy.statuses.frost.active > 0 ? 1 / BALANCE.status.frost.slow : 1;
     if (enemy.windup > 0) {
       enemy.windup -= dt / slow;
-      // auto-dodge
-      if (state.automation.autoDodge && mods.unlocks.has('autoDodge') && enemy.windup <= BALANCE.player.perfectWindow * 0.8 && p.dodgeCd <= 0 && p.iframes <= 0) {
+      // auto-dodge (blind phases hide the telegraph from the reflex too)
+      if (state.automation.autoDodge && mods.unlocks.has('autoDodge') && enemy.mech.blind !== 1 && enemy.windup <= BALANCE.player.perfectWindow * 0.8 && p.dodgeCd <= 0 && p.iframes <= 0) {
         playerDodge(state, mods, events);
       }
       if (enemy.windup <= 0) {
         enemy.windup = 0;
         resolveEnemyAttack(state, mods, events);
         if (state.deathScreen > 0) return;
-        enemy.attackIn = attackInterval(enemy) * slow * (0.85 + rand(state.rng) * 0.3);
+        enemy.attackIn = attackInterval(enemy, enc.t) * slow * (0.85 + rand(state.rng) * 0.3);
       }
     } else {
       enemy.attackIn -= dt;
@@ -747,9 +776,12 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
   }
 }
 
-function attackInterval(enemy: EnemyInstance): number {
+function attackInterval(enemy: EnemyInstance, encT = 0): number {
   const ph = currentPhase(enemy);
-  if (ph) return ph.attackInterval;
+  if (ph) {
+    if (ph.mechanic === 'enrage') return ph.attackInterval * Math.max(0.4, 1 - (ph.mechParam ?? 0.01) * (encT - (enemy.mech.phaseStart ?? 0)));
+    return ph.attackInterval;
+  }
   const def = enemyDef(enemy)!;
   const v = enemy.variants.includes('abyssal') ? 0.75 : 1;
   return def.attackInterval * v;

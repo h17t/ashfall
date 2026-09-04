@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useGame, useSel } from '../store';
 import { travelBlocked, expectedLevel, fmt, tierHp, tierSouls, ngLevel, computeMods } from '@/engine';
-import { ZONE_ORDER, getZone, getBoss, globalTier, getEnemy } from '@/content';
+import { ZONE_ORDER, getZone, getBoss, globalTier, getEnemy, cycleBossFor } from '@/content';
 import { Tooltip } from './Tooltip';
 
 export const MapPanel = memo(function MapPanel() {
@@ -21,6 +21,9 @@ function ZoneBlock({ zone }: { zone: string }) {
   const secretFound = useSel((s) => s.zones[zone]?.secretFound ?? false);
   const secretKills = useSel((s) => s.zones[zone]?.secretKills ?? 0);
   const here = useSel((s) => s.encounter.zone === zone);
+  const kindles = useSel((s) => s.prestige.kindles);
+  const cycleKills = useSel((s) => s.zones[zone]?.cycleKills ?? 0);
+  const cb = cycleBossFor(zone);
   return (
     <div className="border border-ash-700 rounded-sm p-2">
       <Tooltip tip={<span className="italic">{z.lore}</span>}>
@@ -30,6 +33,7 @@ function ZoneBlock({ zone }: { zone: string }) {
         {z.tiers.map((t, i) => <TierRow key={i} zone={zone} tier={i} name={t.name} cleared={cleared >= i} here={here} />)}
         <TierRow zone={zone} tier={-1} name={`${getBoss(z.boss).name}, ${getBoss(z.boss).title}`} cleared={bossKills > 0} here={here} boss />
         {z.secretBoss && secretFound && <TierRow zone={zone} tier={-2} name={getBoss(z.secretBoss).name} cleared={secretKills > 0} here={here} boss />}
+        {cb && kindles >= (cb.cycle ?? 99) && bossKills > 0 && <TierRow zone={zone} tier={-3} name={`${cb.name}, ${cb.title}`} cleared={cycleKills > 0} here={here} boss />}
       </div>
     </div>
   );
@@ -56,7 +60,7 @@ function TierRow({ zone, tier, name, cleared, here, boss }: { zone: string; tier
   ) : (
     <div className="flex flex-col gap-1">
       <div className="font-display text-base">{name}</div>
-      <div className="text-bone-300 italic">{getBoss(tier === -1 ? z.boss : z.secretBoss!).lore}</div>
+      <div className="text-bone-300 italic">{getBoss(tier === -1 ? z.boss : tier === -2 ? z.secretBoss! : cycleBossFor(zone)!.id).lore}</div>
       <div className={level < exp ? 'text-blood-500' : 'text-bone-400'}>A wall. Come prepared: around soul level {exp + 4}, a reinforced weapon, and full Estus.</div>
     </div>
   );

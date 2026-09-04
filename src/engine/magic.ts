@@ -19,7 +19,7 @@ export function schoolsAvailable(state: GameState): Set<SchoolKey> {
   const out = new Set<SchoolKey>();
   const w = state.player.weapons;
   if (w.ashenStaff) out.add('sorcery');
-  if (w.crackedTalisman) out.add('miracle');
+  if (w.crackedTalisman || w.stormTalisman) out.add('miracle');
   if (w.pyromancyFlame || state.flags.hasFlame) out.add('pyromancy');
   if (state.flags.hexUnlocked) out.add('hex');
   for (const id of state.spellsKnown) out.add(getSpell(id).school);
@@ -46,8 +46,8 @@ export function spellPower(state: GameState, mods: Mods, spellId: string): numbe
   else scale = 0.4 + Math.min(statCurve(p.stats.int), statCurve(p.stats.fth)) * 3.2;
   const wielded = getWeapon(p.weapon);
   if (wielded.archetype === 'catalyst') {
-    const school: SchoolKey | null = wielded.id === 'ashenStaff' ? 'sorcery' : wielded.id === 'crackedTalisman' ? 'miracle' : wielded.id === 'pyromancyFlame' ? 'pyromancy' : wielded.id === 'abyssalChime' ? 'hex' : null;
-    if (school === sp.school) scale *= 1.25;
+    const school: SchoolKey | null = wielded.id === 'ashenStaff' ? 'sorcery' : wielded.id === 'crackedTalisman' || wielded.id === 'stormTalisman' ? 'miracle' : wielded.id === 'pyromancyFlame' ? 'pyromancy' : wielded.id === 'abyssalChime' ? 'hex' : null;
+    if (school === sp.school) scale *= wielded.id === 'stormTalisman' ? 1.5 : 1.25;
   }
   for (const [k, need] of Object.entries(sp.req)) if (p.stats[k as StatKey] < (need ?? 0)) scale *= 0.5;
   return scale;

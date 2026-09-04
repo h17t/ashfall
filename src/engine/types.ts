@@ -142,13 +142,15 @@ export interface ZoneProgress {
   cleared: number;
   bossKills: number;
   secretKills: number;
+  /** cycle-boss kills this cycle */
+  cycleKills: number;
   /** discovered secret boss */
   secretFound: boolean;
 }
 
 export interface Encounter {
   zone: string;
-  /** tier index; -1 boss, -2 secret boss */
+  /** tier index; -1 boss, -2 secret boss, -3 cycle boss */
   tier: number;
   enemy: EnemyInstance | null;
   /** seconds until the next enemy spawns (after a kill) */

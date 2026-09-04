@@ -14,6 +14,7 @@ import { BALANCE } from './balance';
 import type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef } from './types';
 
 export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, PHANTOMS, COVENANTS, TREE, SIGIL_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial };
+export { UPCOMING_SPELLS } from './spells';
 export type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef };
 
 export function getWeapon(id: string): WeaponDef {
@@ -68,6 +69,12 @@ export function globalTier(zone: string, tier: number): number {
 
 export function zoneOffset(zone: string): number {
   return zoneOffsets[zone] ?? 0;
+}
+
+/** The NG+ cycle boss of a zone, if any. */
+export function cycleBossFor(zone: string): BossDef | null {
+  for (const b of Object.values(BOSSES)) if (b.zone === zone && b.cycle !== undefined) return b;
+  return null;
 }
 
 export function nextZone(zone: string): string | null {
