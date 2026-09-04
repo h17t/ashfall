@@ -50,3 +50,6 @@ export const useGame = create<GameStore>((set, get) => ({
 export function useSel<T>(fn: (s: GameState) => T): T {
   return useGame((g) => fn(g.state));
 }
+
+// Exposed for screenshot/automation scripts and for players who want to poke at their own game.
+(globalThis as any).__ashfall = useGame;

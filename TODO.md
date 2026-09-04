@@ -3,16 +3,15 @@
 Kept accurate enough that a fresh session can resume mid-milestone. Update before stopping, every time.
 
 ## Status
-- Current milestone: **3 — Combat depth (UI pass)**
-- Last completed: Milestone 2 (engine + simulator + 51 tests).
+- Current milestone: **5 — Region 1 + first boss (UI pass)**
+- Last completed: Milestone 4 (progression panels).
 
-## Milestone 3 checklist
-The engine side of M3 (stamina, stagger, riposte, dodge, telegraphs, Estus, death, bloodstain, corpse run) shipped with M1/M2 and is tested. Remaining is making it all *legible and felt* in the UI:
-- [ ] Corpse-run indicator: "your bloodstain lies at <tier>, N kills away", abandon button
-- [ ] Death interstitial audio/visual polish deferred to M12; the 1.2s freeze exists
-- [ ] Riposte moment: time-dilation/chromatic edge deferred to M12; glow + banner exists
-- [ ] Stamina exhaustion feedback in the bar (flash when exhausted)
-- [ ] Telegraph attack name + damage is shown; add "% of your HP"
+## Milestone 5 checklist
+Engine has: bonfire, 4 tiers, Eskel (3 phases: backdraft over-click punish, stagger-only), Hanged Pilgrim secret boss (regen unless status), boss soul choice, flavor text.
+- [ ] Boss intro / phase banner in the encounter view
+- [ ] Minimal spell bar so the boss-soul spell choice is usable (attune + cast, hotkeys 1–6)
+- [ ] Bonfire "lit" moment when entering a zone
+- [ ] Verify with the simulator that Eskel stays inside the 6–16 min window
 
 ## Deferred / known gaps
 - Level-up UI, weapon panel, zone/tier navigation UI (Milestone 4/5)

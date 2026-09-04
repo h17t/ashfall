@@ -49,3 +49,16 @@ Skeleton is in place and exceeds the M1 brief: the combat state shape for M3 (st
 **Auto-attack unlock** is the earlier of: clearing the second tier, or 6 minutes of play. The time fallback exists so the no-click floor is not zero; pillar 6 says the unlock arrives inside 10 minutes and this guarantees it.
 
 **Tests.** 51 tests: formulas, damage, stamina, stagger/riposte, telegraphs/perfect dodge, Estus, death/bloodstain/corpse run, leveling, weapons, content integrity (references + placeholder scan), 12-seed random-action property test on economy invariants, and pacing tests that fail the build if the first boss leaves its window.
+
+## Milestone 3 — combat depth (UI pass)
+
+The engine half of this milestone shipped in M1/M2. This pass made every combat number *legible*: the telegraph shows the attack name, its damage and that damage as a percentage of your HP; the stamina bar shakes and turns amber when a hit lands exhausted; the bloodstain card names the tier where you fell and counts down the kills to reach it, with an explicit "abandon" escape hatch; the log narrates unlocks, tier clears, drops, boss phases and deaths in-world.
+
+**Decision: no hidden numbers, ever.** Every derived value has a hover breakdown (damage = base × reinforce × (1+scaling) × infusion × buffs × permanent). This is pillar 7 (obscurity as flavor, never friction) made structural: the lore is cryptic, the tooltips are not.
+
+## Milestone 4 — progression
+
+- **Level-up at the bonfire.** Each stat row shows the current points, the next soft cap, a filled curve bar, and a tooltip with the *marginal* gain of the next point in concrete terms ("damage 14.3 → 15.1", "HP 268 → 290"). The tooltip also says outright when the equipped weapon does not scale with a stat. A player should never need a spreadsheet.
+- **Weapons panel.** Owned weapons as chips, shop weapons as dashed chips, one detail card: lore, every stat with a tooltip, reinforce button naming the exact material and count, infusion grid (unlocked by the first Cinder Coal drop). Infusions rewrite scaling to an A grade on one stat and downgrade the others by one grade, or trade 15% base for a status buildup.
+- **Respec** is a Soul Vessel consumable (secret-boss drop). It reallocates every point above the starting spread. Scarce, so choices keep their weight.
+- **Weapons in Region 1**: Hollow Straight Sword (hybrid, start), Bandit Dagger (fast, shop), Pilgrim's Mace (heavy, shop), Deserter's Spear (hybrid, drop), Warden's Cleaver (heavy, boss soul), Gallows Rope (fast, secret boss soul). The mace at +2 makes the first boss comfortably beatable; the dagger's 5× riposte rewards the player who has learned to stagger.
