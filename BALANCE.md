@@ -18,6 +18,38 @@ Smoke run (2 min, click every 0.3s, tier 0): 68 kills, 309 souls, no deaths.
 
 ## Latest simulator run
 
+### Run — 2026-09-04 11:42 UTC · 3h · seed 7
+
+| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| greedy | 2.9m | — | 9.6m | — | — | — | — | 60 | 3 | 0 | 0 | 0 | 854 |
+| optimal | 3.8m | — | 10.7m | — | — | — | — | 60 | 3 | 0 | 0 | 0 | 716 |
+| casual | 6.0m | — | 21.9m | — | — | — | — | 57 | 3 | 0 | 0 | 0 | 556 |
+| idle | 6.0m | 26.6m | — | — | — | — | — | 37 | 3 | 0 | 55 | 0 | 646 |
+| noclick | 6.0m | 2.5m | — | — | — | — | — | 35 | 3 | 0 | 54 | 0 | 472 |
+
+Souls earned per hour (first 12 buckets):
+
+| Strategy | h1 | h2 | h3 |
+|---|---|---|---|
+| greedy | 82.7K | 112K |
+| optimal | 82.2K | 111K |
+| casual | 49.7K | 83.3K |
+| idle | 10.5K | 6.64K |
+| noclick | 7.06K | 8.02K |
+
+Bosses (first kill):
+
+- **greedy**: Eskel 9.6m
+- **optimal**: Eskel 10.7m
+- **casual**: Eskel 21.9m
+- **idle**: none
+- **noclick**: none
+
+Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
+
+<details><summary>Previous runs</summary>
+
 ### Run — 2026-09-04 11:15 UTC · 6h · seed 7
 
 | Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
@@ -66,7 +98,7 @@ Stalls (no progress event for 20+ min):
 
 Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
 
-<details><summary>Previous runs</summary>
+---
 
 ### Run — 2026-09-04 11:14 UTC · 2h · seed 7
 

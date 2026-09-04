@@ -10,8 +10,9 @@ import type { GameState, GameEvent, PhantomState, Action, StatusKey } from './ty
 import type { Mods } from './mods';
 import { tierHp, tierDmg, tierSouls, reinforceMult } from './formulas';
 import { damageEnemy, addStagger, applyStatus, ngLevel, buffMult } from './combat';
-import { registerTickHook } from './tick';
-import { registerActionHandler, ensureZone } from './actions';
+import { registerTickHook } from './registry';
+import { ensureZone } from './actions';
+import { registerActionHandler } from './registry';
 import { setIdleRateFn, type IdleRate } from './idle';
 
 // ---------------------------------------------------------------------------

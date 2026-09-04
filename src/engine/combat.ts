@@ -10,6 +10,7 @@ import type { AttackPattern, BossPhase, EnemyDef } from '@/content/types';
 import type { GameState, GameEvent, EnemyInstance, StatusKey, DamageType, Buff, StatKey } from './types';
 import { tierHp, tierDmg, tierPoise, tierSouls, reinforceMult, gradeCoef, statCurve, critChance, playerHpMax, playerStaminaMax, playerStaminaRegen, playerFpMax } from './formulas';
 import type { Mods } from './mods';
+import { addRep } from './covenants';
 
 // ---------------------------------------------------------------------------
 // Derived player numbers
@@ -544,6 +545,7 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
     }
   }
   events.push({ type: 'kill', enemy: enemy.name, souls, isBoss: enemy.isBoss, drops });
+  addRep(state, enemy.isBoss ? 25 : 1);
 
   if (enemy.isBoss) {
     const bossId = enemy.id;

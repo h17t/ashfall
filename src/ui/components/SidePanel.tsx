@@ -8,8 +8,10 @@ import { MapPanel } from './MapPanel';
 import { SoulsPanel } from './SoulsPanel';
 import { SettingsPanel } from './SettingsPanel';
 import { SquadPanel } from './SquadPanel';
+import { MagicPanel } from './MagicPanel';
+import { CovenantPanel } from './CovenantPanel';
 
-type Tab = 'bonfire' | 'weapons' | 'map' | 'squad' | 'souls' | 'settings';
+type Tab = 'bonfire' | 'weapons' | 'magic' | 'map' | 'squad' | 'covenant' | 'souls' | 'settings';
 
 export function SidePanel() {
   const [tab, setTab] = useState<Tab>('bonfire');
@@ -18,14 +20,16 @@ export function SidePanel() {
   const tabs: { id: Tab; label: string; badge?: boolean }[] = [
     { id: 'bonfire', label: 'Bonfire' },
     { id: 'weapons', label: 'Weapons' },
+    { id: 'magic', label: 'Magic' },
     { id: 'map', label: 'Road' },
     { id: 'squad', label: 'Squad', badge: recruitable },
+    { id: 'covenant', label: 'Oaths' },
     { id: 'souls', label: 'Souls', badge: soulsHeld },
     { id: 'settings', label: '⚙' },
   ];
   return (
     <div className="slab p-3 flex flex-col gap-3 min-h-[520px]">
-      <div className="flex gap-1 border-b border-ash-700 pb-2">
+      <div className="flex flex-wrap gap-1 border-b border-ash-700 pb-2">
         {tabs.map((t) => (
           <button key={t.id} className={`text-[11px] uppercase tracking-widest px-2 py-1 rounded-sm ${tab === t.id ? 'text-ember-400 bg-ash-800' : 'text-bone-400 hover:text-bone-200'}`} onClick={() => setTab(t.id)}>
             {t.label}{t.badge && <span className="ml-1 text-ember-400">●</span>}
@@ -36,7 +40,9 @@ export function SidePanel() {
         {tab === 'bonfire' && <BonfirePanel />}
         {tab === 'weapons' && <WeaponsPanel />}
         {tab === 'map' && <MapPanel />}
+        {tab === 'magic' && <MagicPanel />}
         {tab === 'squad' && <SquadPanel />}
+        {tab === 'covenant' && <CovenantPanel />}
         {tab === 'souls' && <SoulsPanel />}
         {tab === 'settings' && <SettingsPanel />}
       </div>

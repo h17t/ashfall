@@ -10,17 +10,14 @@ import { tickCombat, refreshPlayerMaxes } from './combat';
 import { ensureZone } from './actions';
 import { getZone } from '@/content';
 import { checkUnlocks } from './unlocks';
+import { tickHooks } from './registry';
+export { registerTickHook } from './registry';
 
 export interface StepResult {
   state: GameState;
   events: GameEvent[];
 }
 
-const hooks: ((state: GameState, mods: Mods, events: GameEvent[], dt: number) => void)[] = [];
-/** Later modules (phantoms, covenants, prestige) register their per-tick logic here. */
-export function registerTickHook(h: (state: GameState, mods: Mods, events: GameEvent[], dt: number) => void) {
-  hooks.push(h);
-}
 
 export function step(state: GameState, dt: number, actions: Action[] = []): StepResult {
   const events: GameEvent[] = [];
@@ -32,7 +29,7 @@ export function step(state: GameState, dt: number, actions: Action[] = []): Step
   state.stats.playTime += dt;
   state.stats.cycleTime += dt;
   tickCombat(state, mods, events, dt);
-  for (const h of hooks) h(state, mods, events, dt);
+  for (const h of tickHooks) h(state, mods, events, dt);
   checkUnlocks(state, mods, events);
   return { state, events };
 }

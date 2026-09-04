@@ -105,3 +105,17 @@ Simulator: Eskel falls at 12.5m (greedy) / 31m (casual, one death). Inside the 6
 **Performance.** The hunt is re-evaluated once per second of game time (memoised per state object, keyed on roster, level, gear and hunting choice). Deterministic, and it kept the 200-hour simulation under a minute.
 
 Simulator after M7: idle-only earns ~15% of the greedy player's souls in the first hour with a single phantom; the idle path still cannot beat Eskel (it doesn't dodge), which is intended until auto-dodge and auto-riposte are earned.
+
+## Milestone 8 — magic and covenants
+
+**Catalysts open schools.** Owning an Ashen Staff (sorcery), a Cracked Talisman (miracles) or a Pyromancy Flame (from Eskel's soul, or bought in Region 2) opens that school *and* the first attunement slot. Wielding the catalyst channels its school for +25% power at the cost of a weak melee, so a pure caster is a real build rather than "melee plus spells". Three more slots are bought with souls (×6 each); the tree and the Sigil add more.
+
+**Power formula.** Sorcery/miracles: 0.4 + 2.2 × statCurve(INT or FTH) → 0.6 at 10 points, ~2.5 at 40. Pyromancy: (0.6 + 0.5 × (curve INT + curve FTH)) × 1.18^flame, so it levels with souls poured into the flame instead of stats. Spells scale from the "base strike" (weapon base × reinforcement × permanent modifiers, *no* stat scaling) so they stay relevant for a stat-invested caster without being mandatory for a melee build: Soul Arrow at 8 FP is +50% DPS for an unlearned build and +200% for INT 40. Buffs scale gently with √power and never below their listed value.
+
+**The roster** is 21 spells across the three schools (six of them, tied to Regions 2–6 bosses and drops, are staged in `UPCOMING_SPELLS` until Milestone 10 ships their sources). The important ones for session shape: Last Rites (+60% souls for 25s), Sacred Oath (party-wide), Bountiful Light (phantoms ×1.5 for 40s), Power Within (the greedy self-burn).
+
+**Covenants** are five mutually exclusive oaths with a passive, three ranked upgrades each, and *standing* that accrues per kill (+1, +25 per boss) and persists through Kindling. The first oath is free; each later switch costs three level-ups' worth of souls growing ×1.5, so switching is a real decision but never a lock. Upgrade costs are multiples of the current level-up cost, which keeps them meaningful across the exponential. Availability gates: Embers always; Legion after the first phantom; Rot Wardens and the Vigil from Region 2; the Abyssal Pact after two lords (×2 souls, ×2 damage, ×2 damage taken, *no bloodstain*).
+
+**Phantom affinity**: a phantom whose covenant matches yours gets +15% damage (healers +40% healing). This is the horizontal hook that makes two players' squads differ.
+
+Simulator: strategies now buy a catalyst, learn and cast, and swear by play style (Embers for skilled, Vigil for casual, Legion for idle). First boss: greedy 9.6m, casual 21.9m without a death (Heal carries it). Souls/hour up ~50% from the Embers passive and Magic Weapon.

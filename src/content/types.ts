@@ -165,7 +165,8 @@ export interface CovenantUpgrade {
 
 export type CovenantEffectKey =
   | 'soulMult' | 'dmgMult' | 'phantomRate' | 'phantomDmg' | 'statusBuild' | 'statusDmg'
-  | 'offlineCap' | 'offlineRate' | 'takenMult' | 'bloodstainKeep' | 'estusPotency' | 'staggerMult' | 'materialMult' | 'humanityMult';
+  | 'offlineCapHours' | 'offlineRate' | 'takenMult' | 'bloodstainKeep' | 'estusPotency' | 'staggerMult' | 'materialMult' | 'humanityMult'
+  | 'phantomSlot' | 'critChance' | 'dodgeCd';
 
 export interface CovenantDef {
   id: string;

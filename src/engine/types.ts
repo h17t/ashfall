@@ -318,6 +318,7 @@ export type Action =
   | { type: 'attune'; slot: number; spell: string | null }
   | { type: 'cast'; slot: number }
   | { type: 'upgradeFlame' }
+  | { type: 'buySpell'; spell: string }
   | { type: 'buyAttunementSlot' }
   | { type: 'recruit'; phantom: string }
   | { type: 'assignPhantom'; phantom: string; assignment: PhantomAssignment }

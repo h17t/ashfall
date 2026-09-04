@@ -11,6 +11,9 @@ import { levelCost, reinforceCost, statCurve, reinforceMult } from './formulas';
 import { computeMods, type Mods } from './mods';
 import { playerAttack, playerDodge, playerEstus, restAtBonfire, refreshPlayerMaxes, recoverBloodstain, damageEnemy, addStagger, applyStatus, weaponDamage } from './combat';
 import { newZoneProgress } from './state';
+import { actionHandlers } from './registry';
+export { registerActionHandler } from './registry';
+import { spellPower } from './magic';
 
 export function ensureZone(state: GameState, zone: string) {
   if (!state.zones[zone]) state.zones[zone] = newZoneProgress(getZone(zone).tiers.length);
@@ -149,8 +152,8 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
         if (state.spellsKnown.includes(boss.soulSpell)) { state.bossSouls[action.boss]++; return err('Already learned.'); }
         state.spellsKnown.push(boss.soulSpell);
         const sp = getSpell(boss.soulSpell);
-        if (sp.school === 'pyromancy' && !state.flags.hasCatalyst) { state.flags.hasCatalyst = true; }
-        if (!state.flags.hasCatalyst) state.flags.hasCatalyst = true;
+        if (sp.school === 'pyromancy') state.flags.hasFlame = true;
+        state.flags.hasCatalyst = true;
         refreshPlayerMaxes(state, mods);
         events.push({ type: 'unlock', what: 'spell:' + boss.soulSpell, text: `${sp.name} learned from the soul.` });
       }
@@ -171,8 +174,8 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
       return;
     }
     case 'upgradeFlame': {
-      const cost = D(200).mul(D(2.1).pow(p.flameLevel)).floor();
-      if (!state.spellsKnown.some((s) => getSpell(s).school === 'pyromancy')) return err('You have no flame to feed.');
+      const cost = D(300).mul(D(2.2).pow(p.flameLevel)).floor();
+      if (!state.flags.hasFlame && !p.weapons.pyromancyFlame) return err('You have no flame to feed.');
       if (state.souls.lt(cost)) return err('Not enough souls.');
       state.souls = state.souls.sub(cost);
       p.flameLevel++;
@@ -222,28 +225,11 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
   }
 }
 
-// Extended handlers are registered by later modules to keep this file focused on the core loop.
-type Handler = (state: GameState, action: Action, events: GameEvent[], mods: Mods) => boolean;
-const extended: Handler[] = [];
-export function registerActionHandler(h: Handler) {
-  extended.push(h);
-}
 function handleExtended(state: GameState, action: Action, events: GameEvent[], mods: Mods) {
-  for (const h of extended) if (h(state, action, events, mods)) return;
+  for (const h of actionHandlers) if (h(state, action, events, mods)) return;
   events.push({ type: 'error', text: `Nothing happens. (${action.type})` });
 }
 
-export function spellPower(state: GameState, mods: Mods, spellId: string): number {
-  const sp = getSpell(spellId);
-  const p = state.player;
-  let scale: number;
-  if (sp.school === 'sorcery') scale = 1 + statCurve(p.stats.int) * 2.2;
-  else if (sp.school === 'miracle') scale = 1 + statCurve(p.stats.fth) * 2.2;
-  else if (sp.school === 'pyromancy') scale = (1 + (statCurve(p.stats.int) + statCurve(p.stats.fth)) * 0.6) * Math.pow(1.2, p.flameLevel);
-  else scale = 1 + Math.min(statCurve(p.stats.int), statCurve(p.stats.fth)) * 3.0;
-  for (const [k, need] of Object.entries(sp.req)) if (p.stats[k as StatKey] < (need ?? 0)) scale *= 0.5;
-  return scale;
-}
 
 
 export function castSpell(state: GameState, mods: Mods, events: GameEvent[], id: string) {
