@@ -18,7 +18,7 @@ export interface AssetEntry {
   anchor: { x: number; y: number };
   source: AssetSource;
   /** file paths relative to the served root */
-  files: { x2: string; x1: string; mask?: string };
+  files: { x2: string; x1: string; mask?: string; /** a trimmed, lifted crop for chips and lists (weapons) */ icon?: string };
   /** region plates carry four parallax layers */
   layers?: string[];
   /** the seed the procedural build used (for reproducibility) */
@@ -26,7 +26,7 @@ export interface AssetEntry {
 }
 
 const seedOf = (s: string) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h % 1000003; };
-const files = (kind: string, id: string) => ({ x2: `/art/${kind}/${id}@2x.webp`, x1: `/art/${kind}/${id}.webp`, mask: `/art/${kind}/${id}.mask.png` });
+const files = (kind: string, id: string) => ({ x2: `/art/${kind}/${id}@2x.webp`, x1: `/art/${kind}/${id}.webp`, mask: `/art/${kind}/${id}.mask.png`, ...(kind === 'weapon' ? { icon: `/art/${kind}/${id}.icon.webp` } : {}) });
 
 function entry(kind: AssetKind, id: string, w: number, h: number, anchor: { x: number; y: number }, extra: Partial<AssetEntry> = {}): AssetEntry {
   return { id, kind, w, h, anchor, source: 'procedural', files: files(kind, id), seed: seedOf(kind + ':' + id), ...extra };

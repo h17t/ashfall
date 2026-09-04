@@ -77,7 +77,7 @@ export const PlayerPanel = memo(function PlayerPanel() {
       )}
       <div className="t-rule" />
       <div className="flex gap-3 items-start">
-        <div className="w-[68px] h-[68px] shrink-0 -ml-1 -mt-1" style={{ filter: 'drop-shadow(-3px 5px 6px var(--void))' }}><Plate kind="weapon" id={weaponId} className="w-full h-full object-contain" /></div>
+        <div className="w-[68px] h-[68px] shrink-0 -ml-1 -mt-1" style={{ filter: 'drop-shadow(-3px 5px 6px var(--void))' }}><Plate kind="weapon" id={weaponId} variant="icon" className="w-full h-full object-contain" /></div>
         <div className="min-w-0">
           <div className="t-label" style={{ color: 'var(--parchment)' }}>{weapon.name} {weaponLevel > 0 && <span style={{ color: 'var(--ember-hot)' }}>+{weaponLevel}</span>}</div>
           <div className="t-lore text-[13px] leading-snug mt-1 line-clamp-3">{weapon.lore}</div>

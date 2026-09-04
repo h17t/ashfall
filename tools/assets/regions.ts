@@ -8,7 +8,7 @@ import { PALETTE, type PaletteKey } from './palette';
 
 export const RW = 1600, RH = 900;
 
-interface RegionStyle { tint: PaletteKey; sky: string; mid: (r: Rng) => string[]; near: (r: Rng) => string[]; fore: (r: Rng) => string[]; glow?: { x: number; y: number; r: number; color: PaletteKey }[] }
+interface RegionStyle { tint: PaletteKey; sky: string; mid: (r: Rng) => string[]; near: (r: Rng) => string[]; fore: (r: Rng) => string[]; glow?: { x: number; y: number; r: number; color: PaletteKey }[]; shafts?: { x: number; w: number; lean: number }[] }
 
 const f = (n: number) => n.toFixed(1);
 const path = (pts: Pt[], smooth = false) => (smooth ? smoothClosed(pts, 0.5) : polyPath(pts));
@@ -72,8 +72,27 @@ function reeds(r: Rng, x0: number, x1: number, base: number, h: number): string[
   return out;
 }
 function shelf(r: Rng, x: number, y: number, w: number, h: number): string[] {
-  const out: string[] = [path(jitter([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], r, 2))];
-  for (let i = 0; i < 6; i++) { const yy = y + (i + 1) * (h / 7); out.push(`M${x} ${f(yy)} L${x + w} ${f(yy + r.range(-2, 2))}`); }
+  // a bookcase: uprights and shelves as a frame, then rows of spines with gaps so the murk shows through
+  const out: string[] = [path(jitter([[x, y], [x + w, y], [x + w, y + 10], [x, y + 10]], r, 1)), path(jitter([[x, y], [x + 12, y], [x + 12, y + h], [x, y + h]], r, 1)), path(jitter([[x + w - 12, y], [x + w, y], [x + w, y + h], [x + w - 12, y + h]], r, 1))];
+  const rows = Math.max(3, Math.round(h / 90));
+  for (let i = 0; i < rows; i++) {
+    const yy = y + (i + 1) * (h / rows);
+    out.push(path(jitter([[x, yy - 8], [x + w, yy - 8], [x + w, yy], [x, yy]], r, 1)));
+    let bx = x + 14;
+    while (bx < x + w - 18) {
+      const bw = r.range(9, 22), bh = r.range(38, 74);
+      if (r.chance(0.82)) out.push(path(jitter([[bx, yy - 8], [bx + bw, yy - 8 - r.range(-4, 4)], [bx + bw, yy - 8 - bh], [bx, yy - 8 - bh + r.range(-6, 6)]], r, 1)));
+      else if (r.chance(0.5)) out.push(path(jitter([[bx, yy - 8], [bx + bw * 1.6, yy - 8], [bx + bw * 1.6, yy - 20], [bx, yy - 24]], r, 1))); // a fallen book
+      bx += bw + r.range(1, 6);
+    }
+  }
+  return out;
+}
+function ladder(r: Rng, x: number, y: number, len: number, angle: number): string[] {
+  const dx = Math.cos(angle) * len, dy = -Math.sin(angle) * len;
+  const nx = -dy / len * 22, ny = dx / len * 22;
+  const out = [path(taper([x, y], [x + dx, y + dy], 7, 5, r, 0.6, 4)), path(taper([x + nx, y + ny], [x + dx + nx, y + dy + ny], 7, 5, r, 0.6, 4))];
+  for (let i = 1; i < 8; i++) { const t = i / 8; out.push(path(taper([x + dx * t, y + dy * t], [x + dx * t + nx, y + dy * t + ny], 4, 4, r, 0.3, 2))); }
   return out;
 }
 function stair(r: Rng, x: number, y: number, steps: number, w: number, dir = 1): string[] {
@@ -100,9 +119,10 @@ const STYLES: Record<string, RegionStyle> = {
   archive: {
     tint: 'soul', sky: 'ink',
     mid: (r) => [path(ground(r, 640, 6)), ...shelf(r, 80, 100, 220, 540), ...shelf(r, 380, 60, 200, 580), ...shelf(r, 1000, 120, 240, 520), ...shelf(r, 1300, 40, 260, 600), arch(640, 300, 480, 640)],
-    near: (r) => [path(ground(r, 760, 4)), ...shelf(r, -40, 200, 300, 560), ...shelf(r, 1250, 260, 400, 500), ...stair(r, 560, 620, 6, 120, 1)],
-    fore: (r) => [path(ground(r, 860, 3)), ...shelf(r, -80, 300, 380, 600), path(blob(700, 880, 200, 30, r, 0.2, 14)), path(blob(1450, 860, 120, 40, r, 0.3, 12))],
+    near: (r) => [path(ground(r, 760, 4)), ...shelf(r, -40, 200, 300, 560), ...shelf(r, 1250, 260, 400, 500), ...stair(r, 560, 620, 6, 120, 1), ...ladder(r, 900, 760, 520, 1.15)],
+    fore: (r) => [path(ground(r, 860, 3)), ...shelf(r, -80, 300, 380, 600), path(blob(700, 880, 200, 30, r, 0.2, 14)), path(blob(1450, 860, 120, 40, r, 0.3, 12)), ...Array.from({ length: 14 }, () => path(jitter([[r.range(200, 1500), r.range(820, 900)], [r.range(200, 1500), r.range(820, 900)], [r.range(200, 1500), r.range(820, 900)]], r, 2)))],
     glow: [{ x: 790, y: 360, r: 160, color: 'soul' }],
+    shafts: [{ x: 760, w: 70, lean: 60 }],
   },
   sanctum: {
     tint: 'gold', sky: 'stone',
@@ -110,6 +130,7 @@ const STYLES: Record<string, RegionStyle> = {
     near: (r) => [path(ground(r, 720, 6)), ...stair(r, 500, 560, 8, 160, 1), ...stair(r, 1100, 560, 8, 160, -1), path(ruin(r, 40, 260, 400, 740)), path(ruin(r, 1300, 300, 420, 740))],
     fore: (r) => [path(ground(r, 850, 4)), path(ruin(r, -60, 300, 520, 900)), path(ruin(r, 1350, 320, 480, 900))],
     glow: [{ x: 800, y: 260, r: 220, color: 'gold' }],
+    shafts: [{ x: 700, w: 140, lean: 120 }, { x: 900, w: 90, lean: 160 }],
   },
   deep: {
     tint: 'soul', sky: 'void',
@@ -153,6 +174,7 @@ export function regionLayers(id: string, seed: number): string[] {
       <feTurbulence type="fractalNoise" baseFrequency="0.004" numOctaves="3" seed="${seed + 7}" result="n"/>
       <feColorMatrix in="n" type="matrix" values="0 0 0 0 ${ch(skyBase, 0)}  0 0 0 0 ${ch(skyBase, 1)}  0 0 0 0 ${ch(skyBase, 2)}  0 0 0 0.9 -0.25"/>
     </filter>
+    <linearGradient id="shaft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tint}" stop-opacity="0.5"/><stop offset="0.7" stop-color="${tint}" stop-opacity="0.12"/><stop offset="1" stop-color="${tint}" stop-opacity="0"/></linearGradient>
     <linearGradient id="horizon" x1="0" y1="0" x2="0" y2="1"><stop offset="0.45" stop-color="${tint}" stop-opacity="0"/><stop offset="0.8" stop-color="${tint}" stop-opacity="0.16"/><stop offset="1" stop-color="${PALETTE.void}" stop-opacity="0.5"/></linearGradient>` +
     paperFilter('paper', seed, RW, RH);
   const motes: string[] = [];
@@ -162,6 +184,7 @@ export function regionLayers(id: string, seed: number): string[] {
     `<rect width="${RW}" height="${RH}" filter="url(#haze)" opacity="0.7"/>` +
     `<rect width="${RW}" height="${RH}" filter="url(#clouds)" opacity="0.55"/>` +
     (st.glow ?? []).map((g, i) => `<circle cx="${g.x}" cy="${g.y}" r="${g.r * 2.2}" fill="url(#glow${i})" opacity="0.5"/><circle cx="${g.x}" cy="${g.y}" r="${g.r}" fill="url(#glow${i})"/>`).join('') +
+    (st.shafts ?? []).map((sh) => `<path d="M${sh.x} 0 L${sh.x + sh.w} 0 L${sh.x + sh.w + sh.lean} ${RH} L${sh.x - sh.w * 0.6 + sh.lean} ${RH} Z" fill="url(#shaft)" opacity="0.55"/>`).join('') +
     `<rect width="${RW}" height="${RH}" fill="url(#horizon)"/>` +
     motes.join('') +
     `<rect width="${RW}" height="${RH}" filter="url(#paper)" opacity="0.35" style="mix-blend-mode:multiply"/>`);

@@ -29,7 +29,7 @@ export const WeaponsPanel = memo(function WeaponsPanel() {
       <div className="t-display text-[20px] text-ember-hot">Weapons</div>
       <div className="flex flex-wrap gap-1">
         {ownedIds.map((id) => <WeaponChip key={id} id={id} selected={id === current} equipped={id === equipped} onSelect={() => setSel(id)} />)}
-        {shop.map((w) => <button key={w.id} className={`btn flex items-center gap-2 border-dashed ${w.id === current ? 'border-ember' : ''}`} style={{ opacity: 0.8 }} onClick={() => setSel(w.id)}><span className="w-8 h-8 -my-2 shrink-0 icon-well"><Plate kind="weapon" id={w.id} className="w-full h-full object-contain" /></span>{w.name} · {fmt(w.source.kind === 'shop' ? w.source.cost : 0)}</button>)}
+        {shop.map((w) => <button key={w.id} className={`btn flex items-center gap-2 border-dashed ${w.id === current ? 'border-ember' : ''}`} style={{ opacity: 0.8 }} onClick={() => setSel(w.id)}><span className="w-8 h-8 -my-2 shrink-0"><Plate kind="weapon" id={w.id} variant="icon" className="w-full h-full object-contain" /></span>{w.name} · {fmt(w.source.kind === 'shop' ? w.source.cost : 0)}</button>)}
       </div>
       <WeaponDetail id={current} owned={ownedIds.includes(current)} />
     </div>
@@ -42,7 +42,7 @@ function WeaponChip({ id, selected, equipped, onSelect }: { id: string; selected
   const def = getWeapon(id);
   return (
     <button className={`btn flex items-center gap-2 ${selected ? 'border-ember text-parchment' : ''} ${equipped ? 'btn-ember' : ''}`} onClick={onSelect}>
-      <span className="w-8 h-8 -my-2 shrink-0 icon-well"><Plate kind="weapon" id={id} className="w-full h-full object-contain" /></span>
+      <span className="w-8 h-8 -my-2 shrink-0"><Plate kind="weapon" id={id} variant="icon" className="w-full h-full object-contain" /></span>
       {inf !== 'none' && <span className="text-soul">{inf}</span>}{def.name} <span className="font-num text-ember-hot">+{level}</span>
     </button>
   );

@@ -38,7 +38,7 @@ interface Props {
 const MAT: Record<Material, { base: string; rim: string; fg: string; grain: number; mottle: number; edge: EdgeStyle; rough: number; hot: string }> = {
   stone: { base: 'linear-gradient(155deg, var(--stone) 0%, color-mix(in srgb, var(--stone) 70%, var(--ink)) 60%, var(--ink) 100%)', rim: 'color-mix(in srgb, var(--bone) 14%, var(--stone))', fg: 'var(--bone)', grain: 0.5, mottle: 0.55, edge: 'chipped', rough: 6, hot: 'var(--ember)' },
   leather: { base: 'linear-gradient(170deg, color-mix(in srgb, var(--ink) 80%, var(--blood)) 0%, var(--ink) 55%, var(--void) 100%)', rim: 'color-mix(in srgb, var(--ash) 45%, var(--ink))', fg: 'var(--bone)', grain: 0.7, mottle: 0.75, edge: 'chipped', rough: 4, hot: 'var(--ember)' },
-  parchment: { base: 'linear-gradient(160deg, var(--parchment) 0%, color-mix(in srgb, var(--parchment) 80%, var(--bone)) 55%, color-mix(in srgb, var(--bone) 85%, var(--ash)) 100%)', rim: 'color-mix(in srgb, var(--ash) 30%, var(--bone))', fg: 'var(--ink)', grain: 0.3, mottle: 0.45, edge: 'torn', rough: 9, hot: 'var(--ember-hot)' },
+  parchment: { base: 'linear-gradient(160deg, var(--parchment) 0%, color-mix(in srgb, var(--parchment) 80%, var(--bone)) 55%, color-mix(in srgb, var(--bone) 85%, var(--ash)) 100%)', rim: 'color-mix(in srgb, var(--ash) 30%, var(--bone))', fg: 'var(--ink)', grain: 0.22, mottle: 0.2, edge: 'torn', rough: 9, hot: 'var(--ember-hot)' },
   iron: { base: 'linear-gradient(165deg, var(--ash) 0%, var(--stone) 40%, var(--ink) 100%)', rim: 'color-mix(in srgb, var(--bone) 25%, var(--ash))', fg: 'var(--parchment)', grain: 0.6, mottle: 0.4, edge: 'cut', rough: 2, hot: 'var(--ember-hot)' },
 };
 

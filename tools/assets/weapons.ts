@@ -43,7 +43,12 @@ export function weaponPlate(id: string, seed: number): Plate {
     const head: Pt = [c + 34 * S, c - 38 * S];
     if (k === 'mace') L.push({ kind: 'mass', pts: maceHead(head, r, 24 * S), z: 3, tone: 0.4 });
     if (k === 'club') L.push({ kind: 'mass', pts: blob(head[0], head[1], 20 * S, 32 * S, r, 0.25, 14, -0.7), z: 3, tone: 0.2 });
-    if (k === 'hammer') L.push({ kind: 'mass', pts: jitter([[head[0] - 34, head[1] - 12], [head[0] + 26, head[1] - 34], [head[0] + 40, head[1] + 4], [head[0] - 20, head[1] + 26]], r, 1.5), z: 3, tone: 0.4 });
+    if (k === 'hammer') {
+      // a maul: a squared head across the haft with a bevelled face and a spike behind
+      L.push({ kind: 'mass', pts: jitter([[head[0] - 30, head[1] - 4], [head[0] + 6, head[1] - 40], [head[0] + 34, head[1] - 16], [head[0] - 2, head[1] + 22]], r, 1.5), z: 3, tone: 0.45 });
+      L.push({ kind: 'mass', pts: taper([head[0] - 14, head[1] + 12], [head[0] - 40, head[1] + 36], 12, 2, r, 0.5, 3), z: 3, tone: 0.3 });
+      L.push({ kind: 'line', pts: [[head[0] - 22, head[1] + 2], [head[0] + 10, head[1] - 30]], width: 1.2, closed: false, z: 7 });
+    }
     if (k === 'bell') { L.push({ kind: 'mass', pts: jitter([[head[0] - 26, head[1] - 30], [head[0] + 26, head[1] - 30], [head[0] + 36, head[1] + 18], [head[0] - 36, head[1] + 18]], r, 1.5), z: 3, tone: 0.4 }); L.push({ kind: 'glow', cx: head[0], cy: head[1] + 8, r: 14, color: 'gold', z: 9 }); }
   }
   if (k === 'spear' || k === 'halberd') {
@@ -52,12 +57,16 @@ export function weaponPlate(id: string, seed: number): Plate {
     if (k === 'halberd') L.push({ kind: 'mass', pts: axeHead([c + 36 * S, c - 30 * S], r, 22, 1), z: 3, tone: 0.4 });
   }
   if (k === 'staff') { L.push({ kind: 'mass', pts: haft([c - 56, c + 64], [c + 36, c - 44], r, 7), z: 2 }); L.push({ kind: 'mass', pts: blob(c + 40, c - 50, 14, 16, r, 0.3, 12), z: 3, tone: 0.3 }); L.push({ kind: 'glow', cx: c + 40, cy: c - 50, r: 20, color: 'soul', z: 9 }); }
-  if (k === 'talisman') { L.push({ kind: 'mass', pts: blob(c, c, 40 * S, 48 * S, r, 0.1, 16), z: 2, tone: 0.3 }); L.push({ kind: 'mass', pts: jitter([[c - 6, c - 60 * S], [c + 6, c - 60 * S], [c + 6, c + 60 * S], [c - 6, c + 60 * S]], r, 1), z: 3, tone: 0.5 }); L.push({ kind: 'mass', pts: jitter([[c - 40 * S, c - 10], [c + 40 * S, c - 10], [c + 40 * S, c + 2], [c - 40 * S, c + 2]], r, 1), z: 3, tone: 0.5 }); L.push({ kind: 'detail', pts: taper([c - 8, c - 44], [c + 10, c + 40], 2, 4, r, 0.6, 4), color: 'void', alpha: 0.9, z: 8 }); L.push({ kind: 'glow', cx: c, cy: c - 4, r: 22, color: s.glow ?? 'gold', z: 9 }); }
+  if (k === 'talisman') { L.push({ kind: 'mass', pts: blob(c, c, 40 * S, 48 * S, r, 0.1, 16), z: 2, tone: 0.3 }); L.push({ kind: 'detail', pts: blob(c, c - 2, 22 * S, 27 * S, r, 0.08, 16), color: 'void', alpha: 0.85, z: 8 }); L.push({ kind: 'mass', pts: rope([c - 4, c - 46 * S], [c + 30, c - 78 * S], r, 4), z: 2 }); L.push({ kind: 'mass', pts: jitter([[c - 6, c - 60 * S], [c + 6, c - 60 * S], [c + 6, c + 60 * S], [c - 6, c + 60 * S]], r, 1), z: 3, tone: 0.5 }); L.push({ kind: 'mass', pts: jitter([[c - 40 * S, c - 10], [c + 40 * S, c - 10], [c + 40 * S, c + 2], [c - 40 * S, c + 2]], r, 1), z: 3, tone: 0.5 }); L.push({ kind: 'detail', pts: taper([c - 8, c - 44], [c + 10, c + 40], 2, 4, r, 0.6, 4), color: 'void', alpha: 0.9, z: 8 }); L.push({ kind: 'glow', cx: c, cy: c - 4, r: 22, color: s.glow ?? 'gold', z: 9 }); }
   if (k === 'flame') { L.push({ kind: 'mass', pts: blob(c, c + 44, 34, 18, r, 0.15, 12), z: 2 }); L.push({ kind: 'mass', pts: flame(c, c + 40, r, 96, 56), z: 3, tone: 0.6 }); L.push({ kind: 'glow', cx: c, cy: c + 4, r: 40, color: 'ember', z: 9 }); L.push({ kind: 'glow', cx: c - 4, cy: c + 20, r: 18, color: 'emberHot', z: 9 }); }
   if (k === 'chime') { L.push({ kind: 'mass', pts: jitter([[c - 30, c - 50], [c + 30, c - 50], [c + 44, c + 34], [c - 44, c + 34]], r, 2), z: 2, tone: 0.35 }); L.push({ kind: 'mass', pts: haft([c, c - 70], [c, c - 46], r, 6), z: 2 }); L.push({ kind: 'glow', cx: c, cy: c + 10, r: 26, color: 'soul', z: 9 }); }
   if (k === 'rope') { L.push({ kind: 'mass', pts: rope([c - 60, c + 30], [c + 10, c - 50], r, 7), z: 2 }); L.push({ kind: 'mass', pts: rope([c + 10, c - 50], [c + 60, c + 20], r, 7), z: 2 }); L.push({ kind: 'mass', pts: blob(c + 10, c - 50, 14, 12, r, 0.2, 10), z: 3 }); L.push({ kind: 'mass', pts: rope([c + 60, c + 20], [c + 30, c + 66], r, 6), z: 2 }); }
   // enchanted blades glow along the edge, not as an orb
-  if (s.glow && k !== 'flame' && k !== 'staff' && k !== 'talisman' && k !== 'chime' && k !== 'bell') for (let i = 0; i < 4; i++) L.push({ kind: 'glow', cx: grip[0] + (tip[0] - grip[0]) * (0.45 + i * 0.16), cy: grip[1] + (tip[1] - grip[1]) * (0.45 + i * 0.16), r: 7, color: s.glow, z: 9 });
+  if (s.glow && k !== 'flame' && k !== 'staff' && k !== 'talisman' && k !== 'chime' && k !== 'bell') {
+    // a hot line along the edge, offset a little from the spine toward the cutting side
+    const ex = (tip[1] - grip[1]) / 160, ey = -(tip[0] - grip[0]) / 160;
+    L.push({ kind: 'streak', a: [grip[0] + (tip[0] - grip[0]) * 0.38 + ex * 6, grip[1] + (tip[1] - grip[1]) * 0.38 + ey * 6], b: [grip[0] + (tip[0] - grip[0]) * 0.97 + ex * 4, grip[1] + (tip[1] - grip[1]) * 0.97 + ey * 4], width: 4, color: s.glow, z: 9 });
+  }
   if (s.status) for (let i = 0; i < 4; i++) L.push({ kind: 'detail', pts: blob(c + 8 + i * 9, c - 6 + i * 10, 3, 5, r, 0.4, 8), color: s.status, alpha: 0.85, z: 8 });
   return { id, w: WW, h: WW, seed, tint: s.tint ?? null, fire: [0.1, 1.0], layers: L, bleed: 2.2 };
 }

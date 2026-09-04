@@ -67,6 +67,11 @@ async function buildOne(e: AssetEntry): Promise<'built' | 'cached' | 'skipped'> 
     fs.writeFileSync(target, t.webp2x);
     fs.writeFileSync(path.join(OUT, e.files.x1), t.webp1x);
     if (e.files.mask) fs.writeFileSync(path.join(OUT, e.files.mask), t.mask);
+    if (e.files.icon) {
+      // icon: trim to the drawn bounds, lift the midtones so dark steel reads at 32px, 64px square
+      const icon = await sharp(t.webp2x).trim({ threshold: 20 }).resize(64, 64, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).modulate({ brightness: 1.45, saturation: 1.15 }).webp({ quality: 88 }).toBuffer();
+      fs.writeFileSync(path.join(OUT, e.files.icon), icon);
+    }
   }
   cache[key] = stamp;
   return 'built';

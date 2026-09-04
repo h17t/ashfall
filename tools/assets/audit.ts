@@ -21,6 +21,8 @@ export async function auditAssets(): Promise<string[]> {
   // 2. every manifest entry has files; files are illustrations, not fills
   for (const e of ALL_ASSETS) {
     const paths = e.kind === 'region' ? e.layers! : [e.files.x2, e.files.x1];
+    // icon crops only need to exist; they are judged on the sheet, not by size
+    if (e.files.icon && !fs.existsSync(path.join(OUT, e.files.icon))) errs.push(`${e.files.icon} is missing`);
     for (const p of paths) {
       const fp = path.join(OUT, p);
       if (!fs.existsSync(fp)) { errs.push(`missing file ${p}`); continue; }

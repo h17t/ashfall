@@ -247,7 +247,7 @@ export function humanoid(r: Rng, spec: HumanoidSpec = {}): Layer[] {
   const wk = spec.weapon?.kind ?? 'sword';
   const wl = 84 * H;
   const tipDir: Pt = raised ? [0.35, -1] : [0.15, -1];
-  const tip: Pt = [handR[0] + tipDir[0] * wl * 1.4, handR[1] + tipDir[1] * wl * 1.4];
+  const tip: Pt = [handR[0] + tipDir[0] * wl * (raised ? 1.1 : 1.4), handR[1] + tipDir[1] * wl * (raised ? 1.1 : 1.4)];
   const grip: Pt = [handR[0] - tipDir[0] * wl * 0.3, handR[1] - tipDir[1] * wl * 0.3];
   if (wk === 'sword') L.push({ kind: 'mass', pts: blade(grip, tip, r, 'straight', 9), z: 5, tone: 0.4 });
   if (wk === 'great') L.push({ kind: 'mass', pts: blade(grip, [tip[0] + tipDir[0] * 30, tip[1] + tipDir[1] * 30], r, 'great', 13), z: 5, tone: 0.4 });
@@ -260,17 +260,34 @@ export function humanoid(r: Rng, spec: HumanoidSpec = {}): Layer[] {
   if (wk === 'spear' || wk === 'halberd') { const g2: Pt = [handR[0] - tipDir[0] * wl * 0.9, handR[1] - tipDir[1] * wl * 0.9]; const end: Pt = [handR[0] + tipDir[0] * wl * 1.5, handR[1] + tipDir[1] * wl * 1.5]; L.push({ kind: 'mass', pts: haft(g2, end, r, 5), z: 5 }); L.push({ kind: 'mass', pts: spearHead(end, [end[0] + tipDir[0] * 34, end[1] + tipDir[1] * 34], r, 10), z: 5, tone: 0.4 }); if (wk === 'halberd') L.push({ kind: 'mass', pts: axeHead([end[0], end[1] + 6], r, 14, 1), z: 5, tone: 0.3 }); }
   if (wk === 'axe') { const end: Pt = [handR[0] + tipDir[0] * wl, handR[1] + tipDir[1] * wl]; L.push({ kind: 'mass', pts: haft(grip, end, r, 6), z: 5 }); L.push({ kind: 'mass', pts: axeHead(end, r, 20, 1), z: 5, tone: 0.3 }); }
   if (wk === 'staff') { const g2: Pt = [handR[0] - tipDir[0] * wl * 0.8, handR[1] - tipDir[1] * wl * 0.8]; const end: Pt = [handR[0] + tipDir[0] * wl * 1.3, handR[1] + tipDir[1] * wl * 1.3]; L.push({ kind: 'mass', pts: haft(g2, end, r, 5), z: 5 }); L.push({ kind: 'glow', cx: end[0], cy: end[1] - 6, r: 18, color: 'soul', z: 9 }); }
-  if (wk === 'crossbow') { L.push({ kind: 'mass', pts: haft([handR[0] - 24, handR[1] + 8], [handR[0] + 26, handR[1] - 14], r, 7), z: 5 }); L.push({ kind: 'mass', pts: jitter([[handR[0] + 2, handR[1] - 26], [handR[0] + 28, handR[1] + 4], [handR[0] + 22, handR[1] + 8], [handR[0] - 4, handR[1] - 22]], r, 1), z: 5, tone: 0.3 }); }
+  if (wk === 'crossbow') {
+    // stock along the forearm, a bow arc across the muzzle, a string, the wound bolt
+    const muzzle: Pt = [handR[0] + 34, handR[1] - 18];
+    L.push({ kind: 'mass', pts: haft([handR[0] - 30, handR[1] + 14], muzzle, r, 9), z: 5 });
+    L.push({ kind: 'mass', pts: taper([muzzle[0] - 26, muzzle[1] - 22], [muzzle[0] + 4, muzzle[1] + 2], 7, 3, r, 1.2, 5), z: 5, tone: 0.3 });
+    L.push({ kind: 'mass', pts: taper([muzzle[0] + 30, muzzle[1] + 14], [muzzle[0] + 4, muzzle[1] + 2], 7, 3, r, 1.2, 5), z: 5, tone: 0.3 });
+    L.push({ kind: 'line', pts: [[muzzle[0] - 26, muzzle[1] - 22], [handR[0] - 8, handR[1] + 4], [muzzle[0] + 30, muzzle[1] + 14]], width: 1.2, closed: false, z: 7 });
+    L.push({ kind: 'mass', pts: taper([handR[0] - 16, handR[1] + 6], [muzzle[0] + 12, muzzle[1] - 8], 3, 1.5, r, 0.4, 3), z: 6, tone: 0.5 });
+  }
   if (wk === 'bell') { const end: Pt = [handR[0] + tipDir[0] * wl * 0.9, handR[1] + tipDir[1] * wl * 0.9]; L.push({ kind: 'mass', pts: haft(grip, end, r, 6), z: 5 }); L.push({ kind: 'mass', pts: jitter([[end[0] - 16, end[1] - 22], [end[0] + 16, end[1] - 22], [end[0] + 22, end[1] + 8], [end[0] - 22, end[1] + 8]], r, 1), z: 5, tone: 0.3 }); }
   if (spec.shield && spec.shield !== 'none') L.push({ kind: 'mass', pts: shield(handL[0] - 6, handL[1] - 6, r, 46 * B, 66 * B, spec.shield === 'kite'), z: 6, tone: 0.35 });
-  if (spec.rope) { L.push({ kind: 'mass', pts: rope([cx + 4, 0], [cx + 2, hy - headR], r, 4), z: 0 }); L.push({ kind: 'mass', pts: blob(cx + 2, hy + headR * 0.9, headR * 0.6, 6, r, 0.2, 8), z: 5 }); }
+  if (spec.rope) {
+    // the noose: a heavy rope from the top edge, a knot beside the jaw, a tail over the shoulder
+    L.push({ kind: 'mass', pts: rope([cx + headR * 1.6, -10], [cx + headR * 0.9, hy + headR * 0.5], r, 8), z: 3, tone: 0.5 });
+    L.push({ kind: 'mass', pts: blob(cx + headR * 0.85, hy + headR * 0.85, headR * 0.5, headR * 0.36, r, 0.25, 10), z: 5, tone: 0.6 });
+    L.push({ kind: 'mass', pts: rope([cx + headR * 0.8, hy + headR * 0.95], [cx + w * 0.62, shoulderY + torsoH * 0.4], r, 6), z: 5, tone: 0.5 });
+    // the fibre reads pale against the armour: a bone overlay along the rope and its knot
+    L.push({ kind: 'detail', pts: rope([cx + headR * 1.6, -10], [cx + headR * 0.9, hy + headR * 0.5], r, 5), color: 'bone', alpha: 0.55, z: 7 });
+    L.push({ kind: 'detail', pts: blob(cx + headR * 0.85, hy + headR * 0.85, headR * 0.4, headR * 0.28, r, 0.25, 10), color: 'bone', alpha: 0.5, z: 7 });
+    L.push({ kind: 'detail', pts: rope([cx + headR * 0.8, hy + headR * 0.95], [cx + w * 0.62, shoulderY + torsoH * 0.4], r, 4), color: 'bone', alpha: 0.5, z: 7 });
+  }
   if (spec.chains) for (const c of chain([cx - w * 0.5, hipY], [cx - w * 1.1, ground - 10], r, 5, 4)) L.push({ kind: 'mass', pts: c, z: 6 });
   if (spec.wings) { L.push({ kind: 'mass', pts: jitter([[cx - w * 0.3, shoulderY + 20], [cx - w * 1.6, shoulderY - 40], [cx - w * 1.9, shoulderY + 30], [cx - w * 1.3, shoulderY + 20], [cx - w * 1.4, shoulderY + 70], [cx - w * 0.7, shoulderY + 40]], r, 3), z: 0 }); L.push({ kind: 'mass', pts: jitter([[cx + w * 0.3, shoulderY + 20], [cx + w * 1.6, shoulderY - 40], [cx + w * 1.9, shoulderY + 30], [cx + w * 1.3, shoulderY + 20], [cx + w * 1.4, shoulderY + 70], [cx + w * 0.7, shoulderY + 40]], r, 3), z: 0 }); }
   // interior lines: a few etched folds and edges
   L.push({ kind: 'line', pts: [[cx - w * 0.2, shoulderY + 30], [cx - w * 0.05, hipY - 10]], width: 1.4, closed: false, z: 7 });
   L.push({ kind: 'line', pts: [[cx + w * 0.15, shoulderY + 24], [cx + w * 0.25, hipY - 16]], width: 1.1, closed: false, z: 7 });
   // rim light region: fire-side flank
-  L.push({ kind: 'light', pts: taper([cx - w * 0.45, shoulderY + 10], [cx - w * 0.3, ground], 22 * B, 14 * B, r, 1), strength: 0.55, z: 8 });
+  L.push({ kind: 'light', pts: taper([cx - w * 0.45, shoulderY + 10], [cx - w * 0.3, ground], 22 * B, 14 * B, r, 1), strength: 0.42, z: 8 });
   if (spec.fx) L.push(...spec.fx);
   return L;
 }

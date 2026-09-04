@@ -11,7 +11,8 @@ export type Layer =
   | { kind: 'light'; pts: Pt[]; smooth?: boolean; strength?: number; z?: number }     // rim light region (fire side)
   | { kind: 'detail'; pts: Pt[]; color: PaletteKey; alpha?: number; smooth?: boolean; z?: number }
   | { kind: 'glow'; cx: number; cy: number; r: number; color: PaletteKey; z?: number } // a light source in the world
-  | { kind: 'hatch'; pts: Pt[]; smooth?: boolean; spacing?: number; angle?: number; z?: number };
+  | { kind: 'hatch'; pts: Pt[]; smooth?: boolean; spacing?: number; angle?: number; z?: number }
+  | { kind: 'streak'; a: Pt; b: Pt; width: number; color: PaletteKey; z?: number };            // a hot line of light (a blade's edge)
 
 export interface Plate {
   id: string;
@@ -40,6 +41,7 @@ export function composePlate(p: Plate): string {
     inkFilter('inkFine', p.seed + 3, 1.6, 0.08, p.w, p.h),
     washFilter('wash', p.seed + 11, Math.max(4, p.w / 80), p.w, p.h),
     paperFilter('paper', p.seed + 5, p.w, p.h),
+    `<filter id="soft" filterUnits="userSpaceOnUse" x="0" y="0" width="${p.w}" height="${p.h}"><feGaussianBlur stdDeviation="${Math.max(2, p.w / 60)}"/></filter>`,
     hatchPattern('hatch', 3.2, -32, PALETTE.ink, 1.0),
     hatchPattern('hatchCross', 4.5, 40, PALETTE.ink, 0.7),
     fireGradient('rim', PALETTE.emberHot, PALETTE.ember, fire[0], fire[1], 0.95),
@@ -68,18 +70,22 @@ export function composePlate(p: Plate): string {
   // 2b. Core shadow: ink pools on the side away from the fire.
   body += `<g clip-path="url(#body)" mask="url(#shadowMask)"><rect width="${p.w}" height="${p.h}" fill="${PALETTE.ink}" opacity="0.8"/></g>`;
   // 3. Etching hatch in the shadow ramp, clipped to body.
-  body += `<g clip-path="url(#body)" mask="url(#shadowMask)"><rect width="${p.w}" height="${p.h}" fill="url(#hatch)" opacity="0.7"/><rect width="${p.w}" height="${p.h}" fill="url(#hatchCross)" opacity="0.3"/></g>`;
+  body += `<g clip-path="url(#body)" mask="url(#shadowMask)"><rect width="${p.w}" height="${p.h}" fill="url(#hatch)" opacity="0.85"/><rect width="${p.w}" height="${p.h}" fill="url(#hatchCross)" opacity="0.4"/></g>`;
   // 4. Explicit hatch regions, lights and details.
   for (const l of layers) {
     if (l.kind === 'hatch') {
       body += `<g filter="url(#inkFine)"><path d="${pathOf(l.pts, l.smooth ?? true)}" fill="url(#hatch)" opacity="0.9"/></g>`;
     } else if (l.kind === 'light') {
-      body += `<g clip-path="url(#body)" filter="url(#inkFine)"><path d="${pathOf(l.pts, l.smooth ?? true)}" fill="${PALETTE.emberHot}" opacity="${(l.strength ?? 0.7).toFixed(2)}" mask="url(#lightMask)"/></g>`;
+      body += `<g clip-path="url(#body)" filter="url(#inkFine)"><path d="${pathOf(l.pts, l.smooth ?? true)}" fill="${PALETTE.ember}" opacity="${(l.strength ?? 0.7).toFixed(2)}" mask="url(#lightMask)"/></g>`;
     } else if (l.kind === 'detail') {
       body += `<g filter="url(#inkFine)"><path d="${pathOf(l.pts, l.smooth ?? true)}" fill="${PALETTE[l.color]}" opacity="${(l.alpha ?? 1).toFixed(2)}"/></g>`;
     } else if (l.kind === 'line') {
       const d = l.closed === false ? 'M' + l.pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L') : pathOf(l.pts, l.smooth ?? true);
-      body += `<g filter="url(#inkFine)"><path d="${d}" fill="none" stroke="${PALETTE.ink}" stroke-width="${l.width}" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/></g>`;
+      body += `<g filter="url(#inkFine)"><path d="${d}" fill="none" stroke="${PALETTE.ink}" stroke-width="${(l.width * 1.6).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/></g>`;
+    } else if (l.kind === 'streak') {
+      const d = `M${l.a[0].toFixed(1)} ${l.a[1].toFixed(1)} L${l.b[0].toFixed(1)} ${l.b[1].toFixed(1)}`;
+      body += `<path d="${d}" fill="none" stroke="${PALETTE[l.color]}" stroke-width="${(l.width * 2.2).toFixed(1)}" stroke-linecap="round" opacity="0.55" filter="url(#soft)"/>`;
+      body += `<path d="${d}" fill="none" stroke="${PALETTE.parchment}" stroke-width="${(l.width * 0.45).toFixed(1)}" stroke-linecap="round" opacity="0.9"/>`;
     }
   }
   // 5. Rim light along the fire-facing silhouette edge: offset the body toward the fire, keep the sliver.

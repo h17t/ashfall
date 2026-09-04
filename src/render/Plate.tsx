@@ -16,14 +16,17 @@ interface Props {
   draggable?: boolean;
   /** styles for the image itself (filters that must not re-run when the tint changes) */
   imgStyle?: CSSProperties;
+  /** the trimmed icon crop where the manifest has one (weapon chips) */
+  variant?: 'plate' | 'icon';
 }
 
-export const Plate = memo(function Plate({ kind, id, className = '', style, alt = '', tint, imgStyle }: Props) {
+export const Plate = memo(function Plate({ kind, id, className = '', style, alt = '', tint, imgStyle, variant = 'plate' }: Props) {
   const e = asset(kind, id);
+  const icon = variant === 'icon' && e.files.icon ? e.files.icon : null;
   const img = (
     <img
-      src={e.files.x2}
-      srcSet={`${e.files.x1} 1x, ${e.files.x2} 2x`}
+      src={icon ?? e.files.x2}
+      srcSet={icon ? undefined : `${e.files.x1} 1x, ${e.files.x2} 2x`}
       width={e.w}
       height={e.h}
       alt={alt}
