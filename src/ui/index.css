@@ -166,3 +166,6 @@ html.riposte-time .float-num { animation-duration: 1.6s; }
 .icon-well { position: relative; }
 .icon-well::before { content: ""; position: absolute; inset: 2px; background: radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--bone) 28%, transparent) 0%, transparent 70%); pointer-events: none; }
 .icon-well > * { position: relative; }
+
+/* the riposte figure: four times the display face, hot, with a dark plate behind it */
+.num-riposte { font-family: var(--font-display); font-weight: 400; font-size: 84px; letter-spacing: 0.06em; color: var(--ember-hot); text-shadow: 0 0 30px color-mix(in srgb, var(--ember-hot) 70%, transparent), 0 3px 0 var(--void), 0 0 2px var(--void); animation-duration: 1.4s !important; }

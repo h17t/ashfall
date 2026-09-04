@@ -7,6 +7,8 @@ import { Gauge } from '@/render/Gauge';
 import { Slab } from '@/render/materials/Slab';
 import { Backdrop } from '@/render/Backdrop';
 import { Figure } from './Figure';
+import { Vfx } from '@/vfx/Vfx';
+import { vfxSupported } from '@/vfx/gl';
 import { FloatingNumbers } from './FloatingNumbers';
 import { BossBanner } from './BossBanner';
 
@@ -15,6 +17,8 @@ import { BossBanner } from './BossBanner';
  * the name card top-left, the health gauge along the foot. The eye should land on the enemy's
  * eyes, then the name, then the gauge (ART.md §4, mockup A).
  */
+const GL = vfxSupported();
+
 export const Encounter = memo(function Encounter() {
   const dispatch = useGame((g) => g.dispatch);
   const name = useSel((s) => s.encounter.enemy?.name ?? '');
@@ -69,18 +73,19 @@ export const Encounter = memo(function Encounter() {
   const onClick = useCallback(() => dispatch({ type: 'click' }), [dispatch]);
 
   return (
-    <Slab material="stone" seed="arena" rough={7} ornament="scorch" outer={`arena w-full flex ${shake % 2 ? 'shake' : ''}`} className="flex-1 flex flex-col min-h-0">
+    <Slab material="stone" seed="arena" rough={7} ornament="scorch" outer={`arena w-full flex ${!GL && shake % 2 ? 'shake' : ''}`} className="flex-1 flex flex-col min-h-0">
       <div className={`relative flex-1 min-h-[520px] cursor-pointer overflow-hidden ${staggered ? 'riposte-glow' : ''}`} onMouseDown={onClick}>
-        <Backdrop zone={zone} dim={isBoss ? 0.5 : 0.3} />
-
-        {/* the figure stands on the ground line, lit from the bonfire at lower-left */}
-        <div className={`absolute inset-x-0 bottom-[12%] top-[8%] flex items-end justify-center transition-transform ${staggered ? 'scale-[1.04]' : ''}`}>
-          {name ? (
-            <Figure kind={isBoss ? 'boss' : 'enemy'} id={id} hurt={hurt} staggered={staggered} poison={poison > 0} frost={frost > 0} bleed={bleed} big={isBoss} />
-          ) : (
-            <div className="t-lore text-[18px] mb-24">The ash settles.</div>
-          )}
-        </div>
+        {GL ? (
+          <Vfx />
+        ) : (
+          <>
+            <Backdrop zone={zone} dim={isBoss ? 0.5 : 0.3} />
+            <div className={`absolute inset-x-0 bottom-[12%] top-[8%] flex items-end justify-center transition-transform ${staggered ? 'scale-[1.04]' : ''}`}>
+              {name && <Figure kind={isBoss ? 'boss' : 'enemy'} id={id} hurt={hurt} staggered={staggered} poison={poison > 0} frost={frost > 0} bleed={bleed} big={isBoss} />}
+            </div>
+          </>
+        )}
+        {!name && <div className="absolute inset-x-0 bottom-[30%] text-center t-lore text-[18px] pointer-events-none">The ash settles.</div>}
 
         {/* name card */}
         <div className="absolute left-7 top-6 max-w-[62%] pointer-events-none">
