@@ -89,3 +89,19 @@ Simulator: Eskel falls at 12.5m (greedy) / 31m (casual, one death). Inside the 6
 - **Export/import** is `ASHFALL1.` + base64 of the same blob (unicode-safe through TextEncoder), with distinct error messages for "not an export", "bad base64", "checksum", "newer version".
 - **Offline** is closed-form: `idleRate(state)` × min(gap, cap) × offline multiplier. The rate function is installed by the phantom module (Milestone 7); until then it returns zero with a reason the summary shows verbatim. The player is treated as resting at the bonfire while away: full HP/Estus on return, no combat state, and *never* a soul drop. Tab suspensions longer than the 60s catch-up cap are routed through the same calculator.
 - **UI-only settings** (number format, reduce effects, sound, hints) live outside the game state so exporting a save doesn't carry preferences.
+
+## Milestone 7 — phantoms (the idle layer)
+
+**Roster and slots.** Six phantom characters across the content spine (two in Region 1: Aldric the dps knight at 400 souls, Sister Ilse the healer after Eskel; one each in Regions 2–5, arriving with Milestone 10). Slots start at **one** and grow by one per region lord defeated (max five), with a sixth from the Dark Sigil. Recruiting more phantoms than slots is allowed; the extras wait at the bonfire. So squad *composition* is a choice from the second boss onward, and the first phantom is a 10-minute decision rather than a menu.
+
+**Two assignments, one switch.** *Beside* = the phantom acts in the player's encounter on its own timer (dps hits, stagger feeds the riposte, healer heals the player, buffer refreshes a party damage buff, status applier builds bleed/poison). *Hunt* = closed-form grinding of a cleared tier for 45% souls per kill, 60% drops, plus experience. Offline, everyone hunts regardless. The pillar-3 tension is real: for an active player a dps phantom beside them multiplies full-value kills; for an idle stretch the healer's uptime bonus is what keeps the hunt alive.
+
+**Hunting math is legible.** `evaluateHunt` computes squad DPS, kill time, incoming DPS from the tier's enemy mix, and "death time". If the squad would fall before finishing one kill it *wipes*: rate zero, they retreat, nothing lost. Otherwise uptime = recovery ÷ (recovery + incoming), where recovery is 5% of squad HP per second plus healer output. Kills/s = uptime ÷ kill time. The Squad panel shows all of this: souls/min, uptime bar, "a kill takes 14s, they would fall in 45s", and the exact offline souls/hour with the cap. Auto mode picks the highest cleared tier that holds; manual mode lets the player farm a specific drop table.
+
+**Levels.** Bought with souls (×1.14 per level, ×6 per region) *and* earned free from hunting experience, so an idle player's squad grows on its own while an active player can accelerate it. +7% damage and +6% HP per level, tuned against enemy damage ×1.2 per tier so roughly three phantom levels keep pace with one tier.
+
+**Gear.** A phantom's damage is driven by the base of the weapon in its slot (any owned weapon the player isn't wielding; swapping between phantoms is automatic). This makes old weapons useful hand-me-downs and reinforcement a squad-wide investment.
+
+**Performance.** The hunt is re-evaluated once per second of game time (memoised per state object, keyed on roster, level, gear and hunting choice). Deterministic, and it kept the 200-hour simulation under a minute.
+
+Simulator after M7: idle-only earns ~15% of the greedy player's souls in the first hour with a single phantom; the idle path still cannot beat Eskel (it doesn't dodge), which is intended until auto-dodge and auto-riposte are earned.

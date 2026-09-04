@@ -10,3 +10,4 @@ export * from './tick';
 export * from './unlocks';
 export * from './save';
 export * from './idle';
+export * from './phantoms';

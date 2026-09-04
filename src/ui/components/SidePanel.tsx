@@ -1,20 +1,25 @@
 import { useState } from 'react';
 import { useSel } from '../store';
+import { canRecruit } from '@/engine';
+import { PHANTOMS } from '@/content';
 import { BonfirePanel } from './BonfirePanel';
 import { WeaponsPanel } from './WeaponsPanel';
 import { MapPanel } from './MapPanel';
 import { SoulsPanel } from './SoulsPanel';
 import { SettingsPanel } from './SettingsPanel';
+import { SquadPanel } from './SquadPanel';
 
-type Tab = 'bonfire' | 'weapons' | 'map' | 'souls' | 'settings';
+type Tab = 'bonfire' | 'weapons' | 'map' | 'squad' | 'souls' | 'settings';
 
 export function SidePanel() {
   const [tab, setTab] = useState<Tab>('bonfire');
   const soulsHeld = useSel((s) => Object.values(s.bossSouls).some((n) => n > 0));
+  const recruitable = useSel((s) => Object.keys(PHANTOMS).some((id) => canRecruit(s, id) === null));
   const tabs: { id: Tab; label: string; badge?: boolean }[] = [
     { id: 'bonfire', label: 'Bonfire' },
     { id: 'weapons', label: 'Weapons' },
     { id: 'map', label: 'Road' },
+    { id: 'squad', label: 'Squad', badge: recruitable },
     { id: 'souls', label: 'Souls', badge: soulsHeld },
     { id: 'settings', label: '⚙' },
   ];
@@ -31,6 +36,7 @@ export function SidePanel() {
         {tab === 'bonfire' && <BonfirePanel />}
         {tab === 'weapons' && <WeaponsPanel />}
         {tab === 'map' && <MapPanel />}
+        {tab === 'squad' && <SquadPanel />}
         {tab === 'souls' && <SoulsPanel />}
         {tab === 'settings' && <SettingsPanel />}
       </div>

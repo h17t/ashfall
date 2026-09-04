@@ -65,7 +65,7 @@ export function newGame(seed = 1): GameState {
     bonfiresLit: [first],
     zones: {},
     unlockedZones: [first],
-    squad: { phantoms: [], huntZone: first, huntTier: 0, huntAuto: true, killAcc: 0, slots: 0, recruited: [], buff: { mult: 1, t: 0 } },
+    squad: { phantoms: [], huntZone: first, huntTier: 0, huntAuto: true, killAcc: 0, matAcc: {}, slots: 0, recruited: [], buff: { mult: 1, t: 0 } },
     covenant: { current: null, rep: {}, upgrades: {}, switches: 0 },
     prestige: {
       kindles: 0, humanity: ZERO, humanityTotal: ZERO, tree: {}, sigils: 0, sigilMarks: ZERO, sigilUnlocks: {},

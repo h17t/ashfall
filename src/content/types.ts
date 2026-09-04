@@ -204,8 +204,12 @@ export interface PhantomDef {
   defaultWeapon: string;
   zone: string;
   recruitCost: number;
+  /** boss that must have been killed (ever) before this phantom will answer the summon */
+  requiresBoss?: string;
   lore: string;
   shape: string;
+  /** what the phantom says when recruited / when it levels */
+  greeting: string;
 }
 
 export interface TreeNode {

@@ -44,6 +44,8 @@ export interface PolicyMemory {
   bossDeathBoss: string | null;
   lastEcon: number;
   lastNav: number;
+  /** scratch space for extensions */
+  [k: string]: unknown;
 }
 
 export type Extension = (view: SimView, params: PolicyParams, mem: PolicyMemory, out: Action[]) => void;

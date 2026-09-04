@@ -181,6 +181,8 @@ export interface SquadState {
   huntAuto: boolean;
   /** accumulated fractional kills (closed-form rate integration) */
   killAcc: number;
+  /** accumulated fractional material drops */
+  matAcc: Record<string, number>;
   /** maximum simultaneous phantoms */
   slots: number;
   recruited: string[];

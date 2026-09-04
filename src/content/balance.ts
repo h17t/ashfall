@@ -127,8 +127,10 @@ export const BALANCE = {
     besideDmgMult: 1.0,
     /** squad retreats for this long after a wipe */
     retreatTime: 30,
-    /** base survivable incoming dps fraction: squad survives if enemyDps <= regen */
-    baseRegenFrac: 0.03, // of squad max hp per second
+    /** squad recovery per second as a fraction of its max hp (before healers) */
+    baseRegenFrac: 0.05,
+    /** below this uptime (recovery / incoming) the squad wipes and retreats */
+    wipeUptime: 0.25,
   },
 
   // ---- Offline ----

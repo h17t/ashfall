@@ -106,6 +106,8 @@ export function validateContent(): string[] {
   for (const p of Object.values(PHANTOMS)) {
     if (!WEAPONS[p.defaultWeapon]) errs.push(`phantom ${p.id} weapon missing`);
     if (!ZONES[p.zone]) errs.push(`phantom ${p.id} zone missing`);
+    if (p.requiresBoss && !BOSSES[p.requiresBoss]) errs.push(`phantom ${p.id} requires missing boss`);
+    if (!p.greeting) errs.push(`phantom ${p.id} has no greeting`);
   }
   for (const s of Object.values(SPELLS)) {
     if (s.source.kind === 'bossSoul' && !BOSSES[s.source.boss]) errs.push(`spell ${s.id} boss missing`);

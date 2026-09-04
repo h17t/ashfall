@@ -9,7 +9,7 @@ export const ZONES: Record<string, ZoneDef> = {
     requires: null,
     boss: 'coldPyreWarden',
     secretBoss: 'hangedPilgrim',
-    phantom: 'solaire',
+    phantom: 'aldric',
     tiers: [
       { name: 'Ash Slopes', enemies: ['hollowPilgrim', 'ashRat'], kills: 6 },
       { name: 'The Toll Gate', enemies: ['tollWarden', 'deserterCrossbow', 'hollowPilgrim'], kills: 8 },
