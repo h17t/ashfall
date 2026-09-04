@@ -3,12 +3,13 @@ import { useGame, useSel } from '../store';
 import { travelBlocked, expectedLevel, fmt, tierHp, tierSouls, ngLevel, computeMods } from '@/engine';
 import { ZONE_ORDER, getZone, getBoss, globalTier, getEnemy, cycleBossFor } from '@/content';
 import { Tooltip } from './Tooltip';
+import { asset } from '../../../assets/manifest';
 
 export const MapPanel = memo(function MapPanel() {
   const unlocked = useSel((s) => s.unlockedZones.join(','));
   return (
     <div className="flex flex-col gap-3">
-      <div className="font-display text-lg text-ember-400">The Road</div>
+      <div className="t-display text-[20px] text-ember-hot">The Road</div>
       {ZONE_ORDER.filter((z) => unlocked.split(',').includes(z)).map((z) => <ZoneBlock key={z} zone={z} />)}
     </div>
   );
@@ -26,11 +27,12 @@ function ZoneBlock({ zone }: { zone: string }) {
   const cycleKills = useSel((s) => s.zones[zone]?.cycleKills ?? 0);
   const cb = cycleBossFor(zone);
   return (
-    <div className="border border-ash-700 rounded-sm p-2">
+    <div className="border border-ash/50 p-2 relative overflow-hidden">
+      <div aria-hidden className="absolute inset-x-0 top-0 h-[64px] pointer-events-none" style={{ backgroundImage: `linear-gradient(180deg, transparent 20%, var(--ink) 100%), url(${asset('region', zone).layers?.[1] ?? ''}), url(${asset('region', zone).files.x2})`, backgroundSize: 'cover', backgroundPosition: '50% 70%', opacity: 0.7, filter: 'saturate(0.6)' }} />
       <Tooltip tip={<span className="italic">{z.lore}</span>}>
-        <div className="font-display text-base text-bone-100 cursor-help">{z.name} <span className="text-[10px] uppercase tracking-widest text-bone-400 not-italic">{z.endless ? `Dark Depth ${depthOf()}` : `Region ${z.region}`}</span></div>
+        <div className="relative t-display text-[18px] cursor-help pt-6" style={{ textShadow: '0 1px 2px var(--void), 0 0 12px var(--void)' }}>{z.name} <span className="t-label not-italic">{z.endless ? `Dark Depth ${depthOf()}` : `Region ${z.region}`}</span></div>
       </Tooltip>
-      <div className="flex flex-col gap-0.5 mt-1">
+      <div className="relative flex flex-col gap-0.5 mt-2">
         {z.tiers.map((t, i) => <TierRow key={i} zone={zone} tier={i} name={t.name} cleared={cleared >= i} here={here} />)}
         <TierRow zone={zone} tier={-1} name={`${getBoss(z.boss).name}, ${getBoss(z.boss).title}`} cleared={bossKills > 0} here={here} boss />
         {z.secretBoss && secretFound && <TierRow zone={zone} tier={-2} name={getBoss(z.secretBoss).name} cleared={secretKills > 0} here={here} boss />}
@@ -54,24 +56,24 @@ function TierRow({ zone, tier, name, cleared, here, boss }: { zone: string; tier
   const z = getZone(zone);
   const tip = tier >= 0 ? (
     <div className="flex flex-col gap-1">
-      <div className="font-display text-base">{name}</div>
-      <div className="text-bone-300">Foes: {z.tiers[tier].enemies.map((e) => getEnemy(e).name).join(', ')}</div>
-      <div className="font-num text-bone-400">~{fmt(tierHp(g, ng))} HP · ~{fmt(tierSouls(g, ng))} souls each · {kills}/{need} to clear</div>
-      <div className={level < exp - 4 ? 'text-blood-500' : 'text-bone-400'}>Fair fight around soul level {exp}. You are {level}.</div>
+      <div className="font-display text-[16px]">{name}</div>
+      <div className="text-bone">Foes: {z.tiers[tier].enemies.map((e) => getEnemy(e).name).join(', ')}</div>
+      <div className="font-num text-bone/70">~{fmt(tierHp(g, ng))} HP · ~{fmt(tierSouls(g, ng))} souls each · {kills}/{need} to clear</div>
+      <div className={level < exp - 4 ? 'text-blood-bright' : 'text-bone/70'}>Fair fight around soul level {exp}. You are {level}.</div>
     </div>
   ) : (
     <div className="flex flex-col gap-1">
-      <div className="font-display text-base">{name}</div>
-      <div className="text-bone-300 italic">{getBoss(tier === -1 ? z.boss : tier === -2 ? z.secretBoss! : cycleBossFor(zone)!.id).lore}</div>
-      <div className={level < exp ? 'text-blood-500' : 'text-bone-400'}>A wall. Come prepared: around soul level {exp + 4}, a reinforced weapon, and full Estus.</div>
+      <div className="font-display text-[16px]">{name}</div>
+      <div className="text-bone italic">{getBoss(tier === -1 ? z.boss : tier === -2 ? z.secretBoss! : cycleBossFor(zone)!.id).lore}</div>
+      <div className={level < exp ? 'text-blood-bright' : 'text-bone/70'}>A wall. Come prepared: around soul level {exp + 4}, a reinforced weapon, and full Estus.</div>
     </div>
   );
   return (
-    <div className={`flex items-center gap-2 text-[12px] ${current ? 'text-ember-400' : cleared ? 'text-bone-200' : 'text-bone-400'}`}>
-      <span className="w-3 text-center">{current ? '◆' : cleared ? '✓' : boss ? '☠' : '·'}</span>
-      <Tooltip className="flex-1" tip={tip}><span className={`cursor-help ${boss ? 'font-display text-sm' : ''}`}>{name}</span></Tooltip>
-      {tier >= 0 && !cleared && <span className="font-num text-[10px] text-bone-400">{kills}/{need}</span>}
-      <button className="btn text-[10px] px-2 py-0.5" disabled={!!blocked || current} title={blocked ?? 'Travel here'} onClick={() => dispatch({ type: 'travel', zone, tier })}>{current ? 'here' : boss ? 'Challenge' : 'Go'}</button>
+    <div className={`flex items-center gap-2 text-[14px] ${current ? 'text-ember-hot' : cleared ? 'text-parchment' : 'text-bone/70'}`}>
+      <span className="w-3 text-center">{current ? '›' : cleared ? '·' : boss ? '†' : '·'}</span>
+      <Tooltip className="flex-1" tip={tip}><span className={`cursor-help ${boss ? 'font-display text-[15px]' : ''}`}>{name}</span></Tooltip>
+      {tier >= 0 && !cleared && <span className="font-num text-[12px] text-bone/70">{kills}/{need}</span>}
+      <button className="btn text-[12px] px-2 py-0.5" disabled={!!blocked || current} title={blocked ?? 'Travel here'} onClick={() => dispatch({ type: 'travel', zone, tier })}>{current ? 'here' : boss ? 'Challenge' : 'Go'}</button>
     </div>
   );
 }

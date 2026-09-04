@@ -3,6 +3,7 @@ import { useGame, useSel } from '../store';
 import { useEvents } from '../hooks/useEvents';
 import { useSettings } from '../settings';
 import type { GameEvent } from '@/engine';
+import { Slab } from '@/render/materials/Slab';
 
 /**
  * Onboarding that teaches by playing. Each hint appears once, in the moment it is relevant,
@@ -67,10 +68,12 @@ export function Hints() {
   if (!show || !active) return null;
   const h = HINTS[active];
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 max-w-lg w-[92%] slab px-4 py-3 flex items-start gap-3 border-ember-700" role="status">
-      <span className="text-ember-400 text-lg leading-none">✦</span>
-      <p className="text-[13px] text-bone-200 leading-snug flex-1">{h.text}</p>
-      <button className="text-ash-400 hover:text-bone-100 text-sm" onClick={() => dismiss(active)} aria-label="Dismiss hint">✕</button>
+    <div className="fixed bottom-5 left-[38%] -translate-x-1/2 z-30 max-w-lg w-[92%]" role="status">
+      <Slab material="parchment" seed="hint" rough={8} ornament="none" tilt={-0.6} className="px-5 py-3 flex items-start gap-3">
+        <span className="t-display text-[22px] leading-none" style={{ color: 'var(--ember)' }}>¶</span>
+        <p className="text-[15px] leading-snug flex-1" style={{ color: 'var(--ink)' }}>{h.text}</p>
+        <button className="text-[16px] leading-none" style={{ color: 'var(--ash)' }} onClick={() => dismiss(active)} aria-label="Dismiss hint">×</button>
+      </Slab>
     </div>
   );
 }

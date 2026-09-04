@@ -17,11 +17,11 @@ export const Fx = memo(function Fx() {
   const onEvents = useCallback((events: GameEvent[]) => {
     for (const e of events) {
       if (e.type === 'stagger' && !reduceFx) setRiposte(Date.now());
-      if (e.type === 'death') { setAsh(Date.now()); setFlash({ key: Date.now(), color: 'rgba(120,10,20,0.35)' }); }
-      if (e.type === 'bossKilled') setFlash({ key: Date.now(), color: 'rgba(232,113,42,0.25)' });
+      if (e.type === 'death') { setAsh(Date.now()); setFlash({ key: Date.now(), color: 'color-mix(in srgb, #6E1212 35%, transparent)' }); }
+      if (e.type === 'bossKilled') setFlash({ key: Date.now(), color: 'color-mix(in srgb, #F0902E 25%, transparent)' });
       if (e.type === 'enemyAttack' && !e.dodged && shakeOn && !reduceFx) shake(shakeEl.current, Math.min(12, 3 + e.dmg / 40));
       if (e.type === 'hit' && e.riposte && shakeOn && !reduceFx) shake(shakeEl.current, 8);
-      if (e.type === 'statusProc' && e.target === 'enemy') setFlash({ key: Date.now(), color: 'rgba(150,100,255,0.12)' });
+      if (e.type === 'statusProc' && e.target === 'enemy') setFlash({ key: Date.now(), color: 'color-mix(in srgb, #5C7A99 12%, transparent)' });
     }
   }, [reduceFx, shakeOn]);
   useEvents(onEvents);

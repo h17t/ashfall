@@ -11,17 +11,17 @@ export function FloatingNumbers() {
     const add: Num[] = [];
     for (const e of events) {
       if (e.type === 'hit') {
-        const cls = e.riposte ? 'text-ember-400 text-3xl' : e.crit ? 'text-ember-500 text-2xl' : e.source === 'dot' ? 'text-purple-300 text-sm' : e.source === 'phantom' ? 'text-bone-300 text-sm' : 'text-bone-100 text-lg';
-        add.push({ id: nextId++, text: (e.riposte ? 'RIPOSTE ' : e.crit ? '✦ ' : '') + fmt(e.dmg), x: 35 + Math.random() * 30, y: 30 + Math.random() * 30, cls });
+        const cls = e.riposte ? 'text-ember-hot text-[56px]' : e.crit ? 'text-ember-hot text-[30px]' : e.source === 'dot' ? 'text-soul text-[15px]' : e.source === 'phantom' ? 'text-bone text-[15px]' : 'text-parchment text-[22px]';
+        add.push({ id: nextId++, text: (e.riposte ? 'RIPOSTE ' : e.crit ? '¶ ' : '') + fmt(e.dmg), x: 35 + Math.random() * 30, y: 30 + Math.random() * 30, cls });
       } else if (e.type === 'enemyAttack') {
-        if (e.dodged) add.push({ id: nextId++, text: e.perfect ? 'PERFECT DODGE' : 'dodged', x: 40 + Math.random() * 20, y: 70, cls: e.perfect ? 'text-ember-400 text-xl' : 'text-bone-300 text-base' });
-        else add.push({ id: nextId++, text: `-${e.dmg}`, x: 40 + Math.random() * 20, y: 75, cls: 'text-blood-500 text-2xl' });
+        if (e.dodged) add.push({ id: nextId++, text: e.perfect ? 'PERFECT DODGE' : 'dodged', x: 40 + Math.random() * 20, y: 70, cls: e.perfect ? 'text-ember-hot text-[24px]' : 'text-bone text-[17px]' });
+        else add.push({ id: nextId++, text: `-${e.dmg}`, x: 40 + Math.random() * 20, y: 75, cls: 'text-blood-bright text-[30px]' });
       } else if (e.type === 'heal') {
-        add.push({ id: nextId++, text: `+${e.amount}`, x: 45, y: 72, cls: 'text-emerald-400 text-xl' });
+        add.push({ id: nextId++, text: `+${e.amount}`, x: 45, y: 72, cls: 'text-verdigris text-[24px]' });
       } else if (e.type === 'exhausted') {
-        add.push({ id: nextId++, text: 'exhausted', x: 45, y: 60, cls: 'text-ash-400 text-xs' });
+        add.push({ id: nextId++, text: 'exhausted', x: 45, y: 60, cls: 'text-bone text-[13px]' });
       } else if (e.type === 'statusProc') {
-        add.push({ id: nextId++, text: e.status.toUpperCase(), x: 50, y: 40, cls: 'text-purple-300 text-lg' });
+        add.push({ id: nextId++, text: e.status.toUpperCase(), x: 50, y: 40, cls: 'text-soul text-[22px]' });
       }
     }
     if (add.length) {

@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { useGame, useSel } from '../store';
 import { computeMods, STAT_NAMES, STAT_KEYS } from '@/engine';
 import { Tooltip } from './Tooltip';
+import { Slab } from '@/render/materials/Slab';
 
 const FEATURES: { key: 'autoAttack' | 'autoRiposte' | 'autoDodge' | 'autoEstus' | 'autoLevel' | 'autoAdvance' | 'autoKindle' | 'autoSpells' | 'autoSigil'; label: string; desc: string }[] = [
   { key: 'autoAttack', label: 'Attack', desc: 'Hollow Instinct: swings once a second (scaled by weapon speed) whenever stamina allows. Clicking adds on top.' },
@@ -26,22 +27,22 @@ export const AutomationBar = memo(function AutomationBar() {
   const shown = FEATURES.filter((f) => set.has(f.key));
   if (shown.length === 0) return null;
   return (
-    <div className="slab px-3 py-2 flex items-center gap-2 flex-wrap">
-      <span className="text-[10px] uppercase tracking-widest text-bone-400 mr-1">Auto</span>
+    <Slab material="iron" seed="auto" ornament="none" className="px-4 py-2 flex items-center gap-2 flex-wrap">
+      <span className="t-label mr-1">Hollow instinct</span>
       {shown.map((f) => {
         const i = FEATURES.indexOf(f);
         return (
           <Tooltip key={f.key} tip={f.desc}>
-            <button className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm border ${vals[i] ? 'border-ember-500 text-ember-400 bg-ember-700/30' : 'border-ash-600 text-bone-400'}`} onClick={() => dispatch({ type: 'setAutomation', key: f.key, value: !vals[i] })}>{f.label}</button>
+            <button className={`btn px-2.5 py-1 text-[13px] ${vals[i] ? 'btn-ember' : ''}`} style={vals[i] ? undefined : { color: 'var(--bone)', opacity: 0.75 }} onClick={() => dispatch({ type: 'setAutomation', key: f.key, value: !vals[i] })}>{f.label}</button>
           </Tooltip>
         );
       })}
       {set.has('autoLevel') && (
-        <select className="bg-ash-800 border border-ash-600 text-bone-200 text-[10px] px-1 py-0.5 rounded-sm" value={levelStat} onChange={(e) => dispatch({ type: 'setAutomation', key: 'autoLevelStat', value: e.target.value })}>
+        <select value={levelStat} onChange={(e) => dispatch({ type: 'setAutomation', key: 'autoLevelStat', value: e.target.value })}>
           <option value="balanced">balanced</option>
           {STAT_KEYS.map((k) => <option key={k} value={k}>{STAT_NAMES[k]}</option>)}
         </select>
       )}
-    </div>
+    </Slab>
   );
 });

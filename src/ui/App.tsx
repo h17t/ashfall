@@ -17,6 +17,8 @@ import { Hints } from './components/Hints';
 import { Bonfire } from './components/Bonfire';
 import { startAudio } from './audio';
 import { useHotkeys } from './hooks/useHotkeys';
+import { Grain } from '@/render/Grain';
+import { FireLight } from '@/render/FireLight';
 
 export default function App() {
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -38,27 +40,36 @@ export default function App() {
   useHotkeys();
   return (
     <div className={`min-h-full relative ${reduceFx ? 'reduce-fx' : ''}`}>
+      <FireLight />
+      <Grain />
       <OfflineModal />
       <Fx />
       <Bonfire />
       <Hints />
+      <EmberField />
       {loadError && (
-        <div className="relative z-20 max-w-[1400px] mx-auto mt-3 px-4">
-          <div className="border border-blood-600 bg-blood-600/10 text-bone-200 text-[12px] px-3 py-2 rounded-sm flex justify-between gap-3">
+        <div className="relative z-20 max-w-[1440px] mx-auto mt-3 px-5">
+          <div className="text-[13px] px-3 py-2 flex justify-between gap-3" style={{ border: '1px solid var(--blood)', background: 'color-mix(in srgb, var(--blood) 18%, transparent)', color: 'var(--parchment)' }}>
             <span>{loadError} {loadError.includes('backup') ? 'A fresh game was started; the damaged saves are kept in storage under ashfall.corrupt.' : 'The backup save was loaded instead.'}</span>
-            <button className="text-ash-400 hover:text-bone-100" onClick={() => setLoadError(null)}>✕</button>
+            <button className="hover:text-parchment" style={{ color: 'var(--bone)' }} onClick={() => setLoadError(null)}>×</button>
           </div>
         </div>
       )}
-      <EmberField />
-      <div className="relative z-10 max-w-[1400px] mx-auto p-4 grid gap-4 grid-cols-1 lg:grid-cols-[270px_1fr_380px]">
-        <header className="lg:col-span-3 flex items-baseline justify-between">
-          <h1 className="font-display text-3xl tracking-[0.35em] uppercase text-bone-100">Ashfall</h1>
-          <span className="text-[10px] uppercase tracking-widest text-bone-400">an ember-tender's idle</span>
+      <div className="relative z-10 max-w-[1440px] mx-auto px-5 pt-4 pb-10">
+        <header className="flex items-baseline gap-5 mb-3 pl-1">
+          <h1 className="t-display text-[26px] leading-none" style={{ letterSpacing: '0.34em' }}>Ashfall</h1>
+          <span className="t-label">an ember-tender's idle</span>
         </header>
-        <div className="order-2 lg:order-1"><PlayerPanel /></div>
-        <div className="flex flex-col gap-3 order-1 lg:order-2"><div className="min-h-[520px] flex-1"><Encounter /></div><SpellBar /><AutomationBar /><Log /></div>
-        <div className="order-3"><SidePanel /></div>
+        <div className="grid gap-x-0 gap-y-4 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+          <div className="flex flex-col gap-4 min-w-0">
+            <div className="min-h-[560px] lg:min-h-[620px] flex-1 flex"><Encounter /></div>
+            <div className="flex flex-col gap-3 lg:pr-12"><SpellBar /><AutomationBar /><Log /></div>
+          </div>
+          <div className="flex flex-col gap-5 lg:-ml-12 lg:mt-10 relative z-20">
+            <PlayerPanel />
+            <SidePanel />
+          </div>
+        </div>
       </div>
     </div>
   );

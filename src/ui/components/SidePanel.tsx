@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSel } from '../store';
 import { canRecruit, canKindle, humanityPreview, canSigil } from '@/engine';
 import { PHANTOMS, BALANCE } from '@/content';
+import { Slab } from '@/render/materials/Slab';
 import { BonfirePanel } from './BonfirePanel';
 import { WeaponsPanel } from './WeaponsPanel';
 import { MapPanel } from './MapPanel';
@@ -34,14 +35,14 @@ export function SidePanel() {
     { id: 'kindle', label: 'Kindle', badge: kindleReady },
     ...(sigilVisible ? [{ id: 'sigil' as Tab, label: 'Sigil', badge: sigilReady }] : []),
     { id: 'bestiary', label: 'Lore' },
-    { id: 'settings', label: '⚙' },
+    { id: 'settings', label: 'Settings' },
   ];
   return (
-    <div className="slab p-3 flex flex-col gap-3 min-h-[520px]">
-      <div className="flex flex-wrap gap-1 border-b border-ash-700 pb-2">
+    <Slab material="leather" seed="side" rough={5} ornament="none" className="px-5 pt-3 pb-5 flex flex-col gap-3 min-h-[520px]">
+      <div className="flex flex-wrap gap-x-1 -mx-1" role="tablist" style={{ borderBottom: '1px solid color-mix(in srgb, var(--ash) 55%, transparent)' }}>
         {tabs.map((t) => (
-          <button key={t.id} className={`text-[11px] uppercase tracking-widest px-2 py-1 rounded-sm ${tab === t.id ? 'text-ember-400 bg-ash-800' : 'text-bone-400 hover:text-bone-200'}`} onClick={() => setTab(t.id)}>
-            {t.label}{t.badge && <span className="ml-1 text-ember-400">●</span>}
+          <button key={t.id} role="tab" aria-selected={tab === t.id} className="tab" onClick={() => setTab(t.id)}>
+            {t.label}{t.badge && <span className="ml-1" style={{ color: 'var(--ember-hot)' }}>•</span>}
           </button>
         ))}
       </div>
@@ -58,6 +59,6 @@ export function SidePanel() {
         {tab === 'bestiary' && <BestiaryPanel />}
         {tab === 'settings' && <SettingsPanel />}
       </div>
-    </div>
+    </Slab>
   );
 }

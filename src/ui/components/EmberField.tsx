@@ -15,7 +15,7 @@ export const EmberField = memo(function EmberField({ count = 28 }: { count?: num
       {embers.map((e) => (
         <div key={e.id} className="ember absolute rounded-full" style={{
           left: `${e.left}%`, bottom: -10, width: e.size, height: e.size,
-          background: e.size > 2.5 ? '#ffa24d' : '#e8712a', boxShadow: '0 0 6px 1px rgba(232,113,42,0.5)',
+          background: e.size > 2.5 ? '#F0902E' : '#F0902E', boxShadow: '0 0 6px 1px color-mix(in srgb, #F0902E 50%, transparent)',
           animation: `ember-rise ${e.dur}s linear ${e.delay}s infinite`, ['--drift' as any]: `${e.drift}px`, opacity: 0,
         }} />
       ))}

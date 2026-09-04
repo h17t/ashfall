@@ -3,6 +3,7 @@ import { useGame, useSel } from '../store';
 import { fmt, levelCost, statCurve, statMarginal, softCapBand, STAT_NAMES, STAT_DESC, D, computeMods, weaponDamage, playerHpMax, playerStaminaMax, STAT_KEYS, type StatKey } from '@/engine';
 import { BALANCE, MATERIALS, getWeapon } from '@/content';
 import { Tooltip } from './Tooltip';
+import { Plate } from '@/render/Plate';
 
 const GRADE_ORDER = ['-', 'E', 'D', 'C', 'B', 'A', 'S'];
 
@@ -22,24 +23,24 @@ export const BonfirePanel = memo(function BonfirePanel() {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
-        <span className="font-display text-lg text-ember-400">Bonfire</span>
-        <span className="text-[10px] uppercase tracking-widest text-bone-400">Level {level} → {level + 1}: <span className={`font-num ${canAfford ? 'text-bone-100' : 'text-blood-500'}`}>{fmt(cost)}</span> souls</span>
+        <span className="t-display text-[20px] text-ember-hot">Bonfire</span>
+        <span className="t-label">Level {level} → {level + 1}: <span className={`font-num ${canAfford ? 'text-parchment' : 'text-blood-bright'}`}>{fmt(cost)}</span> souls</span>
       </div>
       <div className="grid grid-cols-1 gap-1">
         {STAT_KEYS.map((k) => <StatRow key={k} stat={k} canAfford={canAfford} onLevel={() => dispatch({ type: 'levelUp', stat: k })} />)}
       </div>
-      <div className="border-t border-ash-700 pt-2 flex flex-col gap-1">
-        <div className="flex items-center justify-between text-[12px]">
+      <div className="border-t border-ash/50 pt-2 flex flex-col gap-1">
+        <div className="flex items-center justify-between text-[14px]">
           <Tooltip tip={<span>Each Estus Shard adds one flask. Shards drop from bosses and hidden places. Current: {estus} flasks healing {Math.round(potency * 100)}% each.</span>}>
-            <span className="text-bone-200">Estus flasks: <span className="font-num">{estus}</span></span>
+            <span className="text-parchment flex items-center gap-2"><span className="w-7 h-7"><Plate kind="item" id="estusShard" className="w-full h-full object-contain" /></span>Estus flasks: <span className="font-num">{estus}</span></span>
           </Tooltip>
-          <button className="btn text-xs" disabled={shards <= 0} onClick={() => dispatch({ type: 'upgradeEstus', kind: 'count' })}>Fit shard ({shards})</button>
+          <button className="btn text-[13px]" disabled={shards <= 0} onClick={() => dispatch({ type: 'upgradeEstus', kind: 'count' })}>Fit shard ({shards})</button>
         </div>
-        <div className="flex items-center justify-between text-[12px]">
+        <div className="flex items-center justify-between text-[14px]">
           <Tooltip tip={<span>An Undead Bone Shard cast into the flame makes each flask heal 8% more of your max HP (max 90%).</span>}>
-            <span className="text-bone-200">Flask potency: <span className="font-num">{Math.round(potency * 100)}%</span></span>
+            <span className="text-parchment flex items-center gap-2"><span className="w-7 h-7"><Plate kind="item" id="boneShard" className="w-full h-full object-contain" /></span>Flask potency: <span className="font-num">{Math.round(potency * 100)}%</span></span>
           </Tooltip>
-          <button className="btn text-xs" disabled={bones <= 0} onClick={() => dispatch({ type: 'upgradeEstus', kind: 'potency' })}>Burn bone ({bones})</button>
+          <button className="btn text-[13px]" disabled={bones <= 0} onClick={() => dispatch({ type: 'upgradeEstus', kind: 'potency' })}>Burn bone ({bones})</button>
         </div>
         {vessels > 0 && <RespecRow />}
       </div>
@@ -58,12 +59,12 @@ function StatRow({ stat, canAfford, onLevel }: { stat: StatKey; canAfford: boole
     <div className="flex items-center gap-2">
       <Tooltip className="flex-1" tip={<StatTip stat={stat} pts={pts} nextCap={nextCap} marginal={marginal} preview={preview} />}>
         <div className="flex items-baseline justify-between cursor-help">
-          <span className="text-bone-200 text-sm">{STAT_NAMES[stat]}</span>
-          <span className="font-num text-bone-100">{pts}<span className="text-[10px] text-bone-400 ml-1">{nextCap ? `→${nextCap}` : 'capped'}</span></span>
+          <span className="text-parchment text-[15px]">{STAT_NAMES[stat]}</span>
+          <span className="font-num text-parchment">{pts}<span className="text-[12px] text-bone/70 ml-1">{nextCap ? `→${nextCap}` : 'capped'}</span></span>
         </div>
-        <div className="h-0.5 mt-0.5 bg-ash-800"><div className="h-full bg-ember-700" style={{ width: `${Math.min(100, (statCurve(pts) / 1.2) * 100)}%` }} /></div>
+        <div className="h-[2px] mt-0.5" style={{ background: 'color-mix(in srgb, var(--ash) 40%, transparent)' }}><div className="h-full" style={{ width: `${Math.min(100, (statCurve(pts) / 1.2) * 100)}%`, background: 'linear-gradient(90deg, var(--ember), var(--ember-hot))' }} /></div>
       </Tooltip>
-      <button className={`btn text-xs px-2 ${canAfford ? 'btn-ember' : ''}`} disabled={!canAfford} onClick={onLevel}>+</button>
+      <button className={`btn text-[13px] px-2 ${canAfford ? 'btn-ember' : ''}`} disabled={!canAfford} onClick={onLevel}>+</button>
     </div>
   );
 }
@@ -98,10 +99,10 @@ function statPreview(s: any, stat: StatKey): string {
 function StatTip({ stat, pts, nextCap, marginal, preview }: { stat: StatKey; pts: number; nextCap: number | null; marginal: number; preview: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <div className="font-display text-base text-bone-100">{STAT_NAMES[stat]} {pts}</div>
-      <div className="text-bone-300">{STAT_DESC[stat]}</div>
-      <div className="text-bone-200">Next point: {preview}</div>
-      <div className="text-bone-400">Scaling value +{marginal.toFixed(4)} per point in this band. {nextCap ? `Soft cap at ${nextCap}: returns drop after it.` : 'Past every soft cap: small returns.'} Caps at {BALANCE.level.softCaps.join(' / ')}.</div>
+      <div className="font-display text-[16px] text-parchment">{STAT_NAMES[stat]} {pts}</div>
+      <div className="text-bone">{STAT_DESC[stat]}</div>
+      <div className="text-parchment">Next point: {preview}</div>
+      <div className="text-bone/70">Scaling value +{marginal.toFixed(4)} per point in this band. {nextCap ? `Soft cap at ${nextCap}: returns drop after it.` : 'Past every soft cap: small returns.'} Caps at {BALANCE.level.softCaps.join(' / ')}.</div>
     </div>
   );
 }
@@ -124,9 +125,9 @@ function RespecRow() {
     dispatch({ type: 'respec', stats: next });
   };
   return (
-    <div className="flex items-center justify-between text-[12px]">
-      <Tooltip tip={<span>{MATERIALS.soulVessel.lore}</span>}><span className="text-bone-200">Soul Vessels: <span className="font-num">{vessels}</span></span></Tooltip>
-      <button className="btn text-xs" onClick={onRespec}>Reallocate stats</button>
+    <div className="flex items-center justify-between text-[14px]">
+      <Tooltip tip={<span>{MATERIALS.soulVessel.lore}</span>}><span className="text-parchment flex items-center gap-2"><span className="w-7 h-7"><Plate kind="item" id="soulVessel" className="w-full h-full object-contain" /></span>Soul Vessels: <span className="font-num">{vessels}</span></span></Tooltip>
+      <button className="btn text-[13px]" onClick={onRespec}>Reallocate stats</button>
     </div>
   );
 }

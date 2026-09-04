@@ -1,10 +1,13 @@
 import { memo, useCallback, useState } from 'react';
 import { useGame, useSel } from '../store';
 import { useEvents } from '../hooks/useEvents';
-import { fmt, D, type GameEvent } from '@/engine';
-import { getZone, BALANCE } from '@/content';
-import { Bar } from './Bar';
+import { fmt, D, type GameEvent, computeMods, weaponDamage } from '@/engine';
+import { getZone, BALANCE, getWeapon } from '@/content';
+import { Gauge } from '@/render/Gauge';
+import { Slab } from '@/render/materials/Slab';
+import { Plate } from '@/render/Plate';
 
+/** The ember-tender's hub: souls, vitals, the flask, the blade in hand. Overlaps the arena's edge. */
 export const PlayerPanel = memo(function PlayerPanel() {
   const dispatch = useGame((g) => g.dispatch);
   const hp = useSel((s) => Math.round(s.player.hp));
@@ -29,50 +32,62 @@ export const PlayerPanel = memo(function PlayerPanel() {
     const target = r.targetTier < 0 ? z.tiers.length : r.targetTier;
     return (target - r.atTier + (r.targetTier < 0 ? 0 : 1)) * BALANCE.death.runKillsPerTier - r.killsAtTier;
   });
+  const weaponId = useSel((s) => s.player.weapon);
+  const weaponLevel = useSel((s) => s.player.weapons[s.player.weapon]?.level ?? 0);
+  const weaponDmg = useSel((s) => weaponDamage(s, computeMods(s), s.player.weapon).total.toString());
+  const weapon = getWeapon(weaponId);
   const [exhaustFlash, setExhaustFlash] = useState(0);
   useEvents(useCallback((events: GameEvent[]) => { if (events.some((e) => e.type === 'exhausted')) setExhaustFlash((x) => x + 1); }, []));
 
   return (
-    <div className="slab p-4 flex flex-col gap-3">
+    <Slab material="stone" seed="hub" rough={6} className="px-6 pt-5 pb-5 flex flex-col gap-4">
       <div className="flex justify-between items-baseline">
-        <span className="font-display text-xl text-bone-100">Ember-tender</span>
-        <span className="text-[10px] uppercase tracking-widest text-bone-400">Soul level <span className="font-num text-bone-200">{level}</span></span>
+        <span className="t-label">Ember-tender · Soul level <span className="t-num text-[12px]" style={{ color: 'var(--parchment)' }}>{level}</span></span>
       </div>
-      <div>
-        <div className="text-[10px] uppercase tracking-[0.3em] text-ember-400">Souls</div>
-        <div className="font-num text-3xl text-bone-100 leading-tight">{fmt(D(souls))}</div>
+      <div className="-mt-1">
+        <div className="t-label" style={{ color: 'var(--ember-hot)' }}>Souls</div>
+        <div className="t-num text-[46px] leading-none mt-1" style={{ color: 'var(--parchment)' }}>{fmt(D(souls))}</div>
         {bloodstain && (
-          <div className="text-[11px] text-blood-500 mt-1 border border-blood-600/60 rounded-sm px-2 py-1">
-            <div>Bloodstain: <span className="font-num">{fmt(D(bloodstain))}</span> souls lie at {runTarget || 'where you fell'}.</div>
-            {run && <div className="text-bone-400">{runKillsLeft} kill{runKillsLeft === 1 ? '' : 's'} to reach it. Die first and it is gone.</div>}
-            {run && <button className="text-[10px] uppercase tracking-widest text-ash-400 hover:text-blood-500 mt-1" onClick={() => dispatch({ type: 'abandonBloodstain' })}>Abandon the stain</button>}
+          <div className="text-[13px] mt-2 px-3 py-2" style={{ border: '1px solid color-mix(in srgb, var(--blood) 70%, transparent)', background: 'color-mix(in srgb, var(--blood) 14%, transparent)', color: 'var(--parchment)' }}>
+            <div><span style={{ color: 'var(--blood-bright)' }}>Bloodstain.</span> <span className="t-num">{fmt(D(bloodstain))}</span> souls lie at {runTarget || 'where you fell'}.</div>
+            {run && <div className="t-lore text-[13px]">{runKillsLeft} kill{runKillsLeft === 1 ? '' : 's'} to reach it. Die first and it is gone.</div>}
+            {run && <button className="t-label mt-1 hover:text-blood-bright" onClick={() => dispatch({ type: 'abandonBloodstain' })}>Abandon the stain</button>}
           </div>
         )}
       </div>
-      <Bar value={hp} max={hpMax} color={poisoned ? '#7c4dab' : '#7d1620'} label="HP" text={`${hp}/${hpMax}`} height={12} />
+      <Gauge value={hp} max={hpMax} tone={poisoned ? 'verdigris' : 'blood'} label="HP" text={`${hp} / ${hpMax}`} height={12} />
       <div key={exhaustFlash} className={exhaustFlash ? 'shake' : ''}>
-        <Bar value={stam} max={stamMax} color={stam < 10 ? '#8a6d1f' : '#3f7a3a'} label="Stamina" text={`${stam}/${stamMax}`} height={8} />
+        <Gauge value={stam} max={stamMax} tone={stam < 10 ? 'gold' : 'stamina'} label="Stamina" text={`${stam} / ${stamMax}`} height={8} cut={1} />
       </div>
       <div className="flex gap-2">
         <button className="btn flex-1" disabled={estus <= 0 || dead || hp >= hpMax} onClick={() => dispatch({ type: 'estus' })} title="Drink from the Estus flask (E)">
-          Estus <span className="font-num text-ember-400">{estus}/{estusMax}</span>
+          Estus <span className="t-num ml-1" style={{ color: 'var(--ember-hot)' }}>{estus}/{estusMax}</span>
         </button>
-        <button className={`btn flex-1 ${iframes ? 'border-ember-500 text-ember-400' : ''}`} disabled={dodgeCd > 0 || dead} onClick={() => dispatch({ type: 'dodge' })} title="Dodge (Space). Time it to the end of a telegraph for a perfect dodge.">
-          Dodge {dodgeCd > 0 && <span className="font-num text-bone-400">{dodgeCd.toFixed(1)}s</span>}
+        <button className={`btn flex-1 ${iframes ? 'btn-ember' : ''}`} disabled={dodgeCd > 0 || dead} onClick={() => dispatch({ type: 'dodge' })} title="Dodge (Space). Time it to the end of a telegraph for a perfect dodge.">
+          Dodge {dodgeCd > 0 && <span className="t-num ml-1" style={{ color: 'var(--bone)' }}>{dodgeCd.toFixed(1)}s</span>}
         </button>
       </div>
       {buffs && (
         <div className="flex flex-wrap gap-1">
           {buffs.split(',').map((b) => {
             const [id, t] = b.split(':');
-            return <span key={id} className="text-[10px] uppercase tracking-widest px-1.5 py-0.5 border border-ember-700 text-ember-400 rounded-sm">{id.replace('spell:', '')} {t}s</span>;
+            return <span key={id} className="t-label px-2 py-0.5" style={{ border: '1px solid var(--ember)', color: 'var(--ember-hot)' }}>{id.replace('spell:', '')} {t}s</span>;
           })}
         </div>
       )}
-      <button className="btn text-xs" disabled={dead} onClick={() => dispatch({ type: 'retreat' })} title="Return to the bonfire. Refills Estus and HP. Keeps your souls. Resets the fight.">
-        Rest at bonfire
+      <div className="t-rule" />
+      <div className="flex gap-3 items-start">
+        <div className="w-[68px] h-[68px] shrink-0 -ml-1 -mt-1" style={{ filter: 'drop-shadow(-3px 5px 6px var(--void))' }}><Plate kind="weapon" id={weaponId} className="w-full h-full object-contain" /></div>
+        <div className="min-w-0">
+          <div className="t-label" style={{ color: 'var(--parchment)' }}>{weapon.name} {weaponLevel > 0 && <span style={{ color: 'var(--ember-hot)' }}>+{weaponLevel}</span>}</div>
+          <div className="t-lore text-[13px] leading-snug mt-1 line-clamp-3">{weapon.lore}</div>
+          <div className="t-num text-[13px] mt-1" style={{ color: 'var(--bone)' }}>Damage {fmt(D(weaponDmg))} · Stagger {weapon.stagger} · Riposte ×{weapon.riposteMult.toFixed(1)}</div>
+        </div>
+      </div>
+      <button className="btn" disabled={dead} onClick={() => dispatch({ type: 'retreat' })} title="Return to the bonfire. Refills Estus and HP. Keeps your souls. Resets the fight.">
+        Rest at the bonfire
       </button>
-      <p className="text-[11px] text-bone-400 leading-snug">Click the enemy to strike. Fill the pale bar to stagger it, then strike during the <span className="text-ember-400">Riposte</span> window. Dodge when the red bar fills.</p>
-    </div>
+      <p className="t-lore text-[13px] leading-snug">Click the enemy to strike. Fill the pale bar to stagger it, then strike in the <span style={{ color: 'var(--ember-hot)', fontStyle: 'normal' }}>Riposte</span> window. Dodge when the red bar fills.</p>
+    </Slab>
   );
 });

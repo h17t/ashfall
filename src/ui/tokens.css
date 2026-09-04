@@ -1,0 +1,18 @@
+/* The palette (ART.md §2). The only place colour literals are allowed in the UI layer. */
+:root {
+  --void: #0A0908;
+  --ink: #14100E;
+  --stone: #241E1A;
+  --ash: #4A423C;
+  --bone: #C8BBA6;
+  --parchment: #E8DCC4;
+  --ember: #C8560F;
+  --ember-hot: #F0902E;
+  --blood: #6E1212;
+  --blood-bright: #A81C1C;
+  --verdigris: #3D5A4C;
+  --soul: #5C7A99;
+  --gold: #B8912F;
+  /* the bonfire's flicker, written by the render loop: 0.85..1.15 */
+  --fire: 1;
+}

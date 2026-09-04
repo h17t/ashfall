@@ -1,86 +1,168 @@
 @import "tailwindcss";
+@import "./fonts.css";
+@import "./tokens.css";
 
+/*
+ * Ashfall presentation layer. Palette is the thirteen tokens in tokens.css and nothing else
+ * (ART.md §2); type is IM Fell / EB Garamond / Barlow Condensed, self-hosted (ART.md §3).
+ * The names below keep older utility classes compiling while mapping them onto the palette.
+ */
 @theme {
-  --color-ash-950: #0b0a0a;
-  --color-ash-900: #141212;
-  --color-ash-800: #1d1a1a;
-  --color-ash-700: #2a2626;
-  --color-ash-600: #3a3535;
-  --color-ash-500: #575050;
-  --color-ash-400: #7a7272;
-  --color-bone-100: #ece4d6;
-  --color-bone-200: #d6cbb8;
-  --color-bone-300: #b9ad99;
-  --color-bone-400: #8f8574;
-  --color-ember-400: #ffa24d;
-  --color-ember-500: #e8712a;
-  --color-ember-600: #c2521a;
-  --color-ember-700: #8a3410;
-  --color-blood-500: #a3202a;
-  --color-blood-600: #7d1620;
-  --font-display: "Cormorant Garamond", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  --font-body: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
-  --font-num: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --color-void: #0A0908;
+  --color-ink: #14100E;
+  --color-stone: #241E1A;
+  --color-ash: #4A423C;
+  --color-bone: #C8BBA6;
+  --color-parchment: #E8DCC4;
+  --color-ember: #C8560F;
+  --color-ember-hot: #F0902E;
+  --color-blood: #6E1212;
+  --color-blood-bright: #A81C1C;
+  --color-verdigris: #3D5A4C;
+  --color-soul: #5C7A99;
+  --color-gold: #B8912F;
+
+  --color-ash-950: #0A0908;
+  --color-ash-900: #14100E;
+  --color-ash-800: #241E1A;
+  --color-ash-700: #241E1A;
+  --color-ash-600: #4A423C;
+  --color-ash-500: #4A423C;
+  --color-ash-400: #4A423C;
+  --color-bone-100: #E8DCC4;
+  --color-bone-200: #E8DCC4;
+  --color-bone-300: #C8BBA6;
+  --color-bone-400: #C8BBA6;
+  --color-ember-400: #F0902E;
+  --color-ember-500: #F0902E;
+  --color-ember-600: #C8560F;
+  --color-ember-700: #C8560F;
+  --color-blood-500: #A81C1C;
+  --color-blood-600: #6E1212;
+
+  --font-display: "IM Fell English SC", "Cinzel", "Palatino Linotype", Georgia, serif;
+  --font-body: "EB Garamond", "Cormorant Garamond", "Palatino Linotype", Georgia, serif;
+  --font-num: "Barlow Condensed", "IBM Plex Sans Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
 }
 
 html, body, #root { height: 100%; }
+html { background: var(--void); }
 body {
   margin: 0;
-  background: radial-gradient(ellipse at 50% 30%, #1a1616 0%, #0b0a0a 70%);
-  color: var(--color-bone-100);
+  /* the bonfire sits low-left of the arena; the whole page is lit from there */
+  background:
+    radial-gradient(ellipse 60% 45% at 26% 100%, color-mix(in srgb, var(--ember) 22%, transparent) 0%, transparent 70%),
+    radial-gradient(ellipse 90% 70% at 40% 60%, var(--ink) 0%, var(--void) 75%);
+  color: var(--bone);
   font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.35;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   user-select: none;
 }
-.font-display { font-family: var(--font-display); }
-.font-num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+::selection { background: var(--ember); color: var(--void); }
 
+.font-display { font-family: var(--font-display); }
+.font-body { font-family: var(--font-body); }
+.font-num { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: 0.02em; }
+
+/* type roles (ART.md §3) */
+.t-label { font-family: var(--font-num); font-weight: 600; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: color-mix(in srgb, var(--bone) 72%, transparent); }
+.t-num { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: 0.02em; }
+.t-display { font-family: var(--font-display); letter-spacing: 0.14em; color: var(--parchment); }
+.t-lore { font-family: var(--font-body); font-style: italic; color: color-mix(in srgb, var(--bone) 85%, transparent); }
+.t-rule { height: 1px; background: linear-gradient(90deg, var(--ember) 0%, color-mix(in srgb, var(--ash) 60%, transparent) 55%, transparent 100%); }
+
+/* legacy slab class: a plain stone face for places not yet carrying a <Slab> */
 .slab {
-  background: linear-gradient(180deg, #1f1b1b 0%, #171414 100%);
-  border: 1px solid #2f2a2a;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 8px 24px rgba(0,0,0,0.5);
-  border-radius: 4px;
+  position: relative;
+  background: linear-gradient(160deg, var(--stone) 0%, var(--ink) 100%);
+  border: 1px solid color-mix(in srgb, var(--bone) 12%, var(--stone));
+  clip-path: polygon(0.4% 0, 99.6% 0.6%, 100% 99%, 0.2% 100%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--parchment) 4%, transparent);
 }
+
+/* engraved stone buttons: no radius, a cut corner, lit edge */
 .btn {
-  @apply px-3 py-1.5 rounded-sm border border-ash-600 bg-ash-800 text-bone-200 hover:border-ember-500 hover:text-bone-100 transition-colors text-sm;
+  font-family: var(--font-num);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  color: var(--bone);
+  background: linear-gradient(180deg, var(--stone) 0%, var(--ink) 100%);
+  border: 1px solid var(--ash);
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  transition: color 120ms, border-color 120ms, background 120ms;
 }
-.btn:disabled { @apply opacity-40 cursor-not-allowed hover:border-ash-600; }
-.btn-ember { @apply border-ember-600 bg-ember-700/40 text-ember-400 hover:bg-ember-700/70; }
+.btn:hover { border-color: var(--ember); color: var(--parchment); background: linear-gradient(180deg, color-mix(in srgb, var(--stone) 80%, var(--ember)) 0%, var(--ink) 100%); }
+.btn:disabled { opacity: 0.38; cursor: not-allowed; border-color: var(--ash); color: var(--bone); background: var(--ink); }
+.btn-ember { border-color: var(--ember); color: var(--ember-hot); background: linear-gradient(180deg, color-mix(in srgb, var(--ember) 35%, var(--ink)) 0%, var(--ink) 100%); }
+.btn-ember:hover { color: var(--parchment); border-color: var(--ember-hot); }
+.btn-lit { box-shadow: 0 0 calc(14px * var(--fire)) color-mix(in srgb, var(--ember) 45%, transparent); }
+
+/* tabs carved into the slab edge */
+.tab {
+  font-family: var(--font-num); font-weight: 600; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 6px 7px 5px; color: color-mix(in srgb, var(--bone) 70%, transparent);
+  border-bottom: 2px solid transparent; transition: color 120ms, border-color 120ms;
+}
+.tab:hover { color: var(--parchment); }
+.tab[aria-selected="true"] { color: var(--ember-hot); border-bottom-color: var(--ember); }
+
+/* an engraved line item: name on the left, figure on the right, thin rule beneath */
+.ledger { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; border-bottom: 1px solid color-mix(in srgb, var(--ash) 45%, transparent); }
+.ledger:last-child { border-bottom: 0; }
+
+select, input[type="text"], input[type="number"] {
+  font-family: var(--font-num); font-size: 12px; letter-spacing: 0.06em;
+  background: var(--ink); color: var(--bone); border: 1px solid var(--ash); padding: 3px 6px;
+}
 
 @keyframes float-up { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-70px); opacity: 0; } }
 @keyframes shake { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-4px,2px); } 50% { transform: translate(3px,-3px); } 75% { transform: translate(-2px,-2px); } }
 @keyframes flash { from { opacity: 0.8; } to { opacity: 0; } }
 @keyframes ember-rise { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(-110vh) translateX(var(--drift)); opacity: 0; } }
 @keyframes you-died { 0% { opacity: 0; letter-spacing: 0.3em; } 30% { opacity: 1; } 100% { opacity: 1; letter-spacing: 0.5em; } }
-@keyframes riposte-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,162,77,0.0); } 50% { box-shadow: 0 0 40px 8px rgba(255,162,77,0.6); } }
+@keyframes riposte-pulse { 0%,100% { opacity: 0.15; } 50% { opacity: 1; } }
+@keyframes backdrop-drift { 0% { transform: translateX(-0.6%) scale(1.09); } 100% { transform: translateX(0.6%) scale(1.09); } }
 
-.float-num { position: absolute; animation: float-up 0.9s ease-out forwards; pointer-events: none; font-family: var(--font-num); font-weight: 700; text-shadow: 0 2px 4px #000; }
+.float-num { position: absolute; animation: float-up 0.9s ease-out forwards; pointer-events: none; font-family: var(--font-num); font-weight: 600; letter-spacing: 0.02em; text-shadow: 0 2px 4px var(--void), 0 0 12px var(--void); }
 .shake { animation: shake 0.18s linear; }
-.riposte-glow { animation: riposte-pulse 0.6s ease-in-out infinite; }
+.riposte-glow::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 5; box-shadow: inset 0 0 60px 8px color-mix(in srgb, var(--ember-hot) 35%, transparent); animation: riposte-pulse 0.6s ease-in-out infinite; will-change: opacity; }
+.backdrop-drift { animation: backdrop-drift 22s ease-in-out infinite alternate; }
 
 @media (prefers-reduced-motion: reduce) {
   .float-num { animation-duration: 0.5s; }
-  .shake { animation: none; }
+  .shake, .backdrop-drift { animation: none; }
 }
 .reduce-fx .float-num { animation-duration: 0.5s; }
-.reduce-fx .shake { animation: none; }
+.reduce-fx .shake, .reduce-fx .backdrop-drift { animation: none; }
 .reduce-fx .ember { display: none; }
 
 /* ---- juice ---- */
 @keyframes ash-fall { from { transform: translate(0, 0); opacity: 0.7; } to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
 @keyframes flame-flicker { 0%,100% { transform: scaleY(1) scaleX(1); } 30% { transform: scaleY(1.06) scaleX(0.97); } 60% { transform: scaleY(0.95) scaleX(1.03); } }
 @keyframes root-shake { 0%,100% { transform: translate(0,0); } 20% { transform: translate(calc(var(--shake) * -1), calc(var(--shake) * 0.5)); } 40% { transform: translate(calc(var(--shake) * 0.8), calc(var(--shake) * -0.6)); } 60% { transform: translate(calc(var(--shake) * -0.5), calc(var(--shake) * -0.3)); } 80% { transform: translate(calc(var(--shake) * 0.3), calc(var(--shake) * 0.4)); } }
-@keyframes chromatic { 0% { box-shadow: inset 0 0 0 0 rgba(255,80,40,0), inset 0 0 0 0 rgba(40,140,255,0); } 20% { box-shadow: inset 6px 0 40px 4px rgba(255,80,40,0.35), inset -6px 0 40px 4px rgba(40,140,255,0.35); } 100% { box-shadow: inset 0 0 0 0 rgba(255,80,40,0), inset 0 0 0 0 rgba(40,140,255,0); } }
+@keyframes chromatic { 0% { box-shadow: inset 0 0 0 0 color-mix(in srgb, var(--ember) 0%, transparent), inset 0 0 0 0 color-mix(in srgb, var(--soul) 0%, transparent); } 20% { box-shadow: inset 6px 0 40px 4px color-mix(in srgb, var(--ember) 35%, transparent), inset -6px 0 40px 4px color-mix(in srgb, var(--soul) 35%, transparent); } 100% { box-shadow: inset 0 0 0 0 color-mix(in srgb, var(--ember) 0%, transparent), inset 0 0 0 0 color-mix(in srgb, var(--soul) 0%, transparent); } }
 #root.shaking { animation: root-shake 0.22s linear; }
 .flame { animation: flame-flicker 1.6s ease-in-out infinite; }
 .chromatic-edge { animation: chromatic 0.65s ease-out forwards; }
-/* riposte time-dilation: every CSS transition/animation in the arena slows for a beat */
-html.riposte-time .slab * { animation-duration: 1.8s; transition-duration: 0.5s; }
+html.riposte-time .arena * { animation-duration: 1.8s; transition-duration: 0.5s; }
 html.riposte-time .float-num { animation-duration: 1.6s; }
 .reduce-fx .flame { animation: none; }
 .reduce-fx #root.shaking { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .flame, #root.shaking, .chromatic-edge { animation: none; }
 }
-:focus-visible { outline: 2px solid var(--color-ember-500); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--ember-hot); outline-offset: 2px; }
+
+/* thin, dark scrollbars: the panels are objects, not browser chrome */
+* { scrollbar-width: thin; scrollbar-color: var(--ash) transparent; }
+
+/* a small lit well behind a dark icon so blades read on stone */
+.icon-well { position: relative; }
+.icon-well::before { content: ""; position: absolute; inset: 2px; background: radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--bone) 28%, transparent) 0%, transparent 70%); pointer-events: none; }
+.icon-well > * { position: relative; }

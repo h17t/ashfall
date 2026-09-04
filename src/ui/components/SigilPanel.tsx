@@ -21,36 +21,36 @@ export const SigilPanel = memo(function SigilPanel() {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
-        <span className="font-display text-lg text-ember-400">The Dark Sigil</span>
-        <span className="text-[10px] uppercase tracking-widest text-bone-400">{sigils} carved · NG+{kindles}{record > 0 ? ` · depth record ${record}` : ''}</span>
+        <span className="t-display text-[20px] text-ember-hot">The Dark Sigil</span>
+        <span className="t-label">{sigils} carved · NG+{kindles}{record > 0 ? ` · depth record ${record}` : ''}</span>
       </div>
-      <div className="border border-ash-700 rounded-sm p-2 text-[12px] flex flex-col gap-1">
-        <div className="flex justify-between"><span className="text-bone-400">Sigil Marks held</span><span className="font-num text-purple-300">{fmt(D(marks))}</span></div>
+      <div className="border border-ash/50 p-2 text-[14px] flex flex-col gap-1">
+        <div className="flex justify-between"><span className="text-bone/70">Sigil Marks held</span><span className="font-num text-soul">{fmt(D(marks))}</span></div>
         <Tooltip tip={<span>Marks = (all Humanity ever gathered this Sigil ÷ {BALANCE.prestige.sigilMarkDivisor})^{BALANCE.prestige.sigilMarkExponent} × √(NG+ ÷ {BALANCE.prestige.sigilAt}) × (1 + 10% per Abyss depth record). Opens at NG+{BALANCE.prestige.sigilAt}.</span>}>
-          <div className="flex justify-between cursor-help"><span className="text-bone-400">Carving now gathers</span><span className="font-num text-purple-300 text-base">+{fmt(D(preview))} Marks</span></div>
+          <div className="flex justify-between cursor-help"><span className="text-bone/70">Carving now gathers</span><span className="font-num text-soul text-[16px]">+{fmt(D(preview))} Marks</span></div>
         </Tooltip>
       </div>
       {!confirm ? (
-        <button className={`btn ${why ? '' : 'border-purple-400 text-purple-300'}`} disabled={!!why} title={why ?? ''} onClick={() => setConfirm(true)}>{why ?? 'Carve the Sigil…'}</button>
+        <button className={`btn ${why ? '' : 'border-soul text-soul'}`} disabled={!!why} title={why ?? ''} onClick={() => setConfirm(true)}>{why ?? 'Carve the Sigil…'}</button>
       ) : (
-        <div className="border border-purple-400/60 rounded-sm p-2 text-[12px] flex flex-col gap-2">
+        <div className="border border-soul/60 p-2 text-[14px] flex flex-col gap-2">
           <div className="grid grid-cols-2 gap-2">
-            <div><div className="text-[10px] uppercase tracking-widest text-emerald-400 mb-1">Kept</div>{L.keep.map((k) => <div key={k} className="text-bone-300">· {k}</div>)}</div>
-            <div><div className="text-[10px] uppercase tracking-widest text-blood-500 mb-1">Unmade</div>{L.lose.map((k) => <div key={k} className="text-bone-300">· {k}</div>)}</div>
+            <div><div className="t-label text-verdigris mb-1">Kept</div>{L.keep.map((k) => <div key={k} className="text-bone">· {k}</div>)}</div>
+            <div><div className="t-label text-blood-bright mb-1">Unmade</div>{L.lose.map((k) => <div key={k} className="text-bone">· {k}</div>)}</div>
           </div>
           <div className="flex gap-2">
-            <button className="btn border-purple-400 text-purple-300" onClick={() => { dispatch({ type: 'darkSigil' }); setConfirm(false); }}>Carve it</button>
+            <button className="btn border-soul text-soul" onClick={() => { dispatch({ type: 'darkSigil' }); setConfirm(false); }}>Carve it</button>
             <button className="btn" onClick={() => setConfirm(false)}>Not yet</button>
           </div>
         </div>
       )}
       <Unlocks />
-      <div className="border-t border-ash-700 pt-2">
+      <div className="border-t border-ash/50 pt-2">
         <div className="flex items-baseline justify-between">
-          <span className="font-display text-base text-bone-100">The Age of Dark</span>
-          <span className="text-[10px] uppercase tracking-widest text-bone-400">Dark Level <span className="font-num text-bone-200">{darkLevel}</span></span>
+          <span className="font-display text-[16px] text-parchment">The Age of Dark</span>
+          <span className="t-label">Dark Level <span className="font-num text-parchment">{darkLevel}</span></span>
         </div>
-        <p className="text-[11px] text-bone-400 mt-1">Each Dark Level: ×1.5 damage and souls, ×1.25 Humanity, forever. Costs Sigil Marks, rising ×1.7. {DARK_LEVEL_GIFTS[darkLevel + 1] ? `Next: ${DARK_LEVEL_GIFTS[darkLevel + 1].name} — ${DARK_LEVEL_GIFTS[darkLevel + 1].desc}` : 'Beyond the last gift, only the multiplier remains, and it does not stop.'}</p>
+        <p className="text-[13px] text-bone/70 mt-1">Each Dark Level: ×1.5 damage and souls, ×1.25 Humanity, forever. Costs Sigil Marks, rising ×1.7. {DARK_LEVEL_GIFTS[darkLevel + 1] ? `Next: ${DARK_LEVEL_GIFTS[darkLevel + 1].name} — ${DARK_LEVEL_GIFTS[darkLevel + 1].desc}` : 'Beyond the last gift, only the multiplier remains, and it does not stop.'}</p>
         <button className={`btn mt-2 ${darkWhy ? '' : 'btn-ember'}`} disabled={!!darkWhy} title={darkWhy ?? ''} onClick={() => dispatch({ type: 'ageOfDark' })}>{darkWhy ?? `${darkLevel === 0 ? 'Begin the Age of Dark' : `Dark Level ${darkLevel + 1}`} · ${fmt(D(darkCost))} Marks`}</button>
       </div>
     </div>
@@ -67,17 +67,17 @@ function Unlocks() {
   const C = JSON.parse(costs) as Record<string, string>;
   return (
     <div className="flex flex-col gap-1">
-      <div className="text-[10px] uppercase tracking-widest text-bone-400">Sigil marks · structural · permanent</div>
+      <div className="t-label">Sigil marks · structural · permanent</div>
       {Object.values(SIGIL_UNLOCKS).map((u) => {
         const rank = R[u.id] ?? 0;
         const why = B[u.id];
         const done = rank >= u.maxRank;
         return (
-          <div key={u.id} className={`flex items-center justify-between gap-2 border rounded-sm px-2 py-1 text-[12px] ${done ? 'border-purple-400/60' : 'border-ash-700'}`}>
-            <Tooltip className="flex-1" tip={<div><div className="font-display text-base">{u.name}</div><div>{u.desc}</div>{u.requires.length > 0 && <div className="text-bone-400 mt-1">Requires {u.requires.map((r) => SIGIL_UNLOCKS[r].name).join(', ')}.</div>}</div>}>
-              <div className="cursor-help"><span className={done ? 'text-purple-300' : 'text-bone-200'}>{u.name}</span> <span className="font-num text-bone-400">{rank}/{u.maxRank}</span></div>
+          <div key={u.id} className={`flex items-center justify-between gap-2 border  px-2 py-1 text-[14px] ${done ? 'border-soul/60' : 'border-ash/50'}`}>
+            <Tooltip className="flex-1" tip={<div><div className="font-display text-[16px]">{u.name}</div><div>{u.desc}</div>{u.requires.length > 0 && <div className="text-bone/70 mt-1">Requires {u.requires.map((r) => SIGIL_UNLOCKS[r].name).join(', ')}.</div>}</div>}>
+              <div className="cursor-help"><span className={done ? 'text-soul' : 'text-parchment'}>{u.name}</span> <span className="font-num text-bone/70">{rank}/{u.maxRank}</span></div>
             </Tooltip>
-            {!done && <button className={`btn text-[10px] px-2 py-0.5 ${why ? '' : 'border-purple-400 text-purple-300'}`} disabled={!!why} title={why ?? ''} onClick={() => dispatch({ type: 'buySigilUnlock', unlock: u.id })}>{C[u.id]} ✦</button>}
+            {!done && <button className={`btn text-[12px] px-2 py-0.5 ${why ? '' : 'border-soul text-soul'}`} disabled={!!why} title={why ?? ''} onClick={() => dispatch({ type: 'buySigilUnlock', unlock: u.id })}>{C[u.id]} ¶</button>}
           </div>
         );
       })}
