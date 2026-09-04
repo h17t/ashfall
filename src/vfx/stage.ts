@@ -59,7 +59,10 @@ export class Stage {
   private figure: { tex: WebGLTexture; mask: WebGLTexture; w: number; h: number; key: string } | null = null;
   private figureKey = '';
   private w = 1; private h = 1; private dpr = 1;
-  private quality = 2; // 2 full, 1 degraded (dpr 1, no bloom)
+  private quality = 2; // 2 full, 1 degraded (dpr 1, no bloom), 0 handed back to the DOM stage
+  /** called once when the stage gives up: the machine cannot hold 60fps even degraded */
+  onGiveUp: (() => void) | null = null;
+  private slowRuns = 0;
   private frameTimes: number[] = [];
   readonly parts = new Particles();
   private time = 0;
@@ -443,6 +446,8 @@ export class Stage {
       const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
       this.frameTimes.length = 0;
       if (avg > 22 && this.quality === 2) { this.quality = 1; this.resize(); }
+      else if (avg > 30 && this.quality === 1 && ++this.slowRuns >= 2) { this.quality = 0; this.onGiveUp?.(); }
+      else if (this.quality === 1 && avg <= 30) this.slowRuns = 0;
     }
   }
 

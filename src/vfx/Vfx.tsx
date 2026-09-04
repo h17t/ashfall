@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useSyncExternalStore } from 'react';
 import { Stage, type Snapshot } from './stage';
 import { subscribeEvents, useGame } from '@/ui/store';
 import { useSettings } from '@/ui/settings';
@@ -8,6 +8,20 @@ import type { GameEvent } from '@/engine';
 
 /** One live stage per page: cinematics reach it through here. */
 export const stageRef: { current: Stage | null } = { current: null };
+
+/** 'gl' while the WebGL stage can hold its frame budget; 'dom' once it has handed the frame back (never bounces back). */
+let glMode: 'gl' | 'dom' = 'gl';
+const modeListeners = new Set<() => void>();
+export function setGlMode(m: 'gl' | 'dom') {
+  if (m === glMode) return;
+  glMode = m;
+  // the last rung of the ladder: a machine that cannot hold the GL stage also loses the ambient motion (grain step, embers, drift, flame)
+  document.documentElement.classList.toggle('perf-lite', m === 'dom');
+  modeListeners.forEach((l) => l());
+}
+export function useGlMode(): 'gl' | 'dom' {
+  return useSyncExternalStore((l) => { modeListeners.add(l); return () => { modeListeners.delete(l); }; }, () => glMode);
+}
 
 /**
  * The WebGL stage under the combat HUD. Reads the game state every frame (no React re-renders) and
@@ -21,6 +35,7 @@ export const Vfx = memo(function Vfx() {
     let stage: Stage;
     try { stage = new Stage(canvas); } catch { return; }
     stageRef.current = stage;
+    stage.onGiveUp = () => setGlMode('dom');
     let raf = 0;
     const snap: Snapshot = { zone: 'approach', kind: null, id: '', big: false, hpFrac: 1, riposteOpen: false, poison: false, frost: false, bleed: 0, dead: false, dim: 0.3, reduceFx: false };
     const frame = (now: number) => {

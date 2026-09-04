@@ -7,7 +7,7 @@ import { Gauge } from '@/render/Gauge';
 import { Slab } from '@/render/materials/Slab';
 import { Backdrop } from '@/render/Backdrop';
 import { Figure } from './Figure';
-import { Vfx } from '@/vfx/Vfx';
+import { Vfx, useGlMode } from '@/vfx/Vfx';
 import { vfxSupported } from '@/vfx/gl';
 import { FloatingNumbers } from './FloatingNumbers';
 
@@ -16,7 +16,7 @@ import { FloatingNumbers } from './FloatingNumbers';
  * the name card top-left, the health gauge along the foot. The eye should land on the enemy's
  * eyes, then the name, then the gauge (ART.md §4, mockup A).
  */
-const GL = vfxSupported();
+const GL_SUPPORTED = vfxSupported();
 
 export const Encounter = memo(function Encounter() {
   const dispatch = useGame((g) => g.dispatch);
@@ -69,6 +69,7 @@ export const Encounter = memo(function Encounter() {
   const telegraph = windup > 0;
   const staggered = riposte > 0;
   const onClick = useCallback(() => dispatch({ type: 'click' }), [dispatch]);
+  const GL = GL_SUPPORTED && useGlMode() === 'gl';
 
   return (
     <Slab material="stone" seed="arena" rough={7} ornament="scorch" outer={`arena w-full flex ${!GL && shake % 2 ? 'shake' : ''}`} className="flex-1 flex flex-col min-h-0">

@@ -39,7 +39,7 @@ export const Fx = memo(function Fx() {
 
 function shake(el: HTMLDivElement | null, px: number) {
   // Shake the whole app root: translate a wrapper via CSS var read by the root animation.
-  const root = document.getElementById('root');
+  const root = (document.querySelector('.arena') as HTMLElement | null) ?? document.getElementById('root');
   if (!root) return;
   root.style.setProperty('--shake', `${px}px`);
   root.classList.remove('shaking');

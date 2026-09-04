@@ -79,7 +79,7 @@ export const Slab = memo(function Slab({ material = 'stone', seed = 1, className
         <div className="absolute inset-0" style={{ backgroundImage: mottleTile(), backgroundSize: '256px 256px', opacity: m.mottle, mixBlendMode: 'multiply' }} />
         <div className="absolute inset-0" style={{ backgroundImage: grainTile(), backgroundSize: '256px 256px', opacity: m.grain, mixBlendMode: material === 'parchment' ? 'multiply' : 'overlay' }} />
         <div className="absolute inset-0" style={{ background: cold, opacity: 0.55 }} />
-        <div className="absolute inset-0" style={{ background: lit, opacity: 'calc(0.22 * var(--fire))' as unknown as number }} />
+        <div className="absolute inset-0 fire-lit" style={{ background: lit, opacity: 0.22 }} />
         {ornament === 'nail' && <span className="absolute" style={{ left: 9, top: 9, width: 7, height: 7, background: 'radial-gradient(circle at 35% 35%, var(--bone), var(--ink) 70%)', clipPath: 'polygon(50% 0,100% 40%,80% 100%,20% 100%,0 40%)' }} />}
         {ornament === 'scorch' && <span className="absolute" style={{ right: -20, top: -24, width: 120, height: 70, background: 'radial-gradient(ellipse at 50% 50%, var(--void) 0%, transparent 65%)', opacity: 0.75 }} />}
         {ornament === 'fold' && <span className="absolute" style={{ right: 0, bottom: 0, width: 16, height: 16, background: 'linear-gradient(225deg, var(--bone) 0 48%, var(--ash) 50%, transparent 52%)', opacity: 0.7 }} />}
