@@ -1,6 +1,10 @@
-import { useEffect } from 'react';
-import { useGame } from './store';
+import { useEffect, useState } from 'react';
 import { startLoop } from './loop';
+import { loadFromStorage, startAutosave, saveToStorage } from './persist';
+import { useSettings } from './settings';
+import { OfflineModal } from './components/OfflineModal';
+import { applyOffline } from '@/engine';
+import { useGame } from './store';
 import { Encounter } from './components/Encounter';
 import { PlayerPanel } from './components/PlayerPanel';
 import { EmberField } from './components/EmberField';
@@ -10,10 +14,33 @@ import { SpellBar } from './components/SpellBar';
 import { useHotkeys } from './hooks/useHotkeys';
 
 export default function App() {
-  useEffect(() => startLoop(), []);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const reduceFx = useSettings((s) => s.reduceFx);
+  useEffect(() => {
+    const report = loadFromStorage();
+    if (report.error) setLoadError(report.error);
+    const stopLoop = startLoop((gapSeconds) => {
+      // Tab was suspended for longer than the catch-up cap: treat it as offline time.
+      const g = useGame.getState();
+      applyOffline(g.state, gapSeconds);
+      g.replace(g.state);
+      saveToStorage();
+    });
+    const stopSave = startAutosave();
+    return () => { stopLoop(); stopSave(); };
+  }, []);
   useHotkeys();
   return (
-    <div className="min-h-full relative">
+    <div className={`min-h-full relative ${reduceFx ? 'reduce-fx' : ''}`}>
+      <OfflineModal />
+      {loadError && (
+        <div className="relative z-20 max-w-[1400px] mx-auto mt-3 px-4">
+          <div className="border border-blood-600 bg-blood-600/10 text-bone-200 text-[12px] px-3 py-2 rounded-sm flex justify-between gap-3">
+            <span>{loadError} {loadError.includes('backup') ? 'A fresh game was started; the damaged saves are kept in storage under ashfall.corrupt.' : 'The backup save was loaded instead.'}</span>
+            <button className="text-ash-400 hover:text-bone-100" onClick={() => setLoadError(null)}>✕</button>
+          </div>
+        </div>
+      )}
       <EmberField />
       <div className="relative z-10 max-w-[1400px] mx-auto p-4 grid gap-4 grid-cols-1 lg:grid-cols-[270px_1fr_380px]">
         <header className="lg:col-span-3 flex items-baseline justify-between">

@@ -35,7 +35,11 @@ const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'D
  * Format a number for display. thousands -> K/M/B... then scientific beyond the suffix table
  * (or beyond `sciThreshold` exponent if the player prefers).
  */
-export function fmt(v: Decimal | number, format: NumberFormat = 'short', precision = 2): string {
+/** Host-settable default format (the UI sets this from Settings). */
+export let defaultFormat: NumberFormat = 'short';
+export function setDefaultFormat(f: NumberFormat) { defaultFormat = f; }
+
+export function fmt(v: Decimal | number, format: NumberFormat = defaultFormat, precision = 2): string {
   const d = typeof v === 'number' ? new Decimal(v) : v;
   if (!isFiniteDec(d)) return '∞';
   if (d.lt(0)) return '-' + fmt(d.neg(), format, precision);

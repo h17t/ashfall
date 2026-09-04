@@ -1,0 +1,44 @@
+/** UI-only preferences (not part of the game state). Persisted separately. */
+import { create } from 'zustand';
+import { setDefaultFormat, type NumberFormat } from '@/engine';
+
+export interface Settings {
+  numberFormat: NumberFormat;
+  reduceFx: boolean;
+  sound: boolean;
+  volume: number;
+  screenShake: boolean;
+  showTutorial: boolean;
+  set: (patch: Partial<Omit<Settings, 'set'>>) => void;
+}
+
+const KEY = 'ashfall.settings';
+
+function load(): Partial<Settings> {
+  try {
+    const raw = localStorage.getItem(KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export const useSettings = create<Settings>((set, get) => ({
+  numberFormat: 'short',
+  reduceFx: typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+  sound: false,
+  volume: 0.5,
+  screenShake: true,
+  showTutorial: true,
+  ...load(),
+  set: (patch) => {
+    set(patch);
+    if (patch.numberFormat) setDefaultFormat(patch.numberFormat);
+    try {
+      const { set: _s, ...rest } = get();
+      localStorage.setItem(KEY, JSON.stringify(rest));
+    } catch { /* storage unavailable */ }
+  },
+}));
+
+setDefaultFormat(useSettings.getState().numberFormat);

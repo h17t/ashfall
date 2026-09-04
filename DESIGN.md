@@ -80,3 +80,12 @@ Boss soul: **Warden's Cleaver** (heavy, STR B, fire) or **Pyre Bloom** (pyromanc
 **Spell bar arrives here**, minimal but real, because the boss soul choice must be usable the moment it exists. Hotkeys 1–6. Full magic depth is Milestone 8.
 
 Simulator: Eskel falls at 12.5m (greedy) / 31m (casual, one death). Inside the 6–16 min target for the skilled path; the casual path's wall-then-win is intended.
+
+## Milestone 6 — save system and offline progress
+
+- **Format.** One JSON blob `{ v, savedAt, checksum, state }`. Decimals serialize as `§D§<string>` so no field list is needed and new Decimal fields need no serializer change. Checksum is FNV-1a over the state JSON: enough to catch truncation and hand edits, cheap enough to run every 10s. (`Decimal` defines `toJSON`, so the replacer reads the original from the holder object — a trap worth recording.)
+- **Migrations.** `migrations[n]` upgrades version n → n+1; `parseSave` walks the chain and then `normalize()` deep-merges defaults from a fresh game, so a *new* field never needs a migration, only a *changed* one. `save.test.ts` keeps a fixture per historical version and asserts every version below current has a migration registered — adding a version without a migration fails the build.
+- **Never lose a save.** Main slot and a rolling backup (the previous main). A main that fails to parse is copied to `ashfall.corrupt` and the backup loads with a visible banner. Hard delete requires typing HOLLOW.
+- **Export/import** is `ASHFALL1.` + base64 of the same blob (unicode-safe through TextEncoder), with distinct error messages for "not an export", "bad base64", "checksum", "newer version".
+- **Offline** is closed-form: `idleRate(state)` × min(gap, cap) × offline multiplier. The rate function is installed by the phantom module (Milestone 7); until then it returns zero with a reason the summary shows verbatim. The player is treated as resting at the bonfire while away: full HP/Estus on return, no combat state, and *never* a soul drop. Tab suspensions longer than the 60s catch-up cap are routed through the same calculator.
+- **UI-only settings** (number format, reduce effects, sound, hints) live outside the game state so exporting a save doesn't carry preferences.

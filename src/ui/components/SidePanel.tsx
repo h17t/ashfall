@@ -4,8 +4,9 @@ import { BonfirePanel } from './BonfirePanel';
 import { WeaponsPanel } from './WeaponsPanel';
 import { MapPanel } from './MapPanel';
 import { SoulsPanel } from './SoulsPanel';
+import { SettingsPanel } from './SettingsPanel';
 
-type Tab = 'bonfire' | 'weapons' | 'map' | 'souls';
+type Tab = 'bonfire' | 'weapons' | 'map' | 'souls' | 'settings';
 
 export function SidePanel() {
   const [tab, setTab] = useState<Tab>('bonfire');
@@ -15,6 +16,7 @@ export function SidePanel() {
     { id: 'weapons', label: 'Weapons' },
     { id: 'map', label: 'Road' },
     { id: 'souls', label: 'Souls', badge: soulsHeld },
+    { id: 'settings', label: '⚙' },
   ];
   return (
     <div className="slab p-3 flex flex-col gap-3 min-h-[520px]">
@@ -30,6 +32,7 @@ export function SidePanel() {
         {tab === 'weapons' && <WeaponsPanel />}
         {tab === 'map' && <MapPanel />}
         {tab === 'souls' && <SoulsPanel />}
+        {tab === 'settings' && <SettingsPanel />}
       </div>
     </div>
   );
