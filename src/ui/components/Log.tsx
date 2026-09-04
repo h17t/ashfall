@@ -20,9 +20,9 @@ export function Log() {
         case 'bossPhase': if (e.phase > 0) push(`Phase ${e.phase + 1}: ${e.name}`, 'text-ember-hot'); break;
         case 'bossKilled': push('The boss falls. Its soul is yours to shape.', 'text-ember-hot'); break;
         case 'zoneUnlocked': push(`${getZone(e.zone).name} lies open.`, 'text-ember-hot'); break;
-        case 'death': push(e.soulsLost.gt(0) ? `You died. ${fmt(e.soulsLost)} souls stain the ground where you fell.` : 'You died.', 'text-blood-bright'); break;
+        case 'death': push(e.soulsLost.gt(0) ? `You died. ${fmt(e.soulsLost)} souls stain the ground where you fell.` : 'You died.', 'text-ember-hot'); break;
         case 'bloodstainRecovered': push(`Bloodstain recovered: ${fmt(e.souls)} souls.`, 'text-verdigris'); break;
-        case 'bloodstainLost': push(`${fmt(e.souls)} souls, lost to the ash.`, 'text-blood-bright'); break;
+        case 'bloodstainLost': push(`${fmt(e.souls)} souls, lost to the ash.`, 'text-ember-hot'); break;
         case 'kill': {
           const drops = Object.entries(e.drops).filter(([k]) => !k.startsWith('__'));
           if (drops.length) push(`Dropped: ${drops.map(([k, n]) => `${n}× ${MATERIALS[k]?.name ?? k}`).join(', ')}`, 'text-bone');

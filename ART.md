@@ -187,3 +187,22 @@ Artifacts: `art/review/m8-tree.png`, `art/review/m8-ritual-sheet.png` (five mome
 ### Round 7 — Milestone 9 (audio pass)
 
 Still synthesized, still opt-in. What changed: every cue now sends into a convolution reverb whose impulse is built for the region (exponentially decaying noise through a one-pole low-pass: 1.4s and bright on the Approach, 5s in the Sanctum, 7s and dark in the Abyss); each region has a drone bed (detuned oscillators under a slow-breathing low-pass, plus a texture: wind on the Approach, water in the Mire, whispers in the Archive, crackle in the Kiln, and drips or distant bells as pings in the Deep, the Sanctum and the Abyss) that crossfades on travel; a boss's arrival and each phase turn are tolled; and the hush: when a boss is within four percent of its next phase threshold everything ducks to a whisper in 0.4s, and the phase's toll lands 0.6s after it turns before the bed returns over 1.2s. The Kindling ritual's fourth act carries a five-second rising chord. `scripts/audio-check.mjs` drives all of it headless: bed on, region swap, hush on approach, release and toll after the turn, zero errors.
+
+### Round 8 — Milestone 10 (final review)
+
+Artifacts: `art/final/boss-intro.png`, `art/final/riposte.png`, `art/final/bonfire.png`, `art/final/bestiary.png`; the gallery is `SCREENSHOTS.md`.
+
+**Three rounds on the three frames.** Round one found the page beyond the frame fully lit during a boss intro (the hub competed with the card) and a crit number floating over Eskel mid-arrival; the columns beyond the frame now step back to 30% under a cinematic and no floating number is raised while one plays. Round two was contrast: `blood-bright` text on stone measured 2.2:1 and `verdigris` labels 2.2:1, `ash` figures 1.7:1; every one is now parchment or bone-at-72% text with the colour carried by a pip beside it (5.2:1 or better everywhere text is read; the palette itself did not change). Round three was performance: the first measurement of the finished stack came in at 77ms a frame headless, and the ladder was built to answer it: full GL → GL at 1× without bloom → the DOM stage → ambient motion off, each rung taken after forty slow frames and never given back. Two real costs surfaced on the way and were fixed for every machine, not only the headless one: the 8Hz `--fire` root-variable write (a full-tree style recalc per write; the flicker is a stepped keyframe on the lit layers now) and the impact shake on `#root` (a re-raster of the whole document per hit; it shakes the combat frame). Headless, software-rendered, with a boss, a phantom, all three status effects and forty clicks in four seconds:
+
+| mode | avg | p50 | p95 | frames over 20ms |
+|---|---|---|---|---|
+| full effects (DOM rung after the ladder) | 5.7ms | 2.8ms | 16.1ms | 5 of 235 |
+| reduce effects | 2.9ms | 2.1ms | 6.9ms | 0 |
+
+On a machine with a GPU the GL rungs hold; the ladder is the guarantee, not the measurement.
+
+**Keyboard and motion.** Every control is a real button with a visible 2px ember focus ring; the hotkeys work from the body; the tab list carries `role=tab` and `aria-selected`. Reduce-effects and `prefers-reduced-motion` hold the grain, embers, drift, flicker, shake and chromatic edge still, shorten every cinematic by half, and never remove information.
+
+**What would still be done with more days**, in order: ash particles through the Kindling ritual's second act; a bonfire plate with the tender beside it for the ritual and the away report; the Mire's hanging moss and the Deep's stalactites; `pyreGolem`'s ember pocks, the chime and the flame plates; the region ridges could take one more octave of shape. None of these is a placeholder; each is a plate or a sequence that ships today and could be better.
+
+**Verdict.** The boss intro, the riposte moment and the bonfire frame could sit on a Steam page. The pass is done.

@@ -65,9 +65,9 @@ export default function App() {
         <div className="grid gap-x-0 gap-y-4 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
           <div className="flex flex-col gap-4 min-w-0">
             <div className="min-h-[560px] lg:min-h-[620px] flex-1 flex"><Encounter /></div>
-            <div className="flex flex-col gap-3 lg:pr-12"><SpellBar /><AutomationBar /><Log /></div>
+            <div className="under-frame flex flex-col gap-3 lg:pr-12"><SpellBar /><AutomationBar /><Log /></div>
           </div>
-          <div className="flex flex-col gap-5 lg:-ml-12 lg:mt-10 relative z-20">
+          <div className="hub-column flex flex-col gap-5 lg:-ml-12 lg:mt-10 relative z-20">
             <PlayerPanel />
             <SidePanel />
           </div>

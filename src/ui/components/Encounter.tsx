@@ -105,11 +105,11 @@ export const Encounter = memo(function Encounter() {
           </div>
         )}
         {telegraph && blind && !staggered && (
-          <div className="absolute inset-x-0 bottom-4 text-center t-label" style={{ color: 'var(--ash)' }}>Something moves in the dark.</div>
+          <div className="absolute inset-x-0 bottom-4 text-center t-label" style={{ color: 'color-mix(in srgb, var(--bone) 72%, transparent)' }}>Something moves in the dark.</div>
         )}
         {telegraph && !blind && !staggered && (
           <div className="absolute inset-x-0 bottom-4 pl-10 pr-10 lg:pr-[120px] pointer-events-none">
-            <div className="t-label mb-1 flex justify-between" style={{ color: 'var(--blood-bright)' }}><span>{attackId}</span><span className="t-num">{attackDmg} · {attackPct}% of you · dodge</span></div>
+            <div className="t-label mb-1 flex justify-between" style={{ color: 'var(--parchment)' }}><span><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--blood-bright)', marginRight: 8, clipPath: 'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)' }} />{attackId}</span><span className="t-num">{attackDmg} · {attackPct}% of you · dodge</span></div>
             <Gauge value={windupTotal - windup} max={windupTotal} tone="blood" height={5} cut={1} />
           </div>
         )}
@@ -120,14 +120,14 @@ export const Encounter = memo(function Encounter() {
       <div className="relative px-7 lg:pr-[120px] pt-3 pb-5" style={{ background: 'linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--void) 35%, transparent) 100%)' }}>
         <div className="flex justify-between items-end mb-1">
           <div className="t-label" style={{ color: isBoss ? 'var(--ember-hot)' : undefined }}>{isBoss ? `Phase ${phase + 1} · ${phaseName}` : tier >= 0 ? <TierProgress /> : ' '}</div>
-          <span className="t-num text-[18px]" style={{ color: 'var(--parchment)' }}>{fmt(hpNum)} <span style={{ color: 'var(--ash)' }}>/ {fmt(hpMaxNum)}</span></span>
+          <span className="t-num text-[18px]" style={{ color: 'var(--parchment)' }}>{fmt(hpNum)} <span style={{ color: 'color-mix(in srgb, var(--bone) 72%, transparent)' }}>/ {fmt(hpMaxNum)}</span></span>
         </div>
         <Gauge value={hpNum} max={hpMaxNum} tone={isBoss ? 'ember' : 'blood'} height={isBoss ? 14 : 11} />
         <Gauge value={staggered ? poise : stagger} max={poise} tone={staggered ? 'ember' : 'bone'} height={4} cut={1} className="mt-1.5" />
         <div className="flex gap-4 mt-2 t-label min-h-[14px]">
-          {bleed > 0 && <span style={{ color: 'var(--blood-bright)' }}>Bleed {Math.round(bleed)}%</span>}
-          {poison > 0 && <span style={{ color: 'var(--verdigris)' }}>Poisoned {poison.toFixed(0)}s</span>}
-          {frost > 0 && <span style={{ color: 'var(--soul)' }}>Frostbitten {frost.toFixed(0)}s</span>}
+          {bleed > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--blood-bright)', marginRight: 6 }} />Bleed {Math.round(bleed)}%</span>}
+          {poison > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--verdigris)', marginRight: 6 }} />Poisoned {poison.toFixed(0)}s</span>}
+          {frost > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--soul)', marginRight: 6 }} />Frostbitten {frost.toFixed(0)}s</span>}
           {isBoss && mechanicText && <span className="t-lore normal-case tracking-normal text-[14px] ml-auto text-right max-w-[70%]" style={{ letterSpacing: 0 }}>{mechanicText}</span>}
         </div>
       </div>

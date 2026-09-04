@@ -41,7 +41,7 @@ function Slot({ slot, known }: { slot: number; known: string[] }) {
           onContextMenu={(e) => { e.preventDefault(); setPick((x) => !x); }}
         >
           {def && <span className="w-6 h-6 -my-1 shrink-0"><Plate kind="spell" id={def.id} className="w-full h-full object-contain" /></span>}
-          <span style={{ color: 'var(--ash)' }}>{slot + 1}</span>{def ? def.name : 'attune'}{cd > 0 && <span className="t-num ml-1" style={{ color: 'var(--bone)' }}>{cd.toFixed(0)}s</span>}
+          <span style={{ color: 'color-mix(in srgb, var(--bone) 72%, transparent)' }}>{slot + 1}</span>{def ? def.name : 'attune'}{cd > 0 && <span className="t-num ml-1" style={{ color: 'var(--bone)' }}>{cd.toFixed(0)}s</span>}
         </button>
       </Tooltip>
       {pick && (

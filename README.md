@@ -1,5 +1,7 @@
 # Ashfall
 
+Screenshots: [SCREENSHOTS.md](SCREENSHOTS.md). Art bible and review log: [ART.md](ART.md).
+
 *You are an undead ember-tender. You click to strike, you die, you lose your souls, you go back for them. You recruit phantoms who fight while you sleep. You kindle the flame and begin again, stronger, in a world that has grown crueler.*
 
 A dark-fantasy incremental game that fuses the moment-to-moment tension of a Souls-like with the long arc of a deep idle game. Everything is CSS, SVG and Web Audio synthesis; there are no external assets.

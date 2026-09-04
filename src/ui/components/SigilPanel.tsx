@@ -36,8 +36,8 @@ export const SigilPanel = memo(function SigilPanel() {
       ) : (
         <div className="border border-soul/60 p-2 text-[14px] flex flex-col gap-2">
           <div className="grid grid-cols-2 gap-2">
-            <div><div className="t-label text-verdigris mb-1">Kept</div>{L.keep.map((k) => <div key={k} className="text-bone">· {k}</div>)}</div>
-            <div><div className="t-label text-blood-bright mb-1">Unmade</div>{L.lose.map((k) => <div key={k} className="text-bone">· {k}</div>)}</div>
+            <div><div className="t-label mb-1" style={{ color: 'var(--parchment)' }}><span aria-hidden className="inline-block w-2 h-2 mr-2" style={{ background: 'var(--verdigris)' }} />Kept</div>{L.keep.map((k) => <div key={k} className="text-bone">· {k}</div>)}</div>
+            <div><div className="t-label mb-1" style={{ color: 'var(--parchment)' }}><span aria-hidden className="inline-block w-2 h-2 mr-2" style={{ background: 'var(--blood-bright)' }} />Unmade</div>{L.lose.map((k) => <div key={k} className="text-bone">· {k}</div>)}</div>
           </div>
           <div className="flex gap-2">
             <button className="btn border-soul text-soul" onClick={() => { dispatch({ type: 'darkSigil' }); setConfirm(false); }}>Carve it</button>

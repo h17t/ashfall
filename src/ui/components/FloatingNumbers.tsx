@@ -8,6 +8,8 @@ let nextId = 1;
 export function FloatingNumbers() {
   const [nums, setNums] = useState<Num[]>([]);
   const onEvents = useCallback((events: GameEvent[]) => {
+    // no numbers over a cinematic: the card is the only thing that speaks
+    if (document.documentElement.classList.contains('cine')) return;
     const add: Num[] = [];
     for (const e of events) {
       if (e.type === 'hit') {
