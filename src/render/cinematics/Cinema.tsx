@@ -19,9 +19,15 @@ const SEEN_KEY = 'ashfall.seenBosses';
 function seenBosses(): Set<string> { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) ?? '[]')); } catch { return new Set(); } }
 function markSeen(id: string) { try { const s = seenBosses(); s.add(id); localStorage.setItem(SEEN_KEY, JSON.stringify([...s])); } catch { /* ignore */ } }
 
+const ORDINAL: Record<number, string> = { 1: 'Second', 2: 'Third', 3: 'Fourth', 4: 'Fifth', 5: 'Sixth', 6: 'Seventh', 7: 'Eighth', 8: 'Ninth', 9: 'Tenth' };
+
 export const sequencer = new Sequencer();
 
-interface Card { title: string; sub?: string; text?: string; kind: 'boss' | 'phase' | 'region' | 'died' | 'stain' | 'kindle'; extra?: string; plate?: { kind: 'ui' | 'boss'; id: string } }
+/** The Kindle panel records what the fire will take and keep just before it dispatches, so the ritual can read it. */
+let kindleLedger: { keep: string[]; lose: string[]; cycle: number } = { keep: [], lose: [], cycle: 0 };
+export function setKindleLedger(l: { keep: string[]; lose: string[]; cycle: number }) { kindleLedger = l; }
+
+interface Card { title: string; sub?: string; text?: string; kind: 'boss' | 'phase' | 'region' | 'died' | 'stain' | 'kindle'; extra?: string; plate?: { kind: 'ui' | 'boss'; id: string }; keep?: string[]; lose?: string[]; cycle?: number }
 
 export const Cinema = memo(function Cinema() {
   const root = useRef<HTMLDivElement>(null);
@@ -157,22 +163,56 @@ export const Cinema = memo(function Cinema() {
       });
     };
 
+    /**
+     * The Kindling ritual, about thirty seconds: the fire dies; what you carried rises as ash, line by
+     * line; what you know settles and stays; the ember catches, the count climbs, the flame roars; the
+     * next burning is named. Skippable, but not before the first act has played.
+     */
     const kindle = (humanity: string) => sequencer.enqueue({
-      id: 'kindle', priority: 0, skippable: false,
+      id: 'kindle', priority: 0, skippable: true,
       build: () => {
-        show({ kind: 'kindle', title: 'The flame is kindled', text: `${humanity} Humanity gathered.`, plate: { kind: 'ui', id: 'bonfire' } });
+        const L = kindleLedger;
+        show({ kind: 'kindle', title: 'The flame is kindled', text: `${humanity} Humanity gathered.`, plate: { kind: 'ui', id: 'bonfire' }, keep: L.keep, lose: L.lose, cycle: L.cycle });
         const tl = gsap.timeline();
         const s = speed();
+        const lose = Array.from(root.current!.querySelectorAll('.cine-kl-lose'));
+        const keep = Array.from(root.current!.querySelectorAll('.cine-kl-keep'));
+        // I. the fire dies
         tl.set('.cine-shroud', { background: 'var(--void)' }, 0);
-        tl.fromTo('.cine-shroud', { opacity: 0 }, { opacity: 1, duration: 1.2 * s, ease: 'power2.inOut' }, 0);
-        tl.fromTo('.cine-kindle', { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.8);
-        tl.fromTo('.cine-kindle-plate', { scale: 0.7, filter: 'brightness(0.3) saturate(0.4)' }, { scale: 1, filter: 'brightness(0.55) saturate(0.7)', duration: 2.2 * s, ease: 'power2.out' }, 1.0);
-        const lines = ['.cine-kl-1', '.cine-kl-2', '.cine-kl-3', '.cine-kl-4'];
-        lines.forEach((l, i) => tl.fromTo(l, { opacity: 0, y: 6 }, { opacity: 0.9, y: 0, duration: 0.9 * s }, 1.6 + i * 2.1 * s));
-        tl.to('.cine-kindle-plate', { filter: 'brightness(1.4) saturate(1.1)', scale: 1.12, duration: 2.4 * s, ease: 'power2.in' }, 6.0 * s);
-        tl.fromTo('.cine-flash', { opacity: 0 }, { opacity: 0.9, duration: 0.35 * s, ease: 'power3.in' }, 8.6 * s);
-        tl.to('.cine-flash', { opacity: 0, duration: 1.6 * s, ease: 'power2.out' });
-        tl.to(['.cine-kindle', '.cine-shroud'], { opacity: 0, duration: 1.2 * s }, '<0.3');
+        tl.fromTo('.cine-shroud', { opacity: 0 }, { opacity: 1, duration: 1.6 * s, ease: 'power2.inOut' }, 0);
+        tl.fromTo('.cine-kindle', { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.0);
+        tl.fromTo('.cine-kindle-plate', { scale: 0.8, filter: 'brightness(0.55) saturate(0.6)' }, { scale: 0.62, filter: 'brightness(0.12) saturate(0.2)', duration: 3.2 * s, ease: 'power2.inOut' }, 1.0);
+        tl.fromTo('.cine-kindle-glow', { opacity: 0.6 }, { opacity: 0.08, duration: 3.2 * s }, 1.0);
+        tl.fromTo('.cine-kl-act1', { opacity: 0, y: 6 }, { opacity: 0.85, y: 0, duration: 1.0 * s }, 1.6);
+        tl.to('.cine-kl-act1', { opacity: 0, duration: 0.8 * s }, 4.4 * s);
+        // II. what you carried rises as ash
+        tl.fromTo('.cine-kl-act2', { opacity: 0 }, { opacity: 0.85, duration: 0.8 * s }, 5.0 * s);
+        lose.forEach((el, i) => {
+          const at = 5.6 * s + i * (6.5 * s / Math.max(1, lose.length));
+          tl.fromTo(el, { opacity: 0, y: 8 }, { opacity: 0.9, y: 0, duration: 0.5 * s }, at);
+          tl.to(el, { opacity: 0, y: -46, filter: 'blur(3px)', duration: 2.2 * s, ease: 'power2.in' }, at + 1.2 * s);
+        });
+        tl.to('.cine-kl-act2', { opacity: 0, duration: 0.8 * s }, 13.4 * s);
+        // III. what you know settles and stays
+        tl.fromTo('.cine-kl-act3', { opacity: 0 }, { opacity: 0.85, duration: 0.8 * s }, 14.0 * s);
+        keep.forEach((el, i) => tl.fromTo(el, { opacity: 0, y: -10 }, { opacity: 0.95, y: 0, duration: 0.9 * s, ease: 'power2.out' }, 14.6 * s + i * 0.7 * s));
+        tl.to(['.cine-kl-act3', ...keep], { opacity: 0, duration: 0.9 * s }, 20.5 * s);
+        // IV. the ember catches
+        tl.to('.cine-kindle-plate', { scale: 1, filter: 'brightness(0.6) saturate(0.8)', duration: 2.6 * s, ease: 'power2.out' }, 20.8 * s);
+        tl.to('.cine-kindle-glow', { opacity: 1, duration: 4.5 * s, ease: 'power2.in' }, 20.8 * s);
+        tl.fromTo('.cine-kl-count', { opacity: 0 }, { opacity: 1, duration: 0.6 * s }, 21.4 * s);
+        const counter = { v: 0 };
+        const target = Number(String(humanity).replace(/[^0-9.]/g, '')) || 0;
+        const suffix = String(humanity).replace(/[0-9.,]/g, '');
+        tl.to(counter, { v: target, duration: 3.2 * s, ease: 'power3.out', onUpdate: () => { const el = q('.cine-kl-num'); if (el) el.textContent = (target >= 100 ? Math.round(counter.v) : counter.v.toFixed(target >= 10 ? 1 : 2)) + suffix; } }, 21.6 * s);
+        tl.to('.cine-kindle-plate', { filter: 'brightness(1.5) saturate(1.15)', scale: 1.18, duration: 2.6 * s, ease: 'power2.in' }, 23.6 * s);
+        tl.fromTo('.cine-flash', { opacity: 0 }, { opacity: 0.95, duration: 0.35 * s, ease: 'power3.in' }, 26.0 * s);
+        tl.to('.cine-flash', { opacity: 0, duration: 1.4 * s, ease: 'power2.out' });
+        // V. the next burning is named
+        tl.to(['.cine-kl-count', '.cine-kindle-plate', '.cine-kindle-glow'], { opacity: 0, duration: 0.6 * s }, 26.2 * s);
+        tl.fromTo('.cine-kl-act5', { opacity: 0, letterSpacing: '0.5em' }, { opacity: 1, letterSpacing: '0.24em', duration: 1.6 * s, ease: 'power2.out' }, 26.6 * s);
+        tl.fromTo('.cine-kl-act5-sub', { opacity: 0 }, { opacity: 0.9, duration: 1.0 * s }, 27.6 * s);
+        tl.to(['.cine-kindle', '.cine-shroud'], { opacity: 0, duration: 1.4 * s }, 30.2 * s);
         tl.set('.cine-shroud', { clearProps: 'background' });
         tl.call(() => show(null));
         return tl;
@@ -231,12 +271,26 @@ export const Cinema = memo(function Cinema() {
       )}
 
       {c && c.kind === 'kindle' && (
-        <div className="cine-kindle absolute inset-0 flex flex-col items-center justify-center text-center opacity-0">
-          <div className="cine-kindle-plate w-[360px] h-[270px]" style={{ filter: 'brightness(0.3)' }}><img src={asset('ui', 'bonfire').files.x2} alt="" className="w-full h-full object-contain" draggable={false} /></div>
-          <div className="cine-kl-1 t-display text-[40px] mt-2 opacity-0" style={{ color: 'var(--parchment)' }}>{c.title}</div>
-          <div className="cine-kl-2 t-lore text-[19px] mt-3 opacity-0" style={{ color: 'var(--bone)' }}>The flame takes what you carried: the souls, the road, the blade's edge.</div>
-          <div className="cine-kl-3 t-display text-[26px] mt-3 opacity-0" style={{ color: 'var(--ember-hot)' }}>{c.text}</div>
-          <div className="cine-kl-4 t-lore text-[19px] mt-3 opacity-0" style={{ color: 'var(--bone)' }}>What you know, you keep. The road begins again, lit a little brighter.</div>
+        <div className="cine-kindle absolute inset-0 opacity-0">
+          <div className="cine-kindle-glow absolute left-1/2 top-[6%] -translate-x-1/2 w-[900px] h-[600px] pointer-events-none" style={{ background: 'radial-gradient(ellipse 45% 40% at 50% 45%, color-mix(in srgb, var(--ember) 30%, transparent), transparent 70%)' }} />
+          <div className="absolute left-1/2 top-[2%] -translate-x-1/2 cine-kindle-plate w-[560px] h-[420px]" style={{ filter: 'brightness(0.5)' }}><img src={asset('ui', 'bonfire').files.x2} alt="" className="w-full h-full object-contain" draggable={false} /></div>
+          <div className="absolute inset-x-0 top-[50%] flex flex-col items-center text-center px-6">
+            <div className="cine-kl-act1 t-display text-[44px] opacity-0 absolute" style={{ color: 'var(--bone)' }}>The fire dies.</div>
+            <div className="cine-kl-act2 t-label text-[13px] opacity-0 absolute" style={{ color: 'var(--blood-bright)' }}>What you carried, the flame takes</div>
+            <div className="absolute top-8 flex flex-col items-center gap-1">
+              {(c.lose ?? []).map((l, i) => <div key={i} className="cine-kl-lose t-lore text-[24px] opacity-0" style={{ color: 'var(--bone)' }}>{l}</div>)}
+            </div>
+            <div className="cine-kl-act3 t-label text-[13px] opacity-0 absolute" style={{ color: 'var(--verdigris)' }}>What you know, you keep</div>
+            <div className="absolute top-8 flex flex-col items-center gap-1">
+              {(c.keep ?? []).map((l, i) => <div key={i} className="cine-kl-keep t-lore text-[24px] opacity-0" style={{ color: 'var(--parchment)' }}>{l}</div>)}
+            </div>
+            <div className="cine-kl-count absolute flex flex-col items-center opacity-0">
+              <div className="t-label" style={{ color: 'var(--ember-hot)' }}>Humanity gathered</div>
+              <div className="cine-kl-num t-num text-[128px] leading-none mt-1" style={{ color: 'var(--parchment)' }}>0</div>
+            </div>
+            <div className="cine-kl-act5 t-display text-[72px] opacity-0 absolute" style={{ color: 'var(--parchment)', textShadow: '0 0 40px color-mix(in srgb, var(--ember-hot) 40%, transparent)' }}>{c.cycle ? `The ${ORDINAL[c.cycle] ?? `${c.cycle}th`} Burning` : 'The Second Burning'}</div>
+            <div className="cine-kl-act5-sub t-lore text-[22px] opacity-0 absolute top-24" style={{ color: 'var(--bone)' }}>The road begins again, lit a little brighter.</div>
+          </div>
         </div>
       )}
     </div>

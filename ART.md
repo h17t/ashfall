@@ -173,3 +173,13 @@ Artifacts: `art/sheet-enemies-parchment.png`, `art/sheet-bosses.png`, `art/sheet
 **Regions.** The Archive is a library: uprights, shelves, rows of spines with gaps, fallen books, a leaning ladder and a scatter of pages on the floor; the Sanctum and the Archive carry light shafts from above.
 
 **Still wrong.** `pyreGolem` keeps its ember pocks on the body by design, but they read as buttons at 100px. The chime and the pyromancy flame remain a glow on a blob. `vigilMaul`'s head is better but still lumpy. The Mire wants hanging moss and the Deep stalactites. These go to the final review's punch list, not to another milestone.
+
+### Round 6 — Milestone 8 (Kindling ritual and the meta screens)
+
+Artifacts: `art/review/m8-tree.png`, `art/review/m8-ritual-sheet.png` (five moments of the ritual), `art/review/m8-souls.png`, `art/review/m8-sigil.png`.
+
+**The Humanity tree** is an illuminated page: four vines on torn parchment, hexagonal medallions (diamonds for the automation gifts) joined by drawn stems that turn ember once the parent is ranked, rank pips beneath each name, the cost in ember when a node is open. The first cut hid every unranked node: the medallions were clip-path buttons whose border was clipped away, so only ranked ones showed; they are SVG polygons now with a transparent button over them. The parchment mottle was dropped from 0.45 to 0.2 because at 0.45 the page read as grey stone.
+
+**The Kindling ritual** runs about thirty seconds in five acts: the fire dies (the plate shrinks and darkens, the glow beneath it fades); what you carried rises as ash, one line at a time from the real ledger the panel hands the sequencer; what you know settles and stays; the ember catches (the plate grows, the ember glow returns, the count climbs to the Humanity gathered); the next burning is named. It is skippable with Escape. Faults: the screen is sparse between acts, and the bonfire plate is a small object for a full-screen moment; the punch list has "ash particles rising through act II from the VFX stage" and "a larger bonfire plate with the tender beside it".
+
+**Boss souls** are parchment pages with the lord's plate and the two one-way choices stacked; **the Dark Sigil** takes the soul-blue accent with a mark beside its name. Both hold the one-accent-per-region rule.

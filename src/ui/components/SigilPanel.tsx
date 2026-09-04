@@ -3,6 +3,7 @@ import { useGame, useSel } from '../store';
 import { fmt, D, sigilMarksPreview, canSigil, sigilLedger, sigilUnlockCost, sigilUnlockBlocked, canAgeOfDark, darkLevelCost, DARK_LEVEL_GIFTS } from '@/engine';
 import { SIGIL_UNLOCKS, BALANCE } from '@/content';
 import { Tooltip } from './Tooltip';
+import { Plate } from '@/render/Plate';
 
 export const SigilPanel = memo(function SigilPanel() {
   const dispatch = useGame((g) => g.dispatch);
@@ -21,7 +22,7 @@ export const SigilPanel = memo(function SigilPanel() {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
-        <span className="t-display text-[20px] text-ember-hot">The Dark Sigil</span>
+        <span className="t-display text-[20px] flex items-center gap-2" style={{ color: 'var(--soul)' }}><span className="w-12 h-6 -my-1 inline-block" style={{ filter: 'hue-rotate(190deg) saturate(0.6) brightness(1.3)' }}><Plate kind="ui" id="bloodstain" className="w-full h-full object-contain" /></span>The Dark Sigil</span>
         <span className="t-label">{sigils} carved · NG+{kindles}{record > 0 ? ` · depth record ${record}` : ''}</span>
       </div>
       <div className="border border-ash/50 p-2 text-[14px] flex flex-col gap-1">

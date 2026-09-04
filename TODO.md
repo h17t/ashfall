@@ -11,7 +11,7 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
   - [x] M5 cinematics: gsap sequencer + Cinema layer (boss intro, phase, YOU DIED, bloodstain, first Kindling rite, region transition); review round 3
   - [x] M6 parallax regions: pointer and impact parallax, per-layer drift, rolled ridges and rebuilt trees; review round 4
   - [x] M7 asset production: every round-2 figure fault addressed, edge streaks and icon crops for weapons, Archive library and light shafts; review round 5
-  - [ ] M8 Kindling ritual & meta screens
+  - [x] M8 Kindling ritual (five acts, ~30s) and meta screens: illuminated Humanity tree, parchment boss souls, Sigil; review round 6
   - [ ] M9 audio pass
   - [ ] M10 final review, perf, a11y, SCREENSHOTS.md
 - **All twelve milestones complete.** The build is playable end to end: six regions, 17 bosses, 32 weapons, 25 spells, 6 phantoms, 5 covenants, Kindling with a 25-node tree, the Dark Sigil with 14 unlocks, the endless Abyss, the Age of Dark, the full automation ladder.
