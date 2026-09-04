@@ -3,8 +3,8 @@
 Kept accurate enough that a fresh session can resume mid-milestone. Update before stopping, every time.
 
 ## Status
-- Current milestone: **12 — Polish** (in progress; all twelve milestones' systems are built)
-- Last completed: Milestone 11 (Dark Sigil, Sigil unlocks, Hexes, the Abyss, Age of Dark, automation ladder).
+- **All twelve milestones complete.** The build is playable end to end: six regions, 17 bosses, 32 weapons, 25 spells, 6 phantoms, 5 covenants, Kindling with a 25-node tree, the Dark Sigil with 14 unlocks, the endless Abyss, the Age of Dark, the full automation ladder.
+- A fresh session should: read DESIGN.md (decisions), BALANCE.md (latest simulator run), this file; run `npm test` and `npm run sim -- --hours 12`; then pick from the list below.
 
 ## Milestone 12 checklist
 - [x] Juice: impact flash, damage-scaled shake, riposte time-dilation + chromatic edge, ash burst on death, growing bonfire flame
@@ -14,8 +14,8 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
 - [x] Performance: 0.02ms engine tick with a full squad (scripts/bench.ts)
 - [x] Bestiary panel
 - [x] README
-- [ ] Final balance pass: 60h report for all strategies (running); then a 200h run of greedy + idle; update pacing tests if the windows move
-- [ ] Commit
+- [x] Final balance pass: 60h report for all strategies; 200h long-horizon run of greedy + idle (see BALANCE.md)
+- [x] Commit
 
 ## After Milestone 12 (ideas, not commitments)
 - Phantom-specific gear (armour slot), a covenant for pure casters, a seventh region theme for Sigil 5+

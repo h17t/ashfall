@@ -39,6 +39,8 @@ Region cadence (skilled / casual): Eskel 9m / 18m · Mother Nettle 35m / 45m · 
 
 Final 60h, seed 7 — every strategy fells all six lords. Lords (skilled / casual / idle): Eskel 9m / 18m / 2.3h · Nettle 17m / 35m / 3.1h · Archivist 35m / 1.0h / 5.3h · Orvane 1.8h / 2.2h / 10h · Keeper 3.1h / 4.1h / 13h · Lord of Cinders 4.2h / 5.4h / 22h · the Watcher 8.3h / 16h / —. First Kindle 1.8h / 2.2h / 10h; first Sigil (see table). Deaths in 60h: 20 / 19 / 0. Two stalls, both 22 minutes, both idle at Sanctum tier 4.
 
+200h long-horizon run (greedy / idle, seed 7, ~5.5 min of wall time each): no stalls (one 22-minute idle stall at 7.7h), no invariant violations at septillion-scale souls. Skilled: Abyss depth 35 (global tier 205), NG+13 within the current Sigil, 20 deaths total, all in the first hours. Idle: the Watcher at 140h, Abyss depth 7, souls/hour rising monotonically for the whole run (11K → 18.8M by hour 12 and onward), zero deaths. The Age of Dark's multiplier and the Abyss keep both curves moving at hour 200.
+
 Known gaps versus the spec targets: the skilled first Kindle (1.8h) is under the 3–7h window because the simulator kindles the moment it is stuck 90 minutes; a human who reads the depth multiplier will wait longer. The first Sigil for skilled play arrives well before the 30–60h target for the same reason (cycles are ~1–2h for a skilled player); both are cadence choices the player owns rather than walls. Region cadence from Orvane onward is 60–90 min per region for skilled play, as intended.
 
 ## Latest simulator run
