@@ -62,3 +62,21 @@ The engine half of this milestone shipped in M1/M2. This pass made every combat 
 - **Weapons panel.** Owned weapons as chips, shop weapons as dashed chips, one detail card: lore, every stat with a tooltip, reinforce button naming the exact material and count, infusion grid (unlocked by the first Cinder Coal drop). Infusions rewrite scaling to an A grade on one stat and downgrade the others by one grade, or trade 15% base for a status buildup.
 - **Respec** is a Soul Vessel consumable (secret-boss drop). It reallocates every point above the starting spread. Scarce, so choices keep their weight.
 - **Weapons in Region 1**: Hollow Straight Sword (hybrid, start), Bandit Dagger (fast, shop), Pilgrim's Mace (heavy, shop), Deserter's Spear (hybrid, drop), Warden's Cleaver (heavy, boss soul), Gallows Rope (fast, secret boss soul). The mace at +2 makes the first boss comfortably beatable; the dagger's 5× riposte rewards the player who has learned to stagger.
+
+## Milestone 5 — Region 1 and the first boss
+
+**The Cindered Approach.** Four tiers (Ash Slopes → Toll Gate → Pyre Yard → Gallows Walk), eight enemies with distinct rhythms: rats bite every 2s for little, crossbowmen wind up for 1.9s and hit for 1.7×, Toll Wardens have 2.2× poise (the first enemy you *cannot* kill before it staggers, which teaches the riposte), Cinder Wraiths take 60% physical and are immune to bleed/poison (the first "rebuild" prompt).
+
+**Eskel, Warden of the Cold Pyre.** Three phases, each invalidating a lazy strategy:
+1. *The Watch* — plain heavy hits; teaches the dodge.
+2. *Backdraft* (60%) — more than 7 player hits inside any 2s window triggers a retaliation burn of 8% max HP. Punishes over-clicking; rewards rhythm (and stamina discipline, since exhausted hits still count).
+3. *Cold Pyre* (30%) — takes 15% damage unless staggered. Must be staggered to be damaged; heavy weapons and the perfect-dodge window suddenly matter.
+Boss soul: **Warden's Cleaver** (heavy, STR B, fire) or **Pyre Bloom** (pyromancy burst that also grants the flame, i.e. the first attunement slot).
+
+**The Hanged Pilgrim** (secret, after 40 kills on Gallows Walk) regenerates 2–3.5% HP/s unless bleeding, poisoned or frostbitten. The answer is the Bandit Dagger's innate bleed or an infusion; the reward is a Soul Vessel (respec) and **Gallows Rope** / **Last Rites** (+60% souls for 25s — the first "schedule your session" spell).
+
+**Bosses respawn** for 25% souls but yield their soul once per cycle. Re-fighting is a legitimate (slow) wall answer and keeps the arena from becoming a dead button.
+
+**Spell bar arrives here**, minimal but real, because the boss soul choice must be usable the moment it exists. Hotkeys 1–6. Full magic depth is Milestone 8.
+
+Simulator: Eskel falls at 12.5m (greedy) / 31m (casual, one death). Inside the 6–16 min target for the skilled path; the casual path's wall-then-win is intended.

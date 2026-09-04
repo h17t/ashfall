@@ -6,6 +6,7 @@ import { PlayerPanel } from './components/PlayerPanel';
 import { EmberField } from './components/EmberField';
 import { SidePanel } from './components/SidePanel';
 import { Log } from './components/Log';
+import { SpellBar } from './components/SpellBar';
 import { useHotkeys } from './hooks/useHotkeys';
 
 export default function App() {
@@ -20,7 +21,7 @@ export default function App() {
           <span className="text-[10px] uppercase tracking-widest text-bone-400">an ember-tender's idle</span>
         </header>
         <PlayerPanel />
-        <div className="flex flex-col gap-3"><div className="min-h-[520px] flex-1"><Encounter /></div><Log /></div>
+        <div className="flex flex-col gap-3"><div className="min-h-[520px] flex-1"><Encounter /></div><SpellBar /><Log /></div>
         <SidePanel />
       </div>
     </div>

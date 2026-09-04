@@ -795,6 +795,9 @@ export function restAtBonfire(state: GameState, mods: Mods, events: GameEvent[])
   enc.enemy = null;
   enc.respawnIn = 0.8;
   enc.streak = 0;
-  if (!state.bonfiresLit.includes(enc.zone)) state.bonfiresLit.push(enc.zone);
+  if (!state.bonfiresLit.includes(enc.zone)) {
+    state.bonfiresLit.push(enc.zone);
+    events.push({ type: 'unlock', what: 'bonfire:' + enc.zone, text: `Bonfire lit: ${getZone(enc.zone).name}. You will return here when you fall.` });
+  }
   state.bonfire = enc.zone;
 }

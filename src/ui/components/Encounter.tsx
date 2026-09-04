@@ -6,6 +6,7 @@ import { getEnemy, getBoss, getZone } from '@/content';
 import { Bar } from './Bar';
 import { EnemySprite } from './EnemySprite';
 import { FloatingNumbers } from './FloatingNumbers';
+import { BossBanner } from './BossBanner';
 
 export const Encounter = memo(function Encounter() {
   const dispatch = useGame((g) => g.dispatch);
@@ -87,6 +88,7 @@ export const Encounter = memo(function Encounter() {
           </div>
         )}
         <FloatingNumbers />
+        <BossBanner />
       </div>
 
       <div className="mt-3">
