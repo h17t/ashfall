@@ -15,8 +15,17 @@ const path = (pts: Pt[], smooth = false) => (smooth ? smoothClosed(pts, 0.5) : p
 
 // ---- shape helpers for landscapes ----
 function ground(r: Rng, y: number, rough = 30, n = 30): Pt[] {
+  // a ridge line: three octaves of seeded sine (the slow swell, the hills, the scree) plus a little grit,
+  // sampled densely so the outline rolls instead of sawing
+  const ph = [r.range(0, 6.28), r.range(0, 6.28), r.range(0, 6.28)];
+  const fr = [r.range(0.8, 1.4), r.range(2.5, 4), r.range(7, 11)];
   const pts: Pt[] = [[-40, RH + 40]];
-  for (let i = 0; i <= n; i++) pts.push([-40 + (i / n) * (RW + 80), y + r.range(-rough, rough)]);
+  const m = Math.max(n * 3, 90);
+  for (let i = 0; i <= m; i++) {
+    const t = i / m;
+    const swell = Math.sin(t * fr[0] * Math.PI * 2 + ph[0]) * 0.55 + Math.sin(t * fr[1] * Math.PI * 2 + ph[1]) * 0.3 + Math.sin(t * fr[2] * Math.PI * 2 + ph[2]) * 0.15;
+    pts.push([-40 + t * (RW + 80), y + swell * rough + r.range(-rough * 0.08, rough * 0.08)]);
+  }
   pts.push([RW + 40, RH + 40]);
   return pts;
 }
@@ -35,8 +44,26 @@ function arch(x: number, w: number, h: number, base = RH): string {
   return `M${x} ${base} L${x} ${base - h * 0.6} Q${x + w / 2} ${base - h * 1.15} ${x + w} ${base - h * 0.6} L${x + w} ${base} Z`;
 }
 function tree(r: Rng, x: number, h: number, base = RH): string[] {
-  const out: string[] = [path(taper([x, base], [x + r.range(-10, 10), base - h], 18, 6, r, 3, 6))];
-  for (let i = 0; i < 4; i++) { const y = base - h * r.range(0.4, 0.95); out.push(path(taper([x, y], [x + r.sign() * r.range(30, 90), y - r.range(10, 60)], 8, 2, r, 3, 4))); }
+  // a dead tree: a leaning trunk that thins to a split crown, limbs that fork once, a few twigs
+  const lean = r.range(-0.12, 0.12) * h;
+  const top: Pt = [x + lean, base - h];
+  const out: string[] = [path(taper([x, base], top, 16 + h * 0.02, 3, r, 2.5, 8))];
+  const limbs = 3 + r.int(0, 3);
+  for (let i = 0; i < limbs; i++) {
+    const f = r.range(0.35, 0.92);
+    const from: Pt = [x + lean * f, base - h * f];
+    const dir = r.sign();
+    const len = r.range(40, 110) * (1 - f * 0.5);
+    const to: Pt = [from[0] + dir * len, from[1] - r.range(0.2, 0.8) * len];
+    out.push(path(taper(from, to, 7, 1.5, r, 2, 5)));
+    // a fork and a twig off the limb
+    const mid: Pt = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2];
+    out.push(path(taper(mid, [mid[0] + dir * r.range(15, 45), mid[1] - r.range(20, 55)], 4, 1, r, 1.5, 4)));
+    out.push(path(taper(to, [to[0] + dir * r.range(8, 30), to[1] - r.range(5, 30)], 3, 0.8, r, 1, 3)));
+  }
+  // the split crown
+  out.push(path(taper(top, [top[0] - r.range(10, 40), top[1] - r.range(20, 50)], 4, 1, r, 1.5, 4)));
+  out.push(path(taper(top, [top[0] + r.range(10, 40), top[1] - r.range(15, 45)], 4, 1, r, 1.5, 4)));
   return out;
 }
 function reeds(r: Rng, x0: number, x1: number, base: number, h: number): string[] {

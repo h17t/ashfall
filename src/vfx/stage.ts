@@ -83,7 +83,9 @@ export class Stage {
   desatTarget = 0; rimTarget = 0; irisTarget = 0;
   timeScale = 1;
   zoom = 1; zoomTarget = 1;
-  parallax = { x: 0, y: 0 };  // -1..1, set by the cinematics/pointer
+  parallax = { x: 0, y: 0 };  // -1..1, eased toward pointerTarget plus impact pushes
+  pointerTarget = { x: 0, y: 0 };
+  private push = { x: 0, y: 0 };
   drift = 0;
   /** external hooks for cinematics: extra dim and an override of the iris centre */
   extraDim = 0;
@@ -245,6 +247,8 @@ export class Stage {
     if (this.snap.reduceFx) return;
     const l = Math.hypot(dx, dy) || 1;
     this.shake = { x: dx / l, y: dy / l, amp: px, t: 1, dur: 0.22 + px * 0.01 };
+    // an impact also shoves the camera: the layers slide apart for a beat
+    this.push.x += (dx / l) * px * 0.06; this.push.y += (dy / l) * px * 0.04;
   }
   private shockAt(px: number, py: number, amp: number) {
     if (this.snap.reduceFx) return;
@@ -274,6 +278,10 @@ export class Stage {
     this.zoom = ease(this.zoom, this.zoomTarget, 4);
     decay(this.shake, rawDt); decay(this.shock, rawDt); decay(this.ca, rawDt); decay(this.flash, rawDt); decay(this.figFlash, rawDt); decay(this.punch, rawDt);
     this.drift += rawDt;
+    // camera: pointer parallax eased, impact push springing back
+    this.push.x *= Math.exp(-6 * rawDt); this.push.y *= Math.exp(-6 * rawDt);
+    const ptx = snap.reduceFx ? 0 : this.pointerTarget.x, pty = snap.reduceFx ? 0 : this.pointerTarget.y;
+    this.parallax.x = ease(this.parallax.x, ptx + this.push.x, 3); this.parallax.y = ease(this.parallax.y, pty + this.push.y, 3);
 
     // ambient emitters
     const amb = AMBIENT[snap.zone] ?? AMBIENT.approach;
@@ -311,8 +319,10 @@ export class Stage {
       let ax = 1, ay = 1, bx = 0, by = 0;
       if (stageAspect > texAspect) { ay = texAspect / stageAspect; } else { ax = stageAspect / texAspect; bx = (1 - ax) / 2; }
       const z = 1 + i * 0.035 + (this.zoom - 1) * (0.4 + i * 0.25);
-      const px = this.parallax.x * (i * 0.012) + Math.sin(this.drift * 0.08 + i) * 0.004 * i;
-      const py = this.parallax.y * (i * 0.006);
+      // far layers barely move; the foreground slides most, and each drifts on its own slow sine
+      const depthK = [0.15, 0.45, 0.8, 1.3][i];
+      const px = this.parallax.x * 0.022 * depthK + Math.sin(this.drift * 0.07 + i * 1.7) * 0.0045 * depthK;
+      const py = this.parallax.y * 0.012 * depthK + Math.cos(this.drift * 0.05 + i * 0.9) * 0.002 * depthK;
       // zoom about bottom-centre: uv' = o + (uv - o)/z
       const ox = 0.5, oy = 0;
       const A = [ax / z, ay / z];
@@ -335,7 +345,7 @@ export class Stage {
       const zx = 0.5, zy = 0.12;
       const zw = fw / this.w * 2 * this.zoom, zh = fh / this.h * 2 * this.zoom;
       // zoom grows the figure upward; drop its feet so the head stays in frame
-      const x = (zx - 0.5) * 2 - zw / 2, y = (zy - 0.5) * 2 - (this.zoom - 1) * 1.2;
+      const x = (zx - 0.5) * 2 - zw / 2 - this.parallax.x * 0.04, y = (zy - 0.5) * 2 - (this.zoom - 1) * 1.2 - this.parallax.y * 0.02;
       gl.useProgram(this.pFigure);
       gl.uniform4f(this.uFigure.u_rect, x, y, zw, zh);
       gl.uniform2f(this.uFigure.u_uvA, 1, 1); gl.uniform2f(this.uFigure.u_uvB, 0, 0);

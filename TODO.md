@@ -9,7 +9,7 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
   - [x] M3 foundation reskin: fonts, tokens, Slab material, grain, fire light, gauges, every screen re-dressed; review round 1
   - [x] M4 VFX layer: WebGL2 stage in src/vfx (layers, masked figure, particles, bloom/CA/shock/heat/vignette/iris post), hit-stop, riposte sequence; review round 2
   - [x] M5 cinematics: gsap sequencer + Cinema layer (boss intro, phase, YOU DIED, bloodstain, first Kindling rite, region transition); review round 3
-  - [ ] M6 parallax regions (4 layers, drift, pointer/combat parallax)
+  - [x] M6 parallax regions: pointer and impact parallax, per-layer drift, rolled ridges and rebuilt trees; review round 4
   - [ ] M7 asset production (fix the figure faults in ART.md round 2; icon crops for weapons)
   - [ ] M8 Kindling ritual & meta screens
   - [ ] M9 audio pass

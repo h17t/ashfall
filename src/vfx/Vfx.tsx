@@ -63,7 +63,12 @@ export const Vfx = memo(function Vfx() {
     });
     const ro = new ResizeObserver(() => stage.resize());
     ro.observe(canvas);
-    return () => { cancelAnimationFrame(raf); unsub(); ro.disconnect(); stage.destroy(); if (stageRef.current === stage) stageRef.current = null; };
+    // pointer parallax over the combat frame; the parent stage element receives the clicks
+    const host = canvas.parentElement ?? canvas;
+    const onMove = (ev: PointerEvent) => { const r = host.getBoundingClientRect(); stage.pointerTarget.x = Math.max(-1, Math.min(1, ((ev.clientX - r.left) / r.width - 0.5) * 2)); stage.pointerTarget.y = Math.max(-1, Math.min(1, (0.5 - (ev.clientY - r.top) / r.height) * 2)); };
+    const onLeave = () => { stage.pointerTarget.x = 0; stage.pointerTarget.y = 0; };
+    host.addEventListener('pointermove', onMove); host.addEventListener('pointerleave', onLeave);
+    return () => { cancelAnimationFrame(raf); unsub(); ro.disconnect(); host.removeEventListener('pointermove', onMove); host.removeEventListener('pointerleave', onLeave); stage.destroy(); if (stageRef.current === stage) stageRef.current = null; };
   }, []);
   return <canvas ref={ref} className="absolute inset-0 w-full h-full block" aria-hidden />;
 });
