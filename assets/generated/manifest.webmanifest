@@ -2,7 +2,7 @@
   "name": "Mournwake",
   "short_name": "Mournwake",
   "description": "A dark-fantasy idle of the dead who refuse it. Tap to strike, die, go back for your Marrow.",
-  "id": "/",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

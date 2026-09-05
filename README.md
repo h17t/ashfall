@@ -6,6 +6,19 @@ Screenshots: [SCREENSHOTS.md](SCREENSHOTS.md). Art bible and review log: [ART.md
 
 A dark-fantasy incremental game that fuses the moment-to-moment tension of a stamina-and-composure action game with the long arc of a deep idle game. Every illustration is procedural (see ART.md), every sound is synthesized, and the fiction is its own (see LORE.md and NAMING.md).
 
+## Play on a phone
+
+Every push publishes the build to GitHub Pages: open **https://h17t.github.io/ashfall/** on the phone.
+Play in the browser, or install it: on Android Chrome, the game offers to install after your first
+lord falls (or use the browser menu, "Install app"); on iPhone, Safari's Share button, then "Add to
+Home Screen". Installed, it opens full-screen in portrait and plays without a signal.
+
+GitHub Pages publishes from a **public** repository on the free plan; a private repository needs
+GitHub Pro, or a host such as Cloudflare Pages or Netlify connected to the repo (both are free and
+build `npm run build`, publishing `dist/`). Without any host: run `npm run dev -- --host` on a
+computer and open the address it prints (`http://192.168.x.x:5173`) on a phone on the same Wi-Fi;
+everything plays, though installing and offline play need HTTPS.
+
 ## Play
 
 ```
