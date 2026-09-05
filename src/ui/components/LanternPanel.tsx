@@ -1,8 +1,9 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useGame, useSel } from '../store';
 import { fmt, levelCost, statCurve, statMarginal, softCapBand, STAT_NAMES, STAT_DESC, D, computeMods, weaponDamage, playerHpMax, playerStaminaMax, STAT_KEYS, type StatKey } from '@/engine';
 import { BALANCE, MATERIALS, getWeapon } from '@/content';
 import { Tooltip } from './Tooltip';
+import { RespecSheet } from './RespecSheet';
 import { Plate } from '@/render/Plate';
 
 const GRADE_ORDER = ['-', 'E', 'D', 'C', 'B', 'A', 'S'];
@@ -108,26 +109,13 @@ function StatTip({ stat, pts, nextCap, marginal, preview }: { stat: StatKey; pts
 }
 
 function RespecRow() {
-  const dispatch = useGame((g) => g.dispatch);
-  const stats = useSel((s) => JSON.stringify(s.player.stats));
-  const vessels = useSel((s) => s.materials.reliquaryBone ?? 0);
-  const onRespec = () => {
-    const cur = JSON.parse(stats) as Record<StatKey, number>;
-    const total = STAT_KEYS.reduce((a, k) => a + cur[k], 0);
-    const min = BALANCE.level.startingStats;
-    const spare = total - STAT_KEYS.reduce((a, k) => a + min[k], 0);
-    const answer = window.prompt(`Pour ${spare} free points into stats as "vit,end,str,fin,int,dev" (added on top of the starting ${Object.values(min).join('/')}):`, STAT_KEYS.map((k) => cur[k] - min[k]).join(','));
-    if (!answer) return;
-    const parts = answer.split(',').map((x) => Math.max(0, Math.floor(Number(x) || 0)));
-    if (parts.length !== 6) return;
-    const next = {} as Record<StatKey, number>;
-    STAT_KEYS.forEach((k, i) => { next[k] = min[k] + parts[i]; });
-    dispatch({ type: 'respec', stats: next });
-  };
+  const bones = useSel((s) => s.materials.reliquaryBone ?? 0);
+  const [open, setOpen] = useState(false);
   return (
-    <div className="flex items-center justify-between text-[14px]">
-      <Tooltip tip={<span>{MATERIALS.reliquaryBone.lore}</span>}><span className="text-parchment flex items-center gap-2"><span className="w-7 h-7"><Plate kind="item" id="reliquaryBone" className="w-full h-full object-contain" /></span>Reliquary Bones: <span className="font-num">{vessels}</span></span></Tooltip>
-      <button className="btn text-[13px]" onClick={onRespec}>Reallocate stats</button>
+    <div className="flex items-center justify-between text-[14px] gap-2">
+      <Tooltip mode="inline" tip={<span>{MATERIALS.reliquaryBone.lore}</span>}><span className="text-parchment flex items-center gap-2"><span className="w-7 h-7"><Plate kind="item" id="reliquaryBone" className="w-full h-full object-contain" /></span>Reliquary Bones: <span className="font-num">{bones}</span></span></Tooltip>
+      <button className="btn text-[13px]" onClick={() => setOpen(true)}>Reallocate</button>
+      {open && <RespecSheet open onClose={() => setOpen(false)} />}
     </div>
   );
 }

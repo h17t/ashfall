@@ -332,3 +332,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .shell-portrait .hint-card { bottom: auto; top: calc(var(--safe-top) + 86px); }
 /* on a phone the hint is part of the flow under the status strip, never over a control */
 .shell-portrait .hint-card { position: static; transform: none; width: auto; max-width: none; margin: 2px 12px 6px; top: auto; }
+@keyframes away-row { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .away .ledger { animation: none !important; } }
+.action-bar, .arena-stage { touch-action: none; }
+.shell-landscape .hint-card { position: static; transform: none; width: auto; max-width: none; margin: 2px 0 6px; left: auto; bottom: auto; }
+/* sideways pans belong to the swipe; vertical scrolling stays native */
+.shell-portrait .section-scroll, .shell-portrait .status-strip { touch-action: pan-y; }

@@ -303,7 +303,7 @@ export interface OfflineSummary {
   marrow: Decimal;
   materials: Record<string, number>;
   kills: Decimal;
-  phantomXp: Decimal;
+  shadeXp: Decimal;
   zone: string;
   tier: number;
   wiped: boolean;

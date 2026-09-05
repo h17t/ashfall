@@ -38,6 +38,7 @@ export const SettingsPanel = memo(function SettingsPanel() {
       </label>
       <Toggle label="Reduce effects (particles, shake, flashes)" value={st.reduceFx} onChange={(v) => st.set({ reduceFx: v })} />
       <Toggle label="Screen shake" value={st.screenShake} onChange={(v) => st.set({ screenShake: v })} />
+      <Toggle label="Haptics (vibration on hits, the Reprisal window, death)" value={st.haptics} onChange={(v) => st.set({ haptics: v })} />
       <Toggle label="Sound (synthesized, off by default)" value={st.sound} onChange={(v) => st.set({ sound: v })} />
       {st.sound && <label className="flex items-center justify-between"><span className="text-bone">Volume</span><input type="range" min={0} max={1} step={0.05} value={st.volume} onChange={(e) => st.set({ volume: Number(e.target.value) })} /></label>}
       <Toggle label="Show hints" value={st.showTutorial} onChange={(v) => st.set({ showTutorial: v })} />

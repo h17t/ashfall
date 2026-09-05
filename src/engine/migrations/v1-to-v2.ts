@@ -85,6 +85,6 @@ export function migrateV1toV2(raw: any): any {
   // flags
   if (s.flags) rename(s.flags, 'hasFlame', 'hasBrand');
   // offline report
-  if (s.offline) { rename(s.offline, 'souls', 'marrow'); s.offline.zone = id(ZONES, s.offline.zone); s.offline.materials = remapKeys(s.offline.materials, MATERIALS); }
+  if (s.offline) { rename(s.offline, 'souls', 'marrow'); rename(s.offline, 'phantomXp', 'shadeXp'); s.offline.zone = id(ZONES, s.offline.zone); s.offline.materials = remapKeys(s.offline.materials, MATERIALS); }
   return s;
 }

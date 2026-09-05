@@ -74,7 +74,7 @@ export function applyOffline(state: GameState, elapsedSeconds: number, mods: Mod
   state.player.buffs = [];
   state.encounter.enemy = null;
   state.encounter.respawnIn = 0.8;
-  const summary: OfflineSummary = { seconds: elapsedSeconds, cappedSeconds: secs, marrow, materials, kills, phantomXp: xp, zone: rate.zone, tier: rate.tier, wiped: rate.wiped };
+  const summary: OfflineSummary = { seconds: elapsedSeconds, cappedSeconds: secs, marrow, materials, kills, shadeXp: xp, zone: rate.zone, tier: rate.tier, wiped: rate.wiped };
   state.offline = summary;
   return summary;
 }

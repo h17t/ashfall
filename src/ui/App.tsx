@@ -1,8 +1,10 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { startLoop } from './loop';
 import { loadFromStorage, startAutosave, saveToStorage } from './persist';
 import { useSettings } from './settings';
-import { OfflineModal } from './components/OfflineModal';
+import { AwayReport } from './components/AwayReport';
+import { startHaptics } from './haptics';
+import { useSwipe } from './shell/useSwipe';
 import { applyOffline, canRecruit, canSnuff, vestigePreview, canSever } from '@/engine';
 import { SHADES, BALANCE } from '@/content';
 import { useGame, useSel } from './store';
@@ -55,9 +57,12 @@ export default function App() {
     });
     const stopSave = startAutosave();
     const stopAudio = startAudio();
-    return () => { stopLoop(); stopSave(); stopAudio(); };
+    const stopHaptics = startHaptics();
+    return () => { stopLoop(); stopSave(); stopAudio(); stopHaptics(); };
   }, []);
   useHotkeys();
+  const mainRef = useRef<HTMLDivElement>(null);
+  useSwipe(mainRef, (dir) => { const order: Pillar[] = ['combat', 'cortege', 'arsenal', 'creeds', 'lantern']; const i = order.indexOf(pillar); const n = dir === 'left' ? Math.min(order.length - 1, i + 1) : Math.max(0, i - 1); if (n !== i) setPillar(order[n]); });
 
   // badges: something waits in a pillar
   const recruitable = useSel((s) => Object.keys(SHADES).some((id) => canRecruit(s, id) === null));
@@ -102,7 +107,7 @@ export default function App() {
       <FireLight />
       <Grain />
       <Cinema />
-      <OfflineModal />
+      <AwayReport />
       <Fx />
       <Lantern />
       {layout !== 'portrait' && <Hints />}
@@ -112,7 +117,7 @@ export default function App() {
         <>
           <StatusStrip />
           <Hints />
-          <div className="shell-main">
+          <div className="shell-main" ref={mainRef}>
             {pillar === 'combat' ? (
               <div className="flex flex-col flex-1 min-h-0">
                 <div className="px-2 flex flex-col"><Encounter /></div>

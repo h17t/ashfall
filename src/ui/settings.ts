@@ -8,6 +8,7 @@ export interface Settings {
   sound: boolean;
   volume: number;
   screenShake: boolean;
+  haptics: boolean;
   showTutorial: boolean;
   set: (patch: Partial<Omit<Settings, 'set'>>) => void;
 }
@@ -29,6 +30,7 @@ export const useSettings = create<Settings>((set, get) => ({
   sound: false,
   volume: 0.5,
   screenShake: true,
+  haptics: true,
   showTutorial: true,
   ...load(),
   set: (patch) => {

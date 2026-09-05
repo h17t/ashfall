@@ -6,7 +6,7 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
 - **Pass 3 (rename, mobile-first, deep content) in progress.** The name is MOURNWAKE (NAMING.md); the fiction is LORE.md; the banned-terms linter runs in `npm test`.
   - [x] M1 rename: name verified as far as the sandbox allows, full term migration (4,600 replacements, every identifier), `tools/lint/banned-terms.ts` in the test suite, save schema 2 with a v1→v2 migration and a pre-rename fixture round-trip, fuzz test, LORE.md
   - [x] M2 mobile foundation: portrait-first shell (status strip, section, action bar, bottom nav), landscape and wide arrangements, safe areas, tooltips as bottom sheets, touch-target and hover audits in CI
-  - [ ] M3 touch feel: tap latency, multi-touch, gestures, haptics, bottom sheets
+  - [x] M3 touch feel: pointerdown actions, multi-touch, swipe/long-press/pull-to-dismiss, haptic patterns with a toggle, the away report and reallocation as sheets; `scripts/touch-check.mjs`
   - [ ] M4 platform: PWA, service worker, install flow, quality tiers, suspension-safe saving
   - [ ] M5 Descent Runs
   - [ ] M6 Standing Orders

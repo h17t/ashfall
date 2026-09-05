@@ -222,3 +222,15 @@ Artifacts: `art/mobile/m2-sheet.png` (the five pillars at 390×844), `art/mobile
 **Harsh reading of the first shots.** Duplicate headings (the section title over the panel's own title): the panels keep theirs. The hint card sat on the Strike button: on a phone it is now part of the flow under the status strip. The Cortege card squashed a segmented control, a select and a button into one row: the control is a real segmented switch and the select takes its own line. The enemy names the multi-line rename missed read "Revenant Pilgrim": they are the Waned now. The info sheet rendered at two-thirds width because its slab shrank to its content inside a flex parent: it spans the phone.
 
 **Legibility.** Body copy is 16px, labels 12px in Barlow, numbers 14–26px; the HP figure at the top reads at arm's length in the 2× capture.
+
+### Round 10 — Pass 3, Milestone 3 (touch feel)
+
+Artifacts: `scripts/touch-check.mjs` (a phone context with a recorded vibration API: tap, two-finger Strike-while-Dodge, swipe, long-press, drag-to-dismiss, idle silence), `art/mobile/m3-away.png`.
+
+**The hand.** Strike, Dodge and Draught fire on `pointerdown`, not click, so the visual answer is the next frame; the viewport disallows zoom and every control carries `touch-action: manipulation`, so there is no 300ms wait and no double-tap zoom; the stage and the action bar carry `touch-action: none`, so a second finger on Strike while the first holds Dodge lands as two pointers (the smoke test proves it). Sections carry `touch-action: pan-y`: vertical scrolling stays native and sideways pans belong to the swipe.
+
+**Gestures, none of them the only way.** Swipe sideways on a section to step through the pillars (the bar does the same). Long-press any row or control with details to open its sheet (a tap on the row or its mark does the same). Pull a sheet down to dismiss it (the scrim, the close mark and Escape do the same); the pull follows the finger and only begins when the sheet's own scroll is at its top. The first drag implementation used pointer events and lost every drag to a `pointercancel` the moment the browser decided the touch was a scroll; it is native touch listeners with `passive: false` now.
+
+**Haptics.** `src/ui/haptics.ts`: a tick on a hit, a firmer pulse on a crit, a double-pulse when the Reprisal window opens, a longer one when a Reprisal lands, a buzz when you are hurt, a triple flick on a perfect dodge, a long heavy buzz when you are unmade, a slow triple for a felled lord; one pattern per event batch, the strongest wins, hits never more than one tick per 60ms, nothing at all on idle ticks. A settings toggle; silent where `navigator.vibrate` is missing.
+
+**Sheets over modals.** The away report is a designed sheet: the region behind, the Shades that hunted standing in it, Marrow and kills counting up, each line arriving in turn, a pull-down to return to the fire. The reallocation prompt (a `window.prompt` with a comma list, indefensible on a phone) is a sheet of six steppers with 48px targets and a confirm that names the cost.
