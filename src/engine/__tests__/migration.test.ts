@@ -8,6 +8,7 @@ import { D } from '../num';
 const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v1.json'), 'utf8');
 const fixtureV2 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v2.json'), 'utf8');
 const fixtureV3 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v3.json'), 'utf8');
+const fixtureV4 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v4.json'), 'utf8');
 
 describe('save migration v1 → v2 (the rename)', () => {
   it('loads the pre-rename fixture and every value survives under its new key', () => {
@@ -123,7 +124,20 @@ describe('save migration v3 → v4 (Standing Orders)', () => {
     everyScalarSurvives(raw.state, s);
   });
   it('every fixture from every version loads to the current version', () => {
-    for (const f of [fixture, fixtureV2, fixtureV3]) expect(parseSave(f).version).toBe(SAVE_VERSION);
+    for (const f of [fixture, fixtureV2, fixtureV3, fixtureV4]) expect(parseSave(f).version).toBe(SAVE_VERSION);
+  });
+});
+
+describe('save migration v4 → v5 (the Study and the forge)', () => {
+  it('loads a v4 save made by an 80-minute authored playthrough; weapons gain empty affix lists, the Study starts empty', () => {
+    const raw = JSON.parse(fixtureV4);
+    expect(raw.v).toBe(4);
+    const s = parseSave(fixtureV4);
+    expect(s.version).toBe(SAVE_VERSION);
+    expect(s.orders.rules.length).toBe(raw.state.orders.rules.length);
+    for (const w of Object.values(s.player.weapons)) { expect(w.affixes).toEqual([]); expect(w.locked).toEqual([]); }
+    expect(s.study).toEqual({});
+    everyScalarSurvives(raw.state, s);
   });
 });
 

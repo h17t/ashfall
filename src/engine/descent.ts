@@ -13,6 +13,8 @@ import type { GameState, GameEvent, DescentRun, EnemyInstance } from './types';
 import { tierHp, tierMarrow, tierPoise } from './formulas';
 import type { Mods } from './mods';
 import { registerActionHandler, registerTickHook } from './registry';
+import { recordStudyKill } from './study';
+import { playerAffixFx } from './forge';
 
 /** the encounter tier that marks a stair floor */
 export const DESCENT_TIER = -4;
@@ -185,7 +187,8 @@ export function descentOnKill(state: GameState, mods: Mods, events: GameEvent[],
   const run = state.descent.run!;
   const enc = state.encounter;
   const fx = runFx(run);
-  const marrow = safe(enemy.marrow.mul(marrowMult).mul(fx.haul).floor());
+  recordStudyKill(state, events, enemy.id);
+  const marrow = safe(enemy.marrow.mul(marrowMult).mul(fx.haul).mul(playerAffixFx(state).stairPay).floor());
   run.haul = run.haul.add(marrow);
   state.stats.kills = state.stats.kills.add(1);
   state.stats.cycleKills = state.stats.cycleKills.add(1);

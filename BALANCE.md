@@ -66,6 +66,18 @@ The metric is "Stair pays": the median over banked runs of the run's marrow per 
 
 `authored` (idle plus eight orders) against `idle`, 12 h, seed 7: level 161 vs 113, first Snuff 6.8 h vs 9.1 h, deepest 27 vs 22, marrow/hour 1.3e5 vs 6.5e4 by hour three; zero deaths in both. The first draft of the authored rule list put "strike the Reprisal" before "level up"; when the Reprisal condition unlocked it took the second of two slots and the strategy stopped leveling at 24. Priority order matters in the list the player writes too, and the editor says so.
 
+## Rev 6 — Pass 3, Milestone 7 (the Study and the forge)
+
+| Knob | Value | Why |
+|---|---|---|
+| Study ranks | 25 / 100 / 500 / 2000 kills; lords 1 / 4 / 12 / 30 | the first draft (10 / 50 / 250 / 1000) gave greedy 132 of 220 ranks by hour six |
+| Study bonus | +0.2% damage and marrow per creature rank, +0.5% per lord rank; +3% damage per rank against the creature | the first draft (0.4% / 1% / 5%) put the greedy first Snuff at 0.94 h, under the 1 h floor of the pacing test; now +27% at 6 h for greedy, +9% for idle, +66% at total mastery |
+| Reforge price | reinforce cost × 0.6 × 2.5 per locked affix, plus 2 Coarse Slag (region 1), 1 Fine (2–3), 1 Black (4+) | a lock is a commitment; slag competes with reinforcement so the forge is a choice, not a tax |
+| Affix tiers | Rough / Fine / Black weighted 70 / 25 / 5 at +0, 30 / 45 / 25 at +10 | a reinforced weapon is worth forging |
+| Sets | 2 / 4 / 6 pieces across the weapon in hand and the shades' | six pieces needs a full armed Cortege |
+
+Six hours, seed 7: greedy holds 100 of 220 Study ranks (+27%), casual 91 (+24%) with a Swift (Black) locked on a Render Greatsword, idle 41 (+9%) and never forges. The pacing tests hold after the tune.
+
 ## Latest simulator run
 
 ### Run — 2026-09-05 08:25 UTC · 12h · seed 7

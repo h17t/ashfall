@@ -274,3 +274,13 @@ Artifacts: `art/mobile/m6-orders.png` (three orders in the editor), `art/mobile/
 **The fold.** The first capture put the Orders and Log tabs at the very bottom of the phone with nothing under them: the Combat column was a fixed flex stack, and the section inside it had no height left after the arena and the hand. It had been that way since the shell was built; the log was simply never reachable in portrait. The column scrolls as one now, and the sections inside it flow.
 
 **The crash, closed.** The production-only crash in the film-grain component survived the tier-hook rewrite and reproduced on an unminified build: React's effect found a non-effect hook in the previous render's slot, in Grain and only in Grain. Grain was the one component with a store subscription (the GL-mode hook) followed by more hooks; Encounter uses the same subscription last and never failed, MoteField uses the tier hook without the GL one and never failed. The grain now reads its gates (perf-lite, the Battery tier) from classes the quality system puts on `<html>` and keeps a single settings subscription; eight cold captures across both flows are clean. The root cause inside React 19.2's store hook is not proven, only avoided; the note stays here for whoever meets it next.
+
+### Round 14 — Pass 3, Milestone 7 (the Study and the forge)
+
+Artifacts: `art/mobile/m7-study.png` (the bestiary with ranks, one entry open), `art/mobile/m7-weapon.png` (a weapon's affixes), `art/mobile/m7-forge.png` (the reforge sheet), `scripts/shot-forge.mjs`.
+
+**The Study.** The bestiary page is now titled for what it does. A completion bar at the top (ranks held of ranks possible, and the bonus they pay), and on every row four rank pips with the kill count and a thin progress line to the next rank. An open entry names its rank and what the next one reveals; the numbers appear rank by rank on the parchment, and the line "+9% damage against it" makes the rank a weapon.
+
+**The weapon.** Under infusions, an Affixes block: each affix a row with its tier on the left in the tier's colour (bone, wisp, the fire), its name, its effect and its set; a locked row fills. Reforge opens a stone sheet: the same rows with a lock switch each, the price with the slag count coloured by whether you have it, one button that names how many slots it rolls, and the pool as chips with the shut ones dashed. A reroll flashes the rows.
+
+**Sets.** A row of chips under the weapon, one per set with pieces held; the chip opens the set's lore and its three bonuses, lit as they are reached.

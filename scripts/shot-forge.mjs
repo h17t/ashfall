@@ -1,0 +1,37 @@
+// The Study and the forge: the bestiary with ranks, an open entry, the reforge sheet.
+import { createRequire } from 'node:module';
+const require = createRequire('/opt/node22/lib/node_modules/');
+const { chromium } = require('playwright');
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+const page = await ctx.newPage();
+page.on('pageerror', (e) => console.log('PAGEERROR', e.message));
+await page.goto(process.env.URL ?? 'http://localhost:4173/', { waitUntil: 'networkidle' });
+await page.waitForTimeout(600);
+await page.evaluate(() => {
+  const g = __ashfall.getState(); const s = g.state; const D = s.marrow.constructor;
+  s.marrow = new D(184000); s.player.level = 41; s.player.hpMax = 1e6; s.player.hp = 1e6; s.stats.bossKills = 2; s.flags.forgeUnlocked = true; s.flags.descentUnlocked = true;
+  s.prestige.bossesEverKilled = ['coldPyreWarden', 'mireMother']; s.unlockedZones = ['tollroad', 'mire'];
+  s.materials.coarseSlag = 14; s.materials.fineSlag = 3;
+  s.study = { wanedPilgrim: 612, ashRat: 2100, tollKnight: 0, charredAcolyte: 31, coldPyreWarden: 5, mireMother: 1, gallowsKnight: 9 };
+  s.player.weapons.banditDagger = { id: 'banditDagger', level: 3, infusion: 'none', affixes: [{ id: 'brutal', tier: 2 }, { id: 'heavy', tier: 1 }], locked: [] };
+  s.player.weapons.revenantSword.level = 4; s.player.weapons.revenantSword.affixes = [{ id: 'brutal', tier: 3 }, { id: 'hungry', tier: 2 }, { id: 'keen', tier: 1 }]; s.player.weapons.revenantSword.locked = ['brutal'];
+  s.cortege.recruited = ['aldric']; s.cortege.shades = [{ id: 'aldric', level: 3, xp: new D(0), weapon: 'banditDagger', assignment: 'beside', hpFrac: 1, actIn: 1, retreat: 0 }]; s.cortege.slots = 1;
+  g.replace(s);
+});
+await page.getByRole('button', { name: /^Lantern$/ }).click(); await page.waitForTimeout(250);
+await page.getByRole('tab', { name: /^Lore/ }).click(); await page.waitForTimeout(400);
+await page.getByRole('button', { name: /Ash Rat/ }).first().click(); await page.waitForTimeout(400);
+await page.screenshot({ path: 'art/mobile/m7-study.png' });
+await page.getByRole('button', { name: /^Arsenal$/ }).click(); await page.waitForTimeout(250);
+await page.getByRole('tab', { name: /^Weapons/ }).click(); await page.waitForTimeout(300);
+await page.evaluate(() => { const el = document.querySelector('.section-scroll'); if (el) el.scrollTop = el.scrollHeight; });
+await page.waitForTimeout(300);
+await page.screenshot({ path: 'art/mobile/m7-weapon.png' });
+await page.getByRole('button', { name: /^Reforge$/ }).first().click(); await page.waitForTimeout(500);
+await page.screenshot({ path: 'art/mobile/m7-forge.png' });
+const before = await page.evaluate(() => JSON.stringify(__ashfall.getState().state.player.weapons.revenantSword.affixes));
+await page.getByRole('button', { name: /^Reforge the/ }).click(); await page.waitForTimeout(400);
+const after = await page.evaluate(() => JSON.stringify(__ashfall.getState().state.player.weapons.revenantSword.affixes));
+console.log('reforged', before !== after, 'brutal kept', after.includes('"brutal","tier":3'));
+await browser.close();

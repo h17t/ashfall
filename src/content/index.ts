@@ -11,10 +11,13 @@ import { CREEDS } from './creeds';
 import { TREE, SEVERING_UNLOCKS, BRANCH_INFO } from './tree';
 import { MATERIALS, reinforceMaterial } from './materials';
 import { BOONS, BOON_ORDER, RARITY_WEIGHT } from './boons';
+import { AFFIXES, AFFIX_ORDER, SETS, SET_PIECES, TIER_NAMES } from './affixes';
+import { STUDY_RANKS_ENEMY, STUDY_RANKS_BOSS, STUDY_RANK_NAMES, STUDY_REVEALS, STUDY_BONUS, STUDY_VS_PER_RANK } from './study';
 import { BALANCE } from './balance';
 import type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef } from './types';
 
-export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, SHADES, CREEDS, TREE, SEVERING_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial, BOONS, BOON_ORDER, RARITY_WEIGHT };
+export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, SHADES, CREEDS, TREE, SEVERING_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial, BOONS, BOON_ORDER, RARITY_WEIGHT, AFFIXES, AFFIX_ORDER, SETS, SET_PIECES, TIER_NAMES, STUDY_RANKS_ENEMY, STUDY_RANKS_BOSS, STUDY_RANK_NAMES, STUDY_REVEALS, STUDY_BONUS, STUDY_VS_PER_RANK };
+export type { AffixDef, AffixTier, AffixStat, SetId, SetDef } from './affixes';
 export type { BoonDef, BoonFx, BoonRarity } from './boons';
 export { UPCOMING_SPELLS } from './spells';
 export type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef };
@@ -105,6 +108,12 @@ export function validateContent(): string[] {
     if (b.phases.length === 0) errs.push(`boss ${b.id} has no phases`);
     if (b.phases[0]?.at !== 1) errs.push(`boss ${b.id} first phase must start at 1.0`);
   }
+  for (const a of Object.values(AFFIXES)) {
+    if (!SETS[a.set]) errs.push(`affix ${a.id} set ${a.set} missing`);
+    if (a.mag.length !== 3 || !(a.mag[0] < a.mag[1] && a.mag[1] < a.mag[2])) errs.push(`affix ${a.id} tiers must climb`);
+    if (a.gate?.kind === 'creature' && !ENEMIES[a.gate.id ?? '']) errs.push(`affix ${a.id} gate creature missing`);
+  }
+  for (const st of Object.values(SETS)) if (!st.lore || st.lore.length < 30) errs.push(`set ${st.id} lore too short`);
   for (const b of Object.values(BOONS)) {
     if (!b.lore || b.lore.length < 30) errs.push(`boon ${b.id} lore too short`);
     if (!b.text) errs.push(`boon ${b.id} has no text`);

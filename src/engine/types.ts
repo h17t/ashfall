@@ -79,10 +79,15 @@ export interface EnemyInstance {
   marrow: Decimal;
 }
 
+export interface WeaponAffix { id: string; tier: 1 | 2 | 3 }
 export interface WeaponInstance {
   id: string;
   level: number; // +0..+10
   infusion: InfusionKey;
+  /** rolled by the forge; empty until the first reforge */
+  affixes?: WeaponAffix[];
+  /** affix ids held through the next reroll (at most two) */
+  locked?: string[];
 }
 
 export interface PlayerState {
@@ -299,6 +304,8 @@ export interface GameState {
   descent: DescentState;
   /** Standing Orders */
   orders: OrdersState;
+  /** the Study: lifetime kills per creature and lord id; kept through every fire */
+  study: Record<string, number>;
 }
 
 /** A Descent in progress: floor, the boons taken, the haul not yet banked. */
@@ -419,7 +426,9 @@ export type Action =
   | { type: 'descend' }
   | { type: 'chooseBoon'; index: number }
   | { type: 'descentWithdraw' }
-  | { type: 'setOrders'; rules: Order[] };
+  | { type: 'setOrders'; rules: Order[] }
+  | { type: 'reforge'; weapon: string }
+  | { type: 'lockAffix'; weapon: string; affix: string | null };
 
 // ---------------- Events ----------------
 
@@ -450,4 +459,6 @@ export type GameEvent =
   | { type: 'descentBanked'; floor: number; haul: Decimal; mult: number; banked: Decimal }
   | { type: 'descentLost'; floor: number; haul: Decimal }
   | { type: 'orderFired'; id: number; action: OrderActKind }
+  | { type: 'studyRank'; enemy: string; rank: number; isBoss: boolean }
+  | { type: 'reforged'; weapon: string; affixes: WeaponAffix[] }
   | { type: 'error'; text: string };

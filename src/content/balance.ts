@@ -180,6 +180,21 @@ export const BALANCE = {
     economyCooldown: 1.0,
   },
 
+  // ---- The forge ----
+  forge: {
+    /** affix slots on a weapon */
+    slots: 3,
+    /** at most this many affixes locked at once */
+    maxLocked: 2,
+    /** reforge marrow cost = reinforce cost at the weapon's level × this */
+    costMult: 0.6,
+    /** each locked affix multiplies the cost */
+    lockCostMult: 2.5,
+    /** tier weights [rough, fine, black] at +0 and at +10; interpolated by weapon level */
+    tierWeightsLow: [70, 25, 5],
+    tierWeightsHigh: [30, 45, 25],
+  },
+
   // ---- Prestige ----
   prestige: {
     /** vestige = (cycleMarrow / divisor) ^ exponent * bossBonus */

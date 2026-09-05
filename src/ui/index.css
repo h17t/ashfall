@@ -375,3 +375,21 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
    inside it flow rather than scroll, so nothing is trapped under the fold. */
 .shell-portrait .shell-main.is-combat { overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
 .shell-portrait .shell-main.is-combat .section, .shell-portrait .shell-main.is-combat .section-scroll { flex: none; overflow: visible; }
+
+/* ---- the Study and the forge ---- */
+.study-bar { padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--ash) 70%, transparent); }
+.study-track { height: 6px; margin-top: 6px; background: color-mix(in srgb, var(--ash) 40%, transparent); }
+.study-fill { height: 100%; background: linear-gradient(90deg, var(--ember), var(--ember-hot)); }
+.rank-pips { display: inline-flex; gap: 3px; }
+.rank-pip { width: 8px; height: 8px; border: 1px solid var(--ash); transform: rotate(45deg); }
+.rank-pip.is-on { background: var(--ember-hot); border-color: var(--ember-hot); }
+.rank-track { width: 36px; height: 3px; background: color-mix(in srgb, var(--ash) 40%, transparent); display: inline-block; }
+.rank-fill { display: block; height: 100%; background: var(--wisp); }
+.affix-row { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 10px; border-left: 3px solid var(--ash); background: color-mix(in srgb, var(--ink) 60%, transparent); }
+.affix-row.t2 { border-left-color: var(--wisp); } .affix-row.t3 { border-left-color: var(--ember-hot); }
+.affix-row.is-locked { background: color-mix(in srgb, var(--ember) 14%, var(--ink)); }
+.affix-tier { font-family: var(--font-num); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bone); min-width: 44px; }
+.affix-row.t3 .affix-tier { color: var(--ember-hot); } .affix-row.t2 .affix-tier { color: var(--wisp); }
+.boon-chip.is-shut { opacity: 0.4; border-style: dashed; }
+@keyframes forge-flash { from { filter: brightness(2.2); } to { filter: brightness(1); } }
+.forge-flash { animation: forge-flash 0.7s ease-out; }

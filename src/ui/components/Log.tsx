@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { fmt, type GameEvent } from '@/engine';
-import { MATERIALS, getZone, BOONS } from '@/content';
+import { MATERIALS, getZone, BOONS, BOSSES, ENEMIES, AFFIXES, TIER_NAMES } from '@/content';
 import { Slab } from '@/render/materials/Slab';
 
 interface Line { id: number; text: string; cls: string; t: number }
@@ -38,6 +38,8 @@ export function Log() {
         case 'boonTaken': push(`${BOONS[e.boon]?.name ?? e.boon}: ${BOONS[e.boon]?.text ?? ''}`, 'text-ember-hot'); break;
         case 'descentBanked': push(`You climb out from floor ${e.floor}. ${fmt(e.haul)} haul × ${e.mult.toFixed(2)} = ${fmt(e.banked)} marrow banked.`, 'text-verdigris'); break;
         case 'descentLost': push(e.haul.gt(0) ? `The stair keeps ${fmt(e.haul)} marrow of haul. Floor ${e.floor}.` : `The stair took you on floor ${e.floor}.`, 'text-ember-hot'); break;
+        case 'studyRank': push(`${e.isBoss ? BOSSES[e.enemy]?.name ?? e.enemy : ENEMIES[e.enemy]?.name ?? e.enemy}: ${['', 'noted', 'known', 'understood', 'mastered'][e.rank]}. ${['', 'Its resistances are yours to read.', 'You know its attacks and their tells.', 'You know what it carries.', 'You know its measure.'][e.rank]}`, 'text-wisp'); break;
+        case 'reforged': push(`Reforged: ${e.affixes.map((a) => `${AFFIXES[a.id]?.name ?? a.id} (${TIER_NAMES[a.tier]})`).join(', ')}.`, 'text-ember-hot'); break;
         case 'snuffed': push(`The flame is snuffed. ${fmt(e.vestige)} Vestige gathered.`, 'text-ember-hot'); break;
       }
     }

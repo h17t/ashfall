@@ -6,3 +6,4 @@ import './ext-magic';
 import './ext-prestige';
 import './ext-descent';
 import './ext-orders';
+import './ext-forge';

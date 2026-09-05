@@ -7,6 +7,8 @@ import { CREEDS, TREE, SEVERING_UNLOCKS } from '@/content';
 import { BALANCE } from '@/content/balance';
 import type { GameState } from './types';
 import { runFx, runDamageMult } from './descent';
+import { studyBonus } from './study';
+import { playerAffixFx } from './forge';
 import { BOONS } from '@/content';
 
 export interface Mods {
@@ -97,6 +99,14 @@ export function computeMods(state: GameState): Mods {
     m.humanityMult *= Math.pow(1.25, dl);
     add(`the Unmaking ${dl}`, `damage & marrow ×${mult.toFixed(2)}`);
   }
+  // ---- the Study: what you have learned of every creature ----
+  const st = studyBonus(state);
+  if (st.dmg > 0) { m.dmg *= 1 + st.dmg; m.marrow *= 1 + st.marrow; add(`the Study (${st.ranks} ranks)`, `damage & marrow +${Math.round(st.dmg * 1000) / 10}%`); }
+  // ---- the forge: the affixes on the weapon in your hand, and the sets across the Cortege ----
+  const fx = playerAffixFx(state);
+  m.dmg *= fx.dmg; m.marrow *= fx.marrow; m.critBonus += fx.crit; m.strain *= fx.strain; m.taken *= fx.taken; m.materialMult *= fx.materials;
+  m.reprisalMult *= fx.reprisal; m.stamRegen *= fx.stamRegen; m.hpMult *= fx.hp; m.statusBuild *= fx.statusBuild; m.statusDmg *= fx.statusDmg;
+  for (const src of fx.sources) add(src.name, src.effect);
   // ---- the Stair: boons last the run ----
   const run = state.descent?.run;
   if (run) {

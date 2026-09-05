@@ -10,7 +10,7 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
   - [x] M4 platform: PWA (icons, manifest, splash, install sheet after the first lord), build-time service worker with precache, four quality tiers with auto-detect and step-down, render pause + 1Hz logic when hidden, freeze/event autosave, budget + interruption audits in CI
   - [x] M5 Descent Runs: the Stair (engine module, 27 boons, offer sheet, strip, haul sheet, Stair page), save v3 + v2 fixture test, sim strategies with a control and a reckless, BALANCE.md rev 4
   - [x] M6 Standing Orders: rule engine (15 conditions, 13 actions, earned slots and kinds), chip-and-sheet editor in Combat, save v4 + v3 fixture, authored sim strategy, BALANCE.md rev 5
-  - [ ] M7 The Study and Reforging
+  - [x] M7 The Study and Reforging: kill ranks with reveals and permanent bonuses, 15 affixes in five sets with Study gates, reforge and lock, sets across the Cortege, save v5 + v4 fixture, forge sim extension, BALANCE.md rev 6
   - [ ] M8 Afflictions and the Toll
   - [ ] M9 stretch: Dispatch, Holdfasts, Creed War, Weapon Mastery
   - [ ] M10 content and art for everything new

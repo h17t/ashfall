@@ -18,3 +18,5 @@ export * from './prestige';
 export * from './prestige2';
 export * from './descent';
 export * from './orders';
+export * from './study';
+export * from './forge';

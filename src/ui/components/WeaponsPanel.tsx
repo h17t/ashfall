@@ -4,6 +4,9 @@ import { fmt, D, computeMods, weaponDamage, reinforceCost, type InfusionKey } fr
 import { WEAPONS, MATERIALS, reinforceMaterial, getZone, getWeapon, BALANCE } from '@/content';
 import { Tooltip } from './Tooltip';
 import { Plate } from '@/render/Plate';
+import { ReforgeSheet, AffixRow } from './ReforgeSheet';
+import { affixesOf, lockedOf, setPieces, setTier } from '@/engine';
+import { SETS, SET_PIECES, type SetId } from '@/content';
 
 const INFUSIONS: { id: InfusionKey; name: string; desc: string }[] = [
   { id: 'none', name: 'Uninfused', desc: 'The blade as it was forged.' },
@@ -32,6 +35,7 @@ export const WeaponsPanel = memo(function WeaponsPanel() {
         {shop.map((w) => <button key={w.id} className={`btn flex items-center gap-2 border-dashed ${w.id === current ? 'border-ember' : ''}`} style={{ opacity: 0.8 }} onClick={() => setSel(w.id)}><span className="w-8 h-8 -my-2 shrink-0"><Plate kind="weapon" id={w.id} variant="icon" className="w-full h-full object-contain" /></span>{w.name} · {fmt(w.source.kind === 'shop' ? w.source.cost : 0)}</button>)}
       </div>
       <WeaponDetail id={current} owned={ownedIds.includes(current)} />
+      <SetsRow />
     </div>
   );
 });
@@ -45,6 +49,42 @@ function WeaponChip({ id, selected, equipped, onSelect }: { id: string; selected
       <span className="w-8 h-8 -my-2 shrink-0"><Plate kind="weapon" id={id} variant="icon" className="w-full h-full object-contain" /></span>
       {inf !== 'none' && <span className="text-wisp">{inf}</span>}{def.name} <span className="font-num text-ember-hot">+{level}</span>
     </button>
+  );
+}
+
+function SetsRow() {
+  const pieces = useSel((s) => JSON.stringify(setPieces(s)));
+  const p = JSON.parse(pieces) as Record<SetId, number>;
+  const any = Object.values(p).some((n) => n > 0);
+  if (!any) return null;
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="t-label">Sets · pieces in your hand and your shades'</div>
+      <div className="flex flex-wrap gap-1">
+        {(Object.keys(SETS) as SetId[]).filter((k) => p[k] > 0).map((k) => (
+          <Tooltip key={k} tip={<div><div className="t-display text-[17px]">{SETS[k].name}</div><div className="text-[14px] italic mt-1" style={{ color: 'var(--bone)' }}>{SETS[k].lore}</div><ol className="mt-2 text-[14px] list-none flex flex-col gap-1">{SETS[k].bonus.map((b, i) => <li key={i} style={{ color: p[k] >= SET_PIECES[i] ? 'var(--parchment)' : 'color-mix(in srgb, var(--bone) 55%, transparent)' }}><span className="t-num">{SET_PIECES[i]}</span> · {b}</li>)}</ol></div>}>
+            <span className="boon-chip"><span className="t-display">{SETS[k].name}</span>&nbsp;<span className="t-num" style={{ color: setTier(p[k]) > 0 ? 'var(--ember-hot)' : 'var(--bone)' }}>{p[k]}</span></span>
+          </Tooltip>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Affixes({ id }: { id: string }) {
+  const affixes = useSel((s) => JSON.stringify(affixesOf(s.player.weapons[id])));
+  const locked = useSel((s) => lockedOf(s.player.weapons[id]).join(','));
+  const forge = useSel((s) => !!s.flags.forgeUnlocked);
+  const [open, setOpen] = useState(false);
+  const list = JSON.parse(affixes) as { id: string; tier: 1 | 2 | 3 }[];
+  if (!forge) return null;
+  const lockedIds = locked.split(',').filter(Boolean);
+  return (
+    <div className="flex flex-col gap-1 border-t border-ash/50 pt-2">
+      <div className="flex items-center justify-between"><span className="t-label">Affixes</span><button className="btn text-[13px] min-h-[48px]" onClick={() => setOpen(true)}>Reforge</button></div>
+      {list.length === 0 ? <div className="text-[14px] italic" style={{ color: 'color-mix(in srgb, var(--bone) 70%, transparent)' }}>Bare steel.</div> : list.map((a) => <AffixRow key={a.id} affix={a.id} tier={a.tier} locked={lockedIds.includes(a.id)} />)}
+      {open && <ReforgeSheet weapon={id} onClose={() => setOpen(false)} />}
+    </div>
   );
 }
 
@@ -106,6 +146,7 @@ function WeaponDetail({ id, owned }: { id: string; owned: boolean }) {
           ))}
         </div>
       )}
+      {owned && <Affixes id={id} />}
     </div>
   );
 }

@@ -34,6 +34,7 @@ Captured headless at 1400×900 from the built game (`npm run build && npx vite p
 | ![The offer](art/mobile/m5-boons.png) | **The Stair's offer**: one of three boons, or the way out. |
 | ![The Stair](art/mobile/m5-stair.png) | **The Stair page**: the way down, the records, every boon. |
 | ![Orders](art/mobile/m6-orders.png) | **Standing Orders**: WHEN this, THEN that, as chips. |
+| ![The forge](art/mobile/m7-forge.png) | **The forge**: three affixes, a lock, the price. |
 
 ## The plates
 

@@ -6,6 +6,8 @@ import { D, Decimal, ZERO, safe, decMin } from './num';
 import { rand, chance, pick } from './rng';
 import { BALANCE } from '@/content/balance';
 import { DESCENT_TIER, spawnDescentEnemy, descentOnKill, descentOnDeath, secondWind, runFx, floorTier } from './descent';
+import { recordStudyKill, studyVsMult } from './study';
+import { playerAffixFx } from './forge';
 import { getEnemy, getZone, getBoss, getWeapon, getSpell, globalTier, nextZone, cycleBossFor, BOSSES, WEAPONS } from '@/content';
 const getSpellSchool = (id: string) => getSpell(id).school;
 import type { AttackPattern, BossPhase, EnemyDef } from '@/content/types';
@@ -284,6 +286,7 @@ export function damageEnemy(
   const enemy = state.encounter.enemy;
   if (!enemy || enemy.hp.lte(0)) return ZERO;
   let d = dmg.mul(resistFor(enemy, type));
+  if (source !== 'dot') d = d.mul(studyVsMult(state, enemy.id)); // you know where to cut
   // Boss mechanics that modify incoming damage
   const ph = currentPhase(enemy);
   if (ph?.mechanic === 'breakOnly' && enemy.reprisal <= 0 && source !== 'dot') {
@@ -416,12 +419,14 @@ export function playerAttack(state: GameState, mods: Mods, events: GameEvent[], 
   if (fromClick) state.stats.clicks++;
   const run = state.descent.run;
   const rfx = run ? runFx(run) : null;
+  const afx = playerAffixFx(state);
   const crit = chance(state.rng, br.crit + (rfx?.crit ?? 0));
-  if (crit) dmg = dmg.mul(BALANCE.player.critMult * (rfx?.critDmg ?? 1));
+  if (crit) dmg = dmg.mul(BALANCE.player.critMult * (rfx?.critDmg ?? 1) * afx.critDmg);
   if (run && rfx) {
     if (!run.hitOnce) { run.hitOnce = true; dmg = dmg.mul(rfx.firstHit); }
-    if (crit && rfx.bleedOnCrit) applyStatus(state, mods, events, 'bleed', 30);
   }
+  if (crit && (rfx?.bleedOnCrit || afx.bleedOnCrit)) applyStatus(state, mods, events, 'bleed', 30);
+  if (afx.lifesteal > 0) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * afx.lifesteal);
   const reprisal = enemy.reprisal > 0;
   if (reprisal) {
     dmg = dmg.mul(br.reprisal);
@@ -441,6 +446,9 @@ export function playerAttack(state: GameState, mods: Mods, events: GameEvent[], 
     const infDef = inst && inst.infusion !== 'none' ? BALANCE.weapon.infusion[inst.infusion] : null;
     if (def.status) for (const [s, a] of Object.entries(def.status)) applyStatus(state, mods, events, s as StatusKey, a as number);
     if (infDef?.status) applyStatus(state, mods, events, infDef.status as StatusKey, infDef.amount ?? 0);
+    if (afx.bleed > 0) applyStatus(state, mods, events, 'bleed', afx.bleed);
+    if (afx.poison > 0) applyStatus(state, mods, events, 'poison', afx.poison);
+    if (afx.frost > 0) applyStatus(state, mods, events, 'frost', afx.frost);
   }
 }
 
@@ -546,6 +554,7 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
   const enc = state.encounter;
   const enemy = enc.enemy!;
   const marrowMult = mods.marrow * buffMult(state.player.buffs, 'marrow');
+  recordStudyKill(state, events, enemy.id);
   if (state.descent.run && enc.tier === DESCENT_TIER) { descentOnKill(state, mods, events, enemy, marrowMult); return; }
   const zone = getZone(enc.zone);
   const g = gTier(state, enc.zone, enc.tier);
@@ -800,7 +809,7 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
     p.autoAttackIn -= dt;
     if (p.autoAttackIn <= 0) {
       const w = getWeapon(p.weapon);
-      p.autoAttackIn = 1 / (BALANCE.player.autoAttackRate * w.speed);
+      p.autoAttackIn = 1 / (BALANCE.player.autoAttackRate * w.speed * playerAffixFx(state).speed);
       // Auto-attack respects stamina: it waits rather than exhausting the player.
       if (p.stamina >= w.stamina) playerAttack(state, mods, events, false);
     }
