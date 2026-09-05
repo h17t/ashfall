@@ -55,7 +55,10 @@ export function Sheet({ open, onClose, title, children, material = 'parchment', 
   }, [open, onClose, dismissable]);
   if (!open || typeof document === 'undefined') return null;
   return createPortal(
-    <div className="sheet-root fixed inset-0 z-[70]" role="presentation">
+    // React bubbles synthetic events through a portal to the tree that rendered it: a tap on the
+    // close mark or the scrim would reach the row or card that opened this sheet and open it again.
+    // Nothing inside a sheet is the business of what is behind it.
+    <div className="sheet-root fixed inset-0 z-[70]" role="presentation" onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onPointerUp={(e) => e.stopPropagation()} onKeyDown={(e) => { if (e.key !== 'Escape') e.stopPropagation(); }}>
       <div className="absolute inset-0 sheet-scrim" onClick={dismissable ? onClose : undefined} aria-hidden style={{ opacity: Math.max(0.2, 1 - drag / 300) }} />
       <div ref={ref} className="sheet absolute inset-x-0 bottom-0 outline-none" role="dialog" aria-modal="true" aria-label={label ?? (typeof title === 'string' ? title : 'Details')} tabIndex={-1}
         style={{ transform: drag ? `translateY(${drag}px)` : undefined, transition: drag ? 'none' : undefined }}>
