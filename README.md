@@ -15,13 +15,14 @@ npm run build      # production build in dist/
 npm run preview    # serve dist/
 ```
 
-Controls: click the enemy (or `F`) to strike · `Space` dodge · `E` Tallowdraught · `1`–`6` cast recited spells. Everything else is in the tabs on the right, and every number has a tooltip that shows how it was computed.
+On a phone, install it from the browser (the game offers after the first lord) and it opens like any app, with or without a signal. Controls: tap Strike, or click the enemy (or `F`), · `Space` dodge · `E` Tallowdraught · `1`–`6` cast recited spells. Everything else is in the tabs on the right, and every number has a tooltip that shows how it was computed.
 
 ## Develop
 
 ```
 npm test           # Vitest: engine formulas, combat, death, saves, shades, magic, prestige, bosses, economy properties, pacing
 npm run typecheck
+npm run ci         # everything CI runs: tests, banned terms, hover, build, payload budget, touch targets, interruptions
 npm run sim        # headless balance simulation; writes BALANCE.md
 npm run sim -- --hours 200 --strategies greedy,idle --seed 3 --verbose
 ```

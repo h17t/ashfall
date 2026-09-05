@@ -21,6 +21,17 @@ Captured headless at 1400×900 from the built game (`npm run build && npx vite p
 | ![Tree](art/review/m8-tree.png) | **The Vestige tree**, an illuminated page. |
 | ![States](art/review/m3-states-sheet.png) | **Boss card, UNMADE., an open lore page, the away report.** |
 
+## The phone
+
+| | |
+|---|---|
+| ![Pillars](art/mobile/m2-sheet.png) | **The five pillars at 390×844.** Status strip, section, the hand. |
+| ![Sheet](art/mobile/m2-sheet-open.png) | **A bottom sheet** where a tooltip used to be. |
+| ![Away](art/mobile/m3-away.png) | **The away report**, the region behind, the Shades that hunted. |
+| ![Quality](art/mobile/m4-settings.png) | **Four quality tiers** and the detected one. |
+| ![Install](art/mobile/m4-install.png) | **Keep the Lantern**, offered once after the first lord. |
+| ![Landscape](art/mobile/m2-combat-landscape.png) | **A phone on its side.** |
+
 ## The plates
 
 | | |

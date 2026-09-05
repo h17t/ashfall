@@ -36,10 +36,14 @@ export function startLoop(largeGapHandler?: (seconds: number) => void) {
       n++;
     }
   };
-  // setInterval keeps ticking (throttled) in background tabs; rAF would stop entirely.
-  timer = window.setInterval(run, TICK_MS / 2);
+  // setInterval keeps ticking (throttled) in background tabs; rAF would stop entirely. Hidden, the
+  // rate drops to once a second: the accumulator catches up in one burst when the tab returns.
+  const arm = () => { if (timer !== null) window.clearInterval(timer); timer = window.setInterval(run, document.hidden ? 1000 : TICK_MS / 2); };
+  arm();
+  document.addEventListener('visibilitychange', arm);
   return () => {
     if (timer !== null) window.clearInterval(timer);
     timer = null;
+    document.removeEventListener('visibilitychange', arm);
   };
 }

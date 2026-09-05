@@ -7,7 +7,7 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
   - [x] M1 rename: name verified as far as the sandbox allows, full term migration (4,600 replacements, every identifier), `tools/lint/banned-terms.ts` in the test suite, save schema 2 with a v1→v2 migration and a pre-rename fixture round-trip, fuzz test, LORE.md
   - [x] M2 mobile foundation: portrait-first shell (status strip, section, action bar, bottom nav), landscape and wide arrangements, safe areas, tooltips as bottom sheets, touch-target and hover audits in CI
   - [x] M3 touch feel: pointerdown actions, multi-touch, swipe/long-press/pull-to-dismiss, haptic patterns with a toggle, the away report and reallocation as sheets; `scripts/touch-check.mjs`
-  - [ ] M4 platform: PWA, service worker, install flow, quality tiers, suspension-safe saving
+  - [x] M4 platform: PWA (icons, manifest, splash, install sheet after the first lord), build-time service worker with precache, four quality tiers with auto-detect and step-down, render pause + 1Hz logic when hidden, freeze/event autosave, budget + interruption audits in CI
   - [ ] M5 Descent Runs
   - [ ] M6 Standing Orders
   - [ ] M7 The Study and Reforging

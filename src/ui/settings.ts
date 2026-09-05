@@ -9,6 +9,8 @@ export interface Settings {
   volume: number;
   screenShake: boolean;
   haptics: boolean;
+  /** VFX quality tier; auto picks from the device and steps down on frame drops */
+  quality: 'auto' | 'cinematic' | 'high' | 'balanced' | 'battery';
   showTutorial: boolean;
   set: (patch: Partial<Omit<Settings, 'set'>>) => void;
 }
@@ -31,6 +33,7 @@ export const useSettings = create<Settings>((set, get) => ({
   volume: 0.5,
   screenShake: true,
   haptics: true,
+  quality: 'auto',
   showTutorial: true,
   ...load(),
   set: (patch) => {

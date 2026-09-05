@@ -338,3 +338,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .shell-landscape .hint-card { position: static; transform: none; width: auto; max-width: none; margin: 2px 0 6px; left: auto; bottom: auto; }
 /* sideways pans belong to the swipe; vertical scrolling stays native */
 .shell-portrait .section-scroll, .shell-portrait .status-strip { touch-action: pan-y; }
+
+/* a segmented control that has to fit five choices on a phone: it wraps, and every choice is at least a thumb wide */
+.seg-wrap { display: flex; flex-wrap: wrap; gap: 8px; border: 0; }
+.seg-wrap .seg-btn { flex: 1 1 calc(33% - 8px); min-width: 96px; border: 1px solid var(--ash); }

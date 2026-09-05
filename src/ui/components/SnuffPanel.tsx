@@ -5,7 +5,7 @@ import { wakingName } from '@/engine/prestige';
 import { TREE, BRANCH_INFO } from '@/content';
 import { Tooltip } from './Tooltip';
 import { Slab } from '@/render/materials/Slab';
-import { setSnuffLedger } from '@/render/cinematics/Cinema';
+import { setSnuffLedger } from '@/render/cinematics/ledger';
 
 export const SnuffPanel = memo(function SnuffPanel() {
   const dispatch = useGame((g) => g.dispatch);

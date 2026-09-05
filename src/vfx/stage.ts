@@ -1,6 +1,8 @@
 import { compile, createFbo, createGL, destroyFbo, loadTexture, quad, toRgb, uniforms, type Fbo, type Uniforms } from './gl';
 import { QUAD_VS, LAYER_FS, FIGURE_FS, PARTICLE_VS, PARTICLE_FS, BRIGHT_FS, BLUR_FS, COMPOSITE_FS } from './shaders';
 import { Particles, STRIDE_FLOATS } from './particles';
+import { knobs, stepDown, currentTier } from './quality';
+import { useSettings } from '@/ui/settings';
 import { asset, type AssetKind } from '../../assets/manifest';
 
 /**
@@ -59,7 +61,7 @@ export class Stage {
   private figure: { tex: WebGLTexture; mask: WebGLTexture; w: number; h: number; key: string } | null = null;
   private figureKey = '';
   private w = 1; private h = 1; private dpr = 1;
-  private quality = 2; // 2 full, 1 degraded (dpr 1, no bloom), 0 handed back to the DOM stage
+  private gaveUp = false; // the last rung: the frame goes back to the DOM stage
   /** called once when the stage gives up: the machine cannot hold 60fps even degraded */
   onGiveUp: (() => void) | null = null;
   private slowRuns = 0;
@@ -122,7 +124,7 @@ export class Stage {
   resize() {
     const r = this.canvas.getBoundingClientRect();
     const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
-    const dpr = Math.min(this.quality === 2 ? 2 : 1, window.devicePixelRatio || 1);
+    const dpr = Math.min(knobs().dpr, window.devicePixelRatio || 1);
     if (w === this.w && h === this.h && dpr === this.dpr && this.scene) return;
     this.w = w; this.h = h; this.dpr = dpr;
     this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);
@@ -289,7 +291,8 @@ export class Stage {
     // ambient emitters
     const amb = AMBIENT[snap.zone] ?? AMBIENT.approach;
     if (!snap.reduceFx && dt > 0) {
-      this.emitAcc.motes += amb.motes * dt; this.emitAcc.ash += amb.ash * dt; this.emitAcc.wisps += amb.wisps * dt;
+      const q = knobs(); this.parts.budget = q.particles;
+      this.emitAcc.motes += amb.motes * q.motes * dt; this.emitAcc.ash += amb.ash * q.motes * dt; this.emitAcc.wisps += amb.wisps * q.motes * dt;
       while (this.emitAcc.motes >= 1) { this.emitAcc.motes--; this.parts.emit({ x: this.w * this.parts.rand(0, 0.55), y: -6, vx: this.parts.rand(10, 40), vy: this.parts.rand(30, 90), life: this.parts.rand(3, 7), size: this.parts.rand(1.5, 3.5), color: this.parts.rand() < 0.3 ? PAL.emberHot : PAL.ember, wob: 25, blend: 1, shrink: 0.5 }); }
       while (this.emitAcc.ash >= 1) { this.emitAcc.ash--; this.parts.emit({ x: this.w * this.parts.rand(-0.1, 1.1), y: this.h + 6, vx: this.parts.rand(-15, 5), vy: this.parts.rand(-40, -14), life: this.parts.rand(6, 14), size: this.parts.rand(1.2, 2.8), color: PAL.bone, alpha: 0.55, wob: 18, blend: 0, shrink: 0.2 }); }
       while (this.emitAcc.wisps >= 1) { this.emitAcc.wisps--; this.parts.emit({ x: this.w * this.parts.rand(0, 1), y: this.h * this.parts.rand(0.1, 0.6), vx: this.parts.rand(-10, 10), vy: this.parts.rand(6, 22), life: this.parts.rand(4, 9), size: this.parts.rand(2, 5), color: amb.moteColor, alpha: 0.7, wob: 30, blend: 1, shrink: 0.9 }); }
@@ -391,7 +394,7 @@ export class Stage {
     gl.disable(gl.BLEND);
 
     // bloom
-    const bloomOn = this.quality === 2 && !snap.reduceFx;
+    const bloomOn = knobs().bloom && !snap.reduceFx;
     if (bloomOn) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.bloomA.fbo); gl.viewport(0, 0, this.bloomA.w, this.bloomA.h);
       gl.useProgram(this.pBright);
@@ -424,7 +427,7 @@ export class Stage {
     gl.uniform4f(this.uComp.u_shock, sh.x, sh.y, (1 - sh.t) * 0.9, sh.t * sh.t * sh.amp);
     gl.uniform1f(this.uComp.u_ca, this.ca.t * this.ca.t * 0.005);
     gl.uniform2f(this.uComp.u_caDir, 1, 0.35);
-    gl.uniform1f(this.uComp.u_heat, snap.reduceFx ? 0 : amb.heat);
+    gl.uniform1f(this.uComp.u_heat, snap.reduceFx || !knobs().heat ? 0 : amb.heat);
     gl.uniform1f(this.uComp.u_desat, this.desat);
     const low = Math.max(0, 0.45 - snap.hpFrac) / 0.45;
     gl.uniform1f(this.uComp.u_vign, snap.dead ? 0.9 : low * low * 0.9);
@@ -440,16 +443,26 @@ export class Stage {
     gl.uniform1f(this.uComp.u_dim, Math.min(1, this.extraDim));
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-    // adaptive quality: if the last 40 frames average above 22ms, drop to 1x and no bloom (never bounces back)
+    // adaptive quality: on sustained frame drops the auto tier steps down one rung (never up, until the
+    // next launch); below Battery the frame is handed back to the DOM stage. A tier the player pinned
+    // by hand is never touched: they chose it, they can feel the cost.
     this.frameTimes.push(rawDt * 1000);
     if (this.frameTimes.length >= 40) {
       const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
       this.frameTimes.length = 0;
-      if (avg > 22 && this.quality === 2) { this.quality = 1; this.resize(); }
-      else if (avg > 30 && this.quality === 1 && ++this.slowRuns >= 2) { this.quality = 0; this.onGiveUp?.(); }
-      else if (this.quality === 1 && avg <= 30) this.slowRuns = 0;
+      const auto = useSettings.getState().quality === 'auto';
+      if (avg > 22 && auto && !this.gaveUp) {
+        if (++this.slowRuns >= 2) {
+          this.slowRuns = 0;
+          if (stepDown() === null && avg > 30) { this.gaveUp = true; this.onGiveUp?.(); }
+          else this.resize();
+        }
+      } else this.slowRuns = 0;
     }
   }
+
+  /** The tier this stage is drawing at, for the settings screen. */
+  tier() { return currentTier(); }
 
   destroy() {
     const gl = this.gl;

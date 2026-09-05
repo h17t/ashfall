@@ -2,6 +2,7 @@ import { memo, useEffect, useRef, useSyncExternalStore } from 'react';
 import { Stage, type Snapshot } from './stage';
 import { subscribeEvents, useGame } from '@/ui/store';
 import { useSettings } from '@/ui/settings';
+import { onTierChange } from './quality';
 import { ZONE_ORDER } from '@/content';
 import { hasAsset } from '../../assets/manifest';
 import type { GameEvent } from '@/engine';
@@ -60,7 +61,11 @@ export const Vfx = memo(function Vfx() {
       stage.update(snap, now);
       raf = requestAnimationFrame(frame);
     };
-    raf = requestAnimationFrame(frame);
+    // rendering pauses while the page is hidden: the engine keeps ticking at 1Hz, the GPU sleeps
+    const onVis = () => { cancelAnimationFrame(raf); raf = 0; if (!document.hidden) raf = requestAnimationFrame(frame); };
+    document.addEventListener('visibilitychange', onVis);
+    if (!document.hidden) raf = requestAnimationFrame(frame);
+    const offTier = onTierChange(() => stage.resize());
     const unsub = subscribeEvents((events: GameEvent[]) => {
       const s = useGame.getState().state;
       const hpMax = Math.max(1, s.encounter.enemy?.hpMax.toNumber() ?? 1);
@@ -83,7 +88,7 @@ export const Vfx = memo(function Vfx() {
     const onMove = (ev: PointerEvent) => { const r = host.getBoundingClientRect(); stage.pointerTarget.x = Math.max(-1, Math.min(1, ((ev.clientX - r.left) / r.width - 0.5) * 2)); stage.pointerTarget.y = Math.max(-1, Math.min(1, (0.5 - (ev.clientY - r.top) / r.height) * 2)); };
     const onLeave = () => { stage.pointerTarget.x = 0; stage.pointerTarget.y = 0; };
     host.addEventListener('pointermove', onMove); host.addEventListener('pointerleave', onLeave);
-    return () => { cancelAnimationFrame(raf); unsub(); ro.disconnect(); host.removeEventListener('pointermove', onMove); host.removeEventListener('pointerleave', onLeave); stage.destroy(); if (stageRef.current === stage) stageRef.current = null; };
+    return () => { cancelAnimationFrame(raf); document.removeEventListener('visibilitychange', onVis); offTier(); unsub(); ro.disconnect(); host.removeEventListener('pointermove', onMove); host.removeEventListener('pointerleave', onLeave); stage.destroy(); if (stageRef.current === stage) stageRef.current = null; };
   }, []);
   return <canvas ref={ref} className="absolute inset-0 w-full h-full block" aria-hidden />;
 });

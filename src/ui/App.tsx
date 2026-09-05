@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { startLoop } from './loop';
 import { loadFromStorage, startAutosave, saveToStorage } from './persist';
 import { useSettings } from './settings';
 import { AwayReport } from './components/AwayReport';
 import { startHaptics } from './haptics';
+import { startPwa } from './pwa';
+import { InstallSheet } from './components/InstallSheet';
 import { useSwipe } from './shell/useSwipe';
 import { applyOffline, canRecruit, canSnuff, vestigePreview, canSever } from '@/engine';
 import { SHADES, BALANCE } from '@/content';
@@ -19,7 +21,8 @@ import { startAudio } from './audio';
 import { useHotkeys } from './hooks/useHotkeys';
 import { Grain } from '@/render/Grain';
 import { FireLight } from '@/render/FireLight';
-import { Cinema } from '@/render/cinematics/Cinema';
+// the cinematics carry gsap; they are not needed before the first lord or the first death, so they load after the shell
+const Cinema = lazy(() => import('@/render/cinematics/Cinema').then((m) => ({ default: m.Cinema })));
 import { LanternPanel } from './components/LanternPanel';
 import { WeaponsPanel } from './components/WeaponsPanel';
 import { MapPanel } from './components/MapPanel';
@@ -58,7 +61,8 @@ export default function App() {
     const stopSave = startAutosave();
     const stopAudio = startAudio();
     const stopHaptics = startHaptics();
-    return () => { stopLoop(); stopSave(); stopAudio(); stopHaptics(); };
+    const stopPwa = startPwa();
+    return () => { stopLoop(); stopSave(); stopAudio(); stopHaptics(); stopPwa(); };
   }, []);
   useHotkeys();
   const mainRef = useRef<HTMLDivElement>(null);
@@ -106,8 +110,9 @@ export default function App() {
     <div className={`shell shell-${layout} relative ${reduceFx ? 'reduce-fx' : ''}`}>
       <FireLight />
       <Grain />
-      <Cinema />
+      <Suspense fallback={null}><Cinema /></Suspense>
       <AwayReport />
+      <InstallSheet />
       <Fx />
       <Lantern />
       {layout !== 'portrait' && <Hints />}

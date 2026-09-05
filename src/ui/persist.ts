@@ -4,7 +4,7 @@
  * under a separate key so nothing is ever silently destroyed.
  */
 import { serialize, parseSave, applyOffline, newGame, SaveError, type GameState } from '@/engine';
-import { useGame } from './store';
+import { useGame, subscribeEvents } from './store';
 
 export const KEYS = { main: 'mournwake.save', backup: 'mournwake.backup', corrupt: 'mournwake.corrupt' } as const;
 /** the keys the game wrote before the rename; read once and carried over */
@@ -69,6 +69,10 @@ export function replaceState(state: GameState) {
   saveToStorage();
 }
 
+let soonTimer = 0;
+/** save within two seconds of a meaningful event, coalescing bursts */
+function saveSoon() { if (soonTimer) return; soonTimer = window.setTimeout(() => { soonTimer = 0; saveToStorage(); }, 2000); }
+
 export function startAutosave(): () => void {
   const id = window.setInterval(() => saveToStorage(), AUTOSAVE_MS);
   const onVis = () => { if (document.visibilityState === 'hidden') saveToStorage(); };
@@ -76,11 +80,17 @@ export function startAutosave(): () => void {
   document.addEventListener('visibilitychange', onVis);
   window.addEventListener('beforeunload', onUnload);
   window.addEventListener('pagehide', onUnload);
+  // a mobile OS may freeze the page without hiding it first, and kill it without either
+  document.addEventListener('freeze', onUnload);
+  const unsubEvents = subscribeEvents((events) => { if (events.some((e) => e.type === 'death' || e.type === 'bossKilled' || e.type === 'levelUp' || e.type === 'kill' || e.type === 'snuffed' || e.type === 'unlock')) saveSoon(); });
   return () => {
     window.clearInterval(id);
     document.removeEventListener('visibilitychange', onVis);
     window.removeEventListener('beforeunload', onUnload);
     window.removeEventListener('pagehide', onUnload);
+    document.removeEventListener('freeze', onUnload);
+    unsubEvents();
+    window.clearTimeout(soonTimer);
   };
 }
 

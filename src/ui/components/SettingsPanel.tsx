@@ -3,6 +3,7 @@ import { useGame, useSel } from '../store';
 import { useSettings } from '../settings';
 import { exportSave, importSave, SaveError, fmt, computeMods } from '@/engine';
 import { saveToStorage, hardDelete, replaceState } from '../persist';
+import { useTier, autoTierName, TIERS, type Tier } from '@/vfx/quality';
 
 export const SettingsPanel = memo(function SettingsPanel() {
   const st = useSettings();
@@ -36,6 +37,7 @@ export const SettingsPanel = memo(function SettingsPanel() {
           <option value="short">1.23M</option><option value="scientific">1.23e6</option><option value="engineering">1.23e6 (eng)</option>
         </select>
       </label>
+      <QualityRow />
       <Toggle label="Reduce effects (particles, shake, flashes)" value={st.reduceFx} onChange={(v) => st.set({ reduceFx: v })} />
       <Toggle label="Screen shake" value={st.screenShake} onChange={(v) => st.set({ screenShake: v })} />
       <Toggle label="Haptics (vibration on hits, the Reprisal window, death)" value={st.haptics} onChange={(v) => st.set({ haptics: v })} />
@@ -88,6 +90,31 @@ function Stats() {
       <span>Reprisals</span><span className="font-num text-parchment text-right">{fmt(reprisals)}</span>
       <span>Perfect dodges</span><span className="font-num text-parchment text-right">{fmt(perfect)}</span>
       <span>Time at the fire</span><span className="font-num text-parchment text-right">{Math.floor(play / 3600)}h {Math.floor((play % 3600) / 60)}m</span>
+    </div>
+  );
+}
+
+const TIER_LABEL: Record<Tier, string> = { cinematic: 'Cinematic', high: 'High', balanced: 'Balanced', battery: 'Battery' };
+const TIER_NOTE: Record<Tier, string> = {
+  cinematic: 'Full resolution, bloom, every mote. For a desktop or a flagship on charge.',
+  high: 'Bloom and most of the particles at 1.5x resolution.',
+  balanced: 'Native resolution, no bloom, half the particles. The phone default.',
+  battery: 'The picture without the weather: no grain, no ambient motes, short cinematics.',
+};
+function QualityRow() {
+  const pref = useSettings((s) => s.quality);
+  const set = useSettings((s) => s.set);
+  const tier = useTier();
+  const auto = autoTierName();
+  return (
+    <div className="flex flex-col gap-2 min-h-[48px]">
+      <div className="flex items-center justify-between gap-3"><span className="text-bone text-[16px]">Quality</span><span className="text-[13px] text-bone/70">{pref === 'auto' ? `Auto · ${TIER_LABEL[auto]}` : TIER_LABEL[tier]}</span></div>
+      <div className="seg seg-wrap" role="radiogroup" aria-label="Quality">
+        {(['auto', ...TIERS] as const).map((t) => (
+          <button key={t} role="radio" aria-checked={pref === t} className={`seg-btn ${pref === t ? 'is-on' : ''}`} onClick={() => set({ quality: t })}>{t === 'auto' ? 'Auto' : TIER_LABEL[t]}</button>
+        ))}
+      </div>
+      <div className="text-[13px] text-bone/70">{pref === 'auto' ? `Picked from what this device says about itself; steps down on its own if frames drop. Right now: ${TIER_LABEL[auto]}. ` : ''}{TIER_NOTE[tier]}</div>
     </div>
   );
 }

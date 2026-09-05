@@ -13,8 +13,11 @@ jobs:
         run: npm run typecheck && npm test && npm run lint:terms && npm run audit:hover
       - name: build
         run: npm run build
-      - name: touch-target audit at a phone viewport
+      - name: payload budget (shell gz, precache, time to playable on slow 4G at 4x CPU)
+        run: npm run audit:budget
+      - name: touch-target and interruption audits at a phone viewport
         run: |
           npx vite preview --port 4173 &
           sleep 3
           node tools/audit/touch-targets.mjs
+          node tools/audit/interrupt.mjs

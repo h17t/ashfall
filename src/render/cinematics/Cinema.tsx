@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { Sequencer } from './sequencer';
 import { subscribeEvents, useGame } from '@/ui/store';
 import { useSettings } from '@/ui/settings';
+import { knobs } from '@/vfx/quality';
 import { getBoss, getZone, ZONE_ORDER } from '@/content';
 import { fmt, type GameEvent } from '@/engine';
 import { stageRef } from '@/vfx/Vfx';
@@ -23,9 +24,7 @@ function markSeen(id: string) { try { const s = seenBosses(); s.add(id); localSt
 
 export const sequencer = new Sequencer();
 
-/** The Snuff panel records what the fire will take and keep just before it dispatches, so the ritual can read it. */
-let snuffLedger: { keep: string[]; lose: string[]; cycle: number } = { keep: [], lose: [], cycle: 0 };
-export function setSnuffLedger(l: { keep: string[]; lose: string[]; cycle: number }) { snuffLedger = l; }
+import { snuffLedgerNow } from './ledger';
 
 interface Card { title: string; sub?: string; text?: string; kind: 'boss' | 'phase' | 'region' | 'died' | 'stain' | 'snuff'; extra?: string; plate?: { kind: 'ui' | 'boss'; id: string }; keep?: string[]; lose?: string[]; cycle?: number }
 
@@ -39,7 +38,7 @@ export const Cinema = memo(function Cinema() {
   useEffect(() => {
     const off = sequencer.onChange((c) => { setPlaying(!!c); document.documentElement.classList.toggle('cine', !!c); });
     const q = (sel: string) => root.current!.querySelector(sel) as HTMLElement;
-    const speed = () => (reduce() ? 0.55 : 1);
+    const speed = () => (reduce() ? 0.55 : 1) * knobs().cinematic;
     const stage = () => stageRef.current;
 
     // commit the card synchronously so the timeline built right after finds its targets in the DOM
@@ -171,7 +170,7 @@ export const Cinema = memo(function Cinema() {
     const snuff = (vestige: string) => sequencer.enqueue({
       id: 'snuff', priority: 0, skippable: true,
       build: () => {
-        const L = snuffLedger;
+        const L = snuffLedgerNow();
         show({ kind: 'snuff', title: 'The flame is snuffed', text: `${vestige} Vestige gathered.`, plate: { kind: 'ui', id: 'lantern' }, keep: L.keep, lose: L.lose, cycle: L.cycle });
         const tl = gsap.timeline();
         const s = speed();

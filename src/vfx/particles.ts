@@ -12,6 +12,8 @@ const STRIDE = 8; // x y size r g b a seed
 
 export class Particles {
   readonly cap = CAP;
+  /** share of emits kept (a quality knob); ambient emitters scale their rate instead */
+  budget = 1;
   n = 0;
   x = new Float32Array(CAP); y = new Float32Array(CAP);
   vx = new Float32Array(CAP); vy = new Float32Array(CAP);
@@ -30,6 +32,7 @@ export class Particles {
 
   emit(o: { x: number; y: number; vx?: number; vy?: number; life: number; size: number; color: string | [number, number, number]; alpha?: number; drag?: number; grav?: number; wob?: number; blend?: Blend; shrink?: number }) {
     if (this.n >= CAP) return;
+    if (this.budget < 1 && this.rnd() > this.budget) return;
     const i = this.n++;
     const c = typeof o.color === 'string' ? toRgb(o.color) : o.color;
     this.x[i] = o.x; this.y[i] = o.y; this.vx[i] = o.vx ?? 0; this.vy[i] = o.vy ?? 0;

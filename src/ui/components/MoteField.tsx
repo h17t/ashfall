@@ -1,7 +1,9 @@
 import { memo, useMemo } from 'react';
+import { useTier, KNOBS } from '@/vfx/quality';
 
 /** Constant drifting motes. Pure CSS; hidden under reduce-effects. */
-export const MoteField = memo(function MoteField({ count = 28 }: { count?: number }) {
+export const MoteField = memo(function MoteField({ count: base = 28 }: { count?: number }) {
+  const count = Math.round(base * KNOBS[useTier()].motes);
   const motes = useMemo(() => Array.from({ length: count }, (_, i) => ({
     id: i,
     left: Math.random() * 100,
@@ -10,6 +12,7 @@ export const MoteField = memo(function MoteField({ count = 28 }: { count?: numbe
     delay: -Math.random() * 20,
     drift: (Math.random() - 0.5) * 120,
   })), [count]);
+  if (count === 0) return null;
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
       {motes.map((e) => (

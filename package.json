@@ -19,7 +19,10 @@
     "lint:terms": "tsx tools/lint/banned-terms.ts",
     "audit:touch": "node tools/audit/touch-targets.mjs",
     "audit:hover": "node tools/audit/hover.mjs",
-    "ci": "npm run typecheck && npm test && npm run lint:terms && npm run audit:hover && npm run build && (npx vite preview --port 4173 & sleep 3; node tools/audit/touch-targets.mjs; code=$?; kill %1; exit $code)"
+    "ci": "npm run typecheck && npm test && npm run lint:terms && npm run audit:hover && npm run build && npm run audit:budget && (npx vite preview --port 4173 & sleep 3; node tools/audit/touch-targets.mjs && node tools/audit/interrupt.mjs; code=$?; kill %1; exit $code)",
+    "audit:budget": "node tools/audit/budget.mjs",
+    "audit:interrupt": "node tools/audit/interrupt.mjs",
+    "pwa:icons": "tsx tools/pwa/icons.ts"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.3.0",
