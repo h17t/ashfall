@@ -32,6 +32,7 @@ registerSimExtension((view, params, mem, out) => {
   const patience = params.clickRate === 0 || params.clickUntil !== undefined ? 240 * 60 : 90 * 60;
   const stuck = (stuckFor > patience || (allBossesDead && stuckFor > 30 * 60)) && gain.gte(2);
   const doubling = s.stats.cycleBosses >= 4 && gain.gte(4) && gain.gte(s.prestige.vestigeTotal.add(1));
+  if (s.descent.run && (doubling || stuck)) { out.push({ type: 'descentWithdraw' }); return; }
   if (!canSnuff(s) && (doubling || stuck)) {
     out.push({ type: 'snuff' });
     mem.progressKey = -1;

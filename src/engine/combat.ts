@@ -5,6 +5,7 @@
 import { D, Decimal, ZERO, safe, decMin } from './num';
 import { rand, chance, pick } from './rng';
 import { BALANCE } from '@/content/balance';
+import { DESCENT_TIER, spawnDescentEnemy, descentOnKill, descentOnDeath, secondWind, runFx, floorTier } from './descent';
 import { getEnemy, getZone, getBoss, getWeapon, getSpell, globalTier, nextZone, cycleBossFor, BOSSES, WEAPONS } from '@/content';
 const getSpellSchool = (id: string) => getSpell(id).school;
 import type { AttackPattern, BossPhase, EnemyDef } from '@/content/types';
@@ -140,6 +141,7 @@ function emptyStatuses(): Record<StatusKey, { buildup: number; active: number; d
 
 /** Global tier of the current encounter, depth-aware for the Nadir. */
 export function gTier(state: GameState, zone: string, tier: number): number {
+  if (tier === DESCENT_TIER && state.descent.run) return floorTier(state, state.descent.run.floor);
   return globalTier(zone, tier, state.prestige.nadirDepth);
 }
 
@@ -149,6 +151,8 @@ export function wakingLevel(state: GameState, mods: Mods): number {
 
 export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
   const enc = state.encounter;
+  if (enc.tier === DESCENT_TIER && state.descent.run) { spawnDescentEnemy(state, mods, events); return; }
+  if (enc.tier === DESCENT_TIER) { enc.tier = 0; enc.zone = state.lantern; }
   const zone = getZone(enc.zone);
   const g = gTier(state, enc.zone, enc.tier);
   const ng = wakingLevel(state, mods);
@@ -410,8 +414,14 @@ export function playerAttack(state: GameState, mods: Mods, events: GameEvent[], 
     events.push({ type: 'exhausted' });
   }
   if (fromClick) state.stats.clicks++;
-  const crit = chance(state.rng, br.crit);
-  if (crit) dmg = dmg.mul(BALANCE.player.critMult);
+  const run = state.descent.run;
+  const rfx = run ? runFx(run) : null;
+  const crit = chance(state.rng, br.crit + (rfx?.crit ?? 0));
+  if (crit) dmg = dmg.mul(BALANCE.player.critMult * (rfx?.critDmg ?? 1));
+  if (run && rfx) {
+    if (!run.hitOnce) { run.hitOnce = true; dmg = dmg.mul(rfx.firstHit); }
+    if (crit && rfx.bleedOnCrit) applyStatus(state, mods, events, 'bleed', 30);
+  }
   const reprisal = enemy.reprisal > 0;
   if (reprisal) {
     dmg = dmg.mul(br.reprisal);
@@ -447,6 +457,7 @@ export function hurtPlayer(state: GameState, mods: Mods, events: GameEvent[], am
   events.push({ type: 'enemyAttack', dmg, dodged: false, perfect: false, attackId });
   if (p.hp <= 0) {
     p.hp = 0;
+    if (secondWind(state, events)) return false;
     playerDie(state, mods, events);
     return true;
   }
@@ -483,13 +494,17 @@ export function playerDie(state: GameState, mods: Mods, events: GameEvent[]) {
   const p = state.player;
   const enc = state.encounter;
   state.stats.deaths++;
-  const lost = state.marrow;
+  const onStair = !!state.descent.run;
+  if (onStair) descentOnDeath(state, events);
+  const lost = onStair ? ZERO : state.marrow; // on the stair the haul was the stake, never your own marrow
   // Losing a stain you hadn't reclaimed
-  if (state.remains && state.remains.marrow.gt(0)) {
+  if (!onStair && state.remains && state.remains.marrow.gt(0)) {
     events.push({ type: 'remainsLost', marrow: state.remains.marrow });
     state.stats.marrowLost = state.stats.marrowLost.add(state.remains.marrow);
   }
-  if (mods.noBloodstain) {
+  if (onStair) {
+    // nothing dropped: the road keeps whatever Remains already lay on it
+  } else if (mods.noBloodstain) {
     state.remains = null;
     state.stats.marrowLost = state.stats.marrowLost.add(lost);
   } else if (lost.gt(0)) {
@@ -497,7 +512,7 @@ export function playerDie(state: GameState, mods: Mods, events: GameEvent[]) {
   } else {
     state.remains = null;
   }
-  state.marrow = ZERO;
+  if (!onStair) state.marrow = ZERO;
   events.push({ type: 'death', marrowLost: lost });
   state.deathScreen = BALANCE.player.deathScreen;
   // Respawn at lantern
@@ -530,10 +545,11 @@ export function playerDie(state: GameState, mods: Mods, events: GameEvent[]) {
 export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
   const enc = state.encounter;
   const enemy = enc.enemy!;
+  const marrowMult = mods.marrow * buffMult(state.player.buffs, 'marrow');
+  if (state.descent.run && enc.tier === DESCENT_TIER) { descentOnKill(state, mods, events, enemy, marrowMult); return; }
   const zone = getZone(enc.zone);
   const g = gTier(state, enc.zone, enc.tier);
   const zp = state.zones[enc.zone];
-  const marrowMult = mods.marrow * buffMult(state.player.buffs, 'marrow');
   const marrow = safe(enemy.marrow.mul(marrowMult).floor());
   state.marrow = state.marrow.add(marrow);
   state.stats.marrowEarned = state.stats.marrowEarned.add(marrow);
@@ -716,6 +732,7 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
 
   // ---- spawn ----
   if (!enc.enemy) {
+    if (state.descent.run?.offer) return; // the stair waits for the choice
     enc.respawnIn -= dt;
     if (enc.respawnIn <= 0) spawnEnemy(state, mods, events);
     return;

@@ -20,6 +20,10 @@ export function checkUnlocks(state: GameState, mods: Mods, events: GameEvent[]) 
   if (!f.firstDeath && state.stats.deaths > 0) {
     f.firstDeath = true;
   }
+  if (!f.descentUnlocked && state.stats.bossKills >= 1) {
+    f.descentUnlocked = true;
+    events.push({ type: 'unlock', what: 'descent', text: 'Behind the lord\'s seat, a stair going down. The Stair: descend floor by floor, take what you can carry, and climb out before it takes you.' });
+  }
   if (!f.infusionUnlocked && (state.materials.pitchCoal ?? 0) > 0) {
     f.infusionUnlocked = true;
     events.push({ type: 'unlock', what: 'infusion', text: 'Cinder Coal: the lantern can now infuse weapons.' });

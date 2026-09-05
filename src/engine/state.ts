@@ -5,7 +5,7 @@ import { STARTING_WEAPON, ZONE_ORDER } from '@/content';
 import type { GameState, PlayerState, StatKey, ZoneProgress } from './types';
 import { playerHpMax, playerStaminaMax, playerFpMax } from './formulas';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 export function newZoneProgress(tierCount: number): ZoneProgress {
   return { kills: new Array(tierCount).fill(0), cleared: -1, bossKills: 0, secretKills: 0, cycleKills: 0, secretFound: false };
@@ -82,6 +82,7 @@ export function newGame(seed = 1): GameState {
     flags: {},
     deathScreen: 0,
     offline: null,
+    descent: { run: null, runs: 0, bestFloor: 0, bankedTotal: ZERO, last: null },
   };
 }
 

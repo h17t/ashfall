@@ -168,7 +168,8 @@ export function startAudio(): () => void {
         case 'bossPhase': if (e.phase === 0) toll('arrival'); else window.setTimeout(() => toll('phase'), 600); break;
         case 'snuffed': swell(5); break;
         case 'levelUp': case 'unlock': sfx.unlock(); break;
-        case 'remainsRecovered': sfx.recover(); break;
+        case 'remainsRecovered': case 'descentBanked': sfx.recover(); break;
+        case 'boonTaken': sfx.unlock(); break;
         case 'cast': sfx.cast(); break;
       }
     }

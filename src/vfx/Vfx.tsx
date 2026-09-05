@@ -20,8 +20,10 @@ export function setGlMode(m: 'gl' | 'dom') {
   document.documentElement.classList.toggle('perf-lite', m === 'dom');
   modeListeners.forEach((l) => l());
 }
+const subscribeMode = (l: () => void) => { modeListeners.add(l); return () => { modeListeners.delete(l); }; };
+const readMode = () => glMode;
 export function useGlMode(): 'gl' | 'dom' {
-  return useSyncExternalStore((l) => { modeListeners.add(l); return () => { modeListeners.delete(l); }; }, () => glMode);
+  return useSyncExternalStore(subscribeMode, readMode, readMode);
 }
 
 /**

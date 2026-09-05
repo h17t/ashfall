@@ -4,3 +4,4 @@ export * from './strategies';
 import './ext-shades';
 import './ext-magic';
 import './ext-prestige';
+import './ext-descent';

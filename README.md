@@ -30,7 +30,7 @@ npm run sim -- --hours 200 --strategies greedy,idle --seed 3 --verbose
 Layout:
 
 - `src/engine/` — pure, deterministic game logic. `step(state, dt, actions)` → `{ state, events }`. No DOM, no clock, seeded RNG. The simulator and the tests drive this directly.
-- `src/content/` — every enemy, boss, weapon, spell, creed, shade, tree node and zone as typed data with its own lore. Adding content never touches the engine; `validateContent()` fails the build on dangling references or placeholder text.
+- `src/content/` — every enemy, boss, weapon, spell, creed, shade, boon, tree node and zone as typed data with its own lore. Adding content never touches the engine; `validateContent()` fails the build on dangling references or placeholder text.
 - `src/sim/` — the balance harness and five scripted strategies (greedy, optimal, casual, idle, noclick).
 - `src/ui/` — React, rendering only. 10Hz fixed-timestep logic decoupled from render.
 

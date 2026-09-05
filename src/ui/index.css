@@ -342,3 +342,19 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* a segmented control that has to fit five choices on a phone: it wraps, and every choice is at least a thumb wide */
 .seg-wrap { display: flex; flex-wrap: wrap; gap: 8px; border: 0; }
 .seg-wrap .seg-btn { flex: 1 1 calc(33% - 8px); min-width: 96px; border: 1px solid var(--ash); }
+
+/* ---- the Stair ---- */
+.descent-strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; margin: 8px 0 0; border: 1px solid color-mix(in srgb, var(--wisp) 45%, transparent); background: linear-gradient(90deg, color-mix(in srgb, var(--wisp) 14%, var(--ink)), var(--ink)); }
+.descent-strip .info-mark { margin-left: 2px; }
+.boon-card { display: block; width: 100%; text-align: left; padding: 12px 14px; min-height: 96px; border: 1px solid var(--ash); background: color-mix(in srgb, var(--ink) 80%, transparent); color: var(--parchment); }
+.boon-card.rare { border-color: color-mix(in srgb, var(--wisp) 70%, var(--ash)); }
+.boon-card.epic { border-color: var(--ember); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ember) 40%, transparent); }
+.boon-card.is-on { background: color-mix(in srgb, var(--ember) 22%, var(--ink)); border-color: var(--ember-hot); }
+.boon-rarity { font-family: var(--font-num); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--bone); white-space: nowrap; }
+.boon-card.rare .boon-rarity, .boon-row.rare .boon-rarity { color: var(--wisp); }
+.boon-card.epic .boon-rarity, .boon-row.epic .boon-rarity { color: var(--ember-hot); }
+.boon-chip { display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px; border: 1px solid var(--ash); font-family: var(--font-display); font-size: 14px; color: var(--parchment); }
+.boon-chip.rare { border-color: var(--wisp); } .boon-chip.epic { border-color: var(--ember); }
+.boon-row { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 4px 10px; border-left: 2px solid var(--ash); }
+.boon-row.rare { border-left-color: var(--wisp); } .boon-row.epic { border-left-color: var(--ember); }
+.stat-tile { padding: 10px 6px; border: 1px solid color-mix(in srgb, var(--ash) 70%, transparent); }

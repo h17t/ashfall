@@ -6,6 +6,7 @@ import { newGame, SAVE_VERSION } from '../state';
 import { D } from '../num';
 
 const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v1.json'), 'utf8');
+const fixtureV2 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v2.json'), 'utf8');
 
 describe('save migration v1 → v2 (the rename)', () => {
   it('loads the pre-rename fixture and every value survives under its new key', () => {
@@ -49,7 +50,7 @@ describe('save migration v1 → v2 (the rename)', () => {
     for (const old of ['"souls"', '"bonfire"', '"estus', '"humanity', '"kindles"', '"sigil', '"covenant"', '"squad"', '"phantoms"', '"attuned"', '"poise"', '"stagger"', '"riposte"', '"bloodstain"', '"vig"', '"str"', 'hollowSword', 'soulArrow', 'titanite']) expect(json, old).not.toContain(old); // banned-terms: allow
   });
 
-  it('round-trips through the current serializer and stays version 2', () => {
+  it('round-trips through the current serializer and stays at the current version', () => {
     const s = parseSave(fixture);
     const again = parseSave(serialize(s, 1));
     expect(again.version).toBe(SAVE_VERSION);
@@ -58,10 +59,42 @@ describe('save migration v1 → v2 (the rename)', () => {
     expect(again.prestige.tree).toEqual(s.prestige.tree);
   });
 
-  it('a fresh v2 save round-trips exactly', () => {
+  it('a fresh save round-trips exactly', () => {
     const s = newGame(7); s.marrow = D(12345);
     const t = parseSave(serialize(s, 1));
     expect(t.marrow.toNumber()).toBe(12345); expect(t.version).toBe(SAVE_VERSION);
+  });
+});
+
+describe('save migration v2 → v3 (the Stair)', () => {
+  it('loads a v2 save made by a 50-minute greedy playthrough and every value survives', () => {
+    const raw = JSON.parse(fixtureV2);
+    expect(raw.v).toBe(2);
+    const s = parseSave(fixtureV2);
+    expect(s.version).toBe(SAVE_VERSION);
+    const before = raw.state;
+    expect(s.player.level).toBe(before.player.level);
+    expect(s.player.stats).toEqual(before.player.stats);
+    expect(s.marrow.toString()).toBe(before.marrow.replace('§D§', ''));
+    expect(s.stats.kills.toString()).toBe(before.stats.kills.replace('§D§', ''));
+    expect(s.stats.bossKills).toBe(before.stats.bossKills);
+    expect(s.unlockedZones).toEqual(before.unlockedZones);
+    expect(Object.keys(s.player.weapons).sort()).toEqual(Object.keys(before.player.weapons).sort());
+    expect(s.cortege.shades.map((p) => p.id)).toEqual(before.cortege.shades.map((p: any) => p.id));
+    expect(s.creed.current).toBe(before.creed.current);
+    expect(s.prestige.bossesEverKilled).toEqual(before.prestige.bossesEverKilled);
+    expect(s.materials).toEqual(before.materials);
+    // the new field arrives with its defaults
+    expect(s.descent).toEqual({ run: null, runs: 0, bestFloor: 0, bankedTotal: D(0), last: null });
+    expect(s.descent.bankedTotal.toNumber()).toBe(0);
+    // and every scalar of the old state is still there, untouched
+    const walk = (a: any, b: any, at: string) => {
+      if (a && typeof a === 'object' && !Array.isArray(a) && !('mantissa' in a)) { for (const k of Object.keys(a)) walk(a[k], b?.[k], at + '.' + k); return; }
+      if (typeof a === 'string' && a.startsWith('§D§')) { expect(String(b), at).toBe(a.slice(3)); return; }
+      if (Array.isArray(a)) { expect(JSON.stringify(b), at).toBe(JSON.stringify(a).replace(/§D§/g, '')); return; }
+      expect(b, at).toEqual(a);
+    };
+    walk({ ...before, version: undefined }, { ...JSON.parse(JSON.stringify(s)), version: undefined }, 'state');
   });
 });
 

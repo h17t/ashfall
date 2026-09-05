@@ -32,6 +32,7 @@ export function wakingName(wakings: number): string {
 }
 
 export function canSnuff(state: GameState): string | null {
+  if (state.descent.run) return 'You are on the stair. Climb out first.';
   if (state.stats.cycleBosses < 1) return 'The flame needs a lord\'s Keepsake to catch. Fell a region boss first.';
   if (vestigePreview(state).lt(BALANCE.prestige.minHumanity)) return 'Too little has burned. Snuffing now would gather no Vestige.';
   return null;

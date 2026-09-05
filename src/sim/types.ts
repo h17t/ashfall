@@ -59,4 +59,6 @@ export interface SimResult {
   stalls: Stall[];
   invariantErrors: string[];
   notes: string[];
+  /** the Stair: runs made, runs that died, best floor, marrow banked, and the median over banked runs of (the run's marrow per minute ÷ the road's marrow per minute since the previous run) */
+  descent: { runs: number; deaths: number; bestFloor: number; banked: string; ratio: number };
 }

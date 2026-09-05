@@ -26,6 +26,7 @@ export function threadsPreview(state: GameState, mods: Mods = computeMods(state)
 }
 
 export function canSever(state: GameState): string | null {
+  if (state.descent.run) return 'You are on the stair. Climb out first.';
   if (state.prestige.wakings < BALANCE.prestige.severingAt) return `The Severing opens in ${wakingName(BALANCE.prestige.severingAt)}. You are in ${wakingName(state.prestige.wakings)}.`;
   if (threadsPreview(state).lt(1)) return 'Not enough has been gathered to mark.';
   return null;
@@ -113,6 +114,7 @@ export function unmakingCost(state: GameState): Decimal {
 }
 
 export function canUnmake(state: GameState): string | null {
+  if (state.descent.run) return 'You are on the stair. Climb out first.';
   if (state.prestige.severings < BALANCE.prestige.ageOfDarkAt) return `The Unmaking begins after ${BALANCE.prestige.ageOfDarkAt} Severings. You have carved ${state.prestige.severings}.`;
   if (state.prestige.threads.lt(unmakingCost(state))) return `Requires ${unmakingCost(state).toString()} Severing Marks.`;
   return null;

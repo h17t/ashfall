@@ -16,3 +16,4 @@ export * from './magic';
 export * from './creeds';
 export * from './prestige';
 export * from './prestige2';
+export * from './descent';

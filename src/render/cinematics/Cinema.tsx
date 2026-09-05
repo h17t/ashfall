@@ -7,7 +7,7 @@ import { subscribeEvents, useGame } from '@/ui/store';
 import { useSettings } from '@/ui/settings';
 import { knobs } from '@/vfx/quality';
 import { getBoss, getZone, ZONE_ORDER } from '@/content';
-import { fmt, type GameEvent } from '@/engine';
+import { fmt, DESCENT_ZONE, type GameEvent } from '@/engine';
 import { stageRef } from '@/vfx/Vfx';
 import { Plate } from '@/render/Plate';
 import { asset } from '../../../assets/manifest';
@@ -220,7 +220,8 @@ export const Cinema = memo(function Cinema() {
 
     // events → cinematics; zone changes are read off the store since a quiet travel emits no event
     let lastZone = useGame.getState().state.encounter.zone;
-    const unsubZone = useGame.subscribe((g) => { const z = g.state.encounter.zone; if (z !== lastZone) { lastZone = z; if (ZONE_ORDER.includes(z)) region(z); } });
+    // the stair borrows a region's picture; walking down or climbing out is not arriving somewhere
+    const unsubZone = useGame.subscribe((g) => { const z = g.state.encounter.zone; if (z !== lastZone) { const fromStair = lastZone === DESCENT_ZONE; lastZone = z; if (ZONE_ORDER.includes(z) && !g.state.descent.run && !fromStair) region(z); } });
     const unsub = subscribeEvents((events: GameEvent[]) => {
       const s = useGame.getState().state;
       for (const e of events) {
@@ -230,7 +231,7 @@ export const Cinema = memo(function Cinema() {
           if (e.phase === 0) bossIntro(enemy.id);
           else phase(e.name, getBoss(enemy.id).phases[e.phase].text);
         }
-        if (e.type === 'death') died(e.marrowLost.gt(0) ? `${fmt(e.marrowLost)} marrow stain the ground where you fell.` : 'Nothing was lost but time.');
+        if (e.type === 'death') { const stair = events.find((x) => x.type === 'descentLost'); died(stair ? (stair.haul.gt(0) ? `The stair keeps ${fmt(stair.haul)} marrow of haul. Floor ${stair.floor}.` : `The stair took you on floor ${stair.floor}.`) : e.marrowLost.gt(0) ? `${fmt(e.marrowLost)} marrow stain the ground where you fell.` : 'Nothing was lost but time.'); }
         if (e.type === 'remainsRecovered') stain(fmt(e.marrow));
         if (e.type === 'snuffed') snuff(fmt(e.vestige));
       }

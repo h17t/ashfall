@@ -35,9 +35,9 @@ export const Encounter = memo(function Encounter() {
   const attackPct = useSel((s) => s.encounter.enemy ? Math.round((s.encounter.enemy.attackDamage / Math.max(1, s.player.hpMax)) * 100) : 0);
   const attackId = useSel((s) => s.encounter.enemy?.attackId ?? '');
   const zone = useSel((s) => s.encounter.zone);
-  const zoneName = useSel((s) => getZone(s.encounter.zone).name);
+  const zoneName = useSel((s) => (s.descent.run ? 'The Stair' : getZone(s.encounter.zone).name));
   const tier = useSel((s) => s.encounter.tier);
-  const tierName = useSel((s) => { const z = getZone(s.encounter.zone); return s.encounter.tier >= 0 ? z.tiers[s.encounter.tier].name : s.encounter.tier === -1 ? 'Boss Arena' : s.encounter.tier === -2 ? 'A hidden place' : 'Something new walks the road'; });
+  const tierName = useSel((s) => { const z = getZone(s.encounter.zone); return s.descent.run ? `Floor ${s.descent.run.floor}${s.descent.run.floor % 5 === 0 ? ' · a lord' : ''}` : s.encounter.tier >= 0 ? z.tiers[s.encounter.tier].name : s.encounter.tier === -1 ? 'Boss Arena' : s.encounter.tier === -2 ? 'A hidden place' : 'Something new walks the road'; });
   const phaseName = useSel((s) => (s.encounter.enemy?.isBoss ? getBoss(s.encounter.enemy.id).phases[s.encounter.enemy.phase].name : ''));
   const bossTitle = useSel((s) => (s.encounter.enemy?.isBoss ? getBoss(s.encounter.enemy.id).title : ''));
   const bossName = useSel((s) => (s.encounter.enemy?.isBoss ? getBoss(s.encounter.enemy.id).name : ''));

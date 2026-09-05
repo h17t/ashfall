@@ -1,0 +1,42 @@
+// The Stair, in four captures: the Stair page, the strip in Combat, the boon offer, the climb out.
+import { createRequire } from 'node:module';
+const require = createRequire('/opt/node22/lib/node_modules/');
+const { chromium } = require('playwright');
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+const page = await ctx.newPage();
+page.on('pageerror', (e) => console.log('PAGEERROR', e.stack?.split('\n').slice(0, 9).join(' / ')));
+await page.goto(process.env.URL ?? 'http://localhost:4173/', { waitUntil: 'networkidle' });
+await page.waitForTimeout(600);
+await page.evaluate(() => {
+  const g = __ashfall.getState(); const s = g.state; const D = s.marrow.constructor;
+  s.marrow = new D(48200); s.player.level = 34; s.player.stats.vit = 99; s.player.level = 300; s.stats.bossKills = 1; s.stats.deepestTier = 7; s.stats.cycleDeepest = 7;
+  s.prestige.bossesEverKilled = ['coldPyreWarden']; s.unlockedZones = ['tollroad', 'mire']; s.flags.descentUnlocked = true;
+  s.descent.runs = 3; s.descent.bestFloor = 7; s.descent.bankedTotal = new D(61400); s.descent.last = { floor: 7, banked: new D(23800), died: false, boons: ['graveMomentum', 'tallowEdge', 'firstCut', 'tallowEdge', 'leechWick', 'shortStair'] };
+  g.replace(s);
+});
+await page.getByRole('button', { name: /^Lantern$/ }).click(); await page.waitForTimeout(250);
+await page.getByRole('tab', { name: /^Stair/ }).click(); await page.waitForTimeout(400);
+await page.screenshot({ path: 'art/mobile/m5-stair.png' });
+await page.getByRole('button', { name: /^Descend/ }).click(); await page.waitForTimeout(200);
+await page.getByRole('button', { name: /^Combat$/ }).click(); await page.waitForTimeout(1600);
+await page.evaluate(() => { const g = __ashfall.getState(); const s = g.state; const D = s.marrow.constructor; if (s.descent.run) { s.descent.run.floor = 3; s.descent.run.haul = new D(6120); s.descent.run.kills = 1; s.descent.run.boons = ['graveMomentum', 'tallowEdge', 'keenEye']; s.descent.run.runKills = 9; } g.replace(s); });
+await page.waitForTimeout(500);
+await page.screenshot({ path: 'art/mobile/m5-strip.png' });
+// clear the floor: the enemy has one hit point left and the floor needs one more kill
+await page.evaluate(() => { const g = __ashfall.getState(); const s = g.state; const D = s.marrow.constructor; if (s.descent.run) s.descent.run.kills = 2; if (s.encounter.enemy) s.encounter.enemy.hp = new D(1); g.replace(s); g.dispatch({ type: 'click' }); });
+await page.waitForTimeout(700);
+await page.evaluate(() => { const g = __ashfall.getState(); const s = g.state; if (s.descent.run?.offer) { s.descent.run.offer = ['glassMarrow', 'leechWick', 'marrowGreed']; g.replace(s); } });
+await page.waitForTimeout(400);
+const offer = await page.getByRole('dialog', { name: /cleared/ }).isVisible().catch(() => false);
+console.log('boon sheet', offer);
+await page.getByRole('radio', { name: /Glass Marrow/ }).click(); await page.waitForTimeout(300);
+await page.screenshot({ path: 'art/mobile/m5-boons.png' });
+await page.getByRole('button', { name: /^Take Glass Marrow/ }).click(); await page.waitForTimeout(600);
+const floor = await page.evaluate(() => __ashfall.getState().state.descent.run?.floor);
+console.log('floor after taking', floor, 'run', await page.evaluate(() => JSON.stringify({ run: !!__ashfall.getState().state.descent.run, hp: __ashfall.getState().state.player.hp, strip: document.querySelectorAll('.descent-strip').length, buttons: [...document.querySelectorAll('button')].map((b) => b.getAttribute('aria-label') || b.textContent.trim()).filter((t) => /withdraw/i.test(t)) })));
+await page.getByRole('button', { name: /^Withdraw$/ }).click(); await page.waitForTimeout(700);
+const haul = await page.getByRole('dialog', { name: 'Climbed out' }).isVisible().catch(() => false);
+console.log('haul sheet', haul, 'marrow', await page.evaluate(() => __ashfall.getState().state.marrow.toString()));
+await page.screenshot({ path: 'art/mobile/m5-haul.png' });
+await browser.close();

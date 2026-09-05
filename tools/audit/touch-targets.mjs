@@ -19,7 +19,7 @@ await page.evaluate(() => {
   s.materials.wickStub = 1; s.materials.renderFat = 1; s.materials.reliquaryBone = 1; s.materials.pitchCoal = 1; s.flags.infusionUnlocked = true;
   s.player.weapons.weaverStaff = { id: 'weaverStaff', level: 0, infusion: 'none' }; s.spellsKnown = ['marrowDart']; s.player.recitationSlots = 1;
   s.cortege.recruited = ['aldric']; s.cortege.shades = [{ id: 'aldric', level: 2, xp: new D(0), assignment: 'beside', weapon: null, retreat: 0 }]; s.cortege.slots = 1;
-  s.keepsakes = { coldPyreWarden: 1 }; s.prestige.bossesEverKilled = ['coldPyreWarden']; s.stats.cycleBosses = 1; s.prestige.wakings = 6; s.prestige.severings = 1;
+  s.keepsakes = { coldPyreWarden: 1 }; s.prestige.bossesEverKilled = ['coldPyreWarden']; s.flags.descentUnlocked = true; s.descent.last = { floor: 4, banked: new D(100), died: false, boons: ['tallowEdge'] }; s.stats.cycleBosses = 1; s.prestige.wakings = 6; s.prestige.severings = 1;
   g.replace(s);
 });
 await page.waitForTimeout(300);
@@ -73,6 +73,18 @@ for (const p of pillars) {
     if (scrolled) { await page.waitForTimeout(120); total += await audit(where + ' (scrolled)'); }
   }
 }
+// the Stair: the strip in Combat and the boon offer, which is a sheet that cannot be dismissed
+await page.getByRole('button', { name: /^Combat$/ }).first().click();
+await page.evaluate(() => { const g = __ashfall.getState(); g.dispatch({ type: 'descend' }); const s = g.state; const D = s.marrow.constructor; s.descent.run.offer = ['glassMarrow', 'leechWick', 'marrowGreed']; s.descent.run.haul = new D(1000); g.replace(s); });
+await page.waitForTimeout(400);
+total += await audit('Combat/stair strip + boon sheet');
+await page.getByRole('radio', { name: /Glass Marrow/ }).click();
+await page.getByRole('button', { name: /^Take/ }).click();
+await page.waitForTimeout(300);
+total += await audit('Combat/stair strip');
+await page.getByRole('button', { name: /^Withdraw$/ }).click();
+await page.waitForTimeout(400);
+total += await audit('Combat/climbed out sheet');
 const uniq = [...new Set(problems)];
 for (const p of uniq) console.log(p);
 console.log(`touch targets: ${total} checked, ${uniq.length} problem${uniq.length === 1 ? '' : 's'}`);

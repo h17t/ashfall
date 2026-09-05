@@ -4,6 +4,7 @@
  */
 import { D, ZERO, safe } from './num';
 import { BALANCE } from '@/content/balance';
+import { runFx } from './descent';
 import { getZone, getWeapon, getBoss, getSpell, reinforceMaterial, cycleBossFor, WEAPONS, MATERIALS } from '@/content';
 import type { GameState, GameEvent, Action, StatKey } from './types';
 import { STAT_KEYS } from './types';
@@ -248,12 +249,13 @@ export function castSpell(state: GameState, mods: Mods, events: GameEvent[], id:
   const sp = getSpell(id);
   if (state.deathScreen > 0) return;
   if ((p.cooldowns[id] ?? 0) > 0) return;
-  if (p.fp < sp.fp) { events.push({ type: 'error', text: 'Not enough FP.' }); return; }
+  const free = state.descent.run ? runFx(state.descent.run).freeCasts > 0 : false;
+  if (!free && p.fp < sp.fp) { events.push({ type: 'error', text: 'Not enough FP.' }); return; }
   const enemy = state.encounter.enemy;
   const eff = sp.effect;
   const needsTarget = eff.kind === 'damage' || eff.kind === 'strainBomb' || eff.kind === 'dot' || eff.kind === 'status';
   if (needsTarget && (!enemy || enemy.hp.lte(0))) return;
-  p.fp -= sp.fp;
+  if (!free) p.fp -= sp.fp;
   p.cooldowns[id] = sp.cooldown;
   events.push({ type: 'cast', spell: id });
   const power = spellPower(state, mods, id);

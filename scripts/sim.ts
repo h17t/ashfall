@@ -22,17 +22,17 @@ for (const id of which) {
   if (!make) { console.error('unknown strategy', id); process.exit(1); }
   const r = runSim({ strategy: make(), seed, hours, verbose });
   results.push(r);
-  console.log(`${id.padEnd(8)} ${r.hours.toFixed(1)}h in ${r.wallMs}ms | firstBoss ${fmtTime(r.milestones.firstBoss)} | snuff ${fmtTime(r.milestones.firstKindle)} | L${r.finalLevel} deepest ${r.finalDeepest} Waking ${r.finalKindles} deaths ${r.deaths} | stalls ${r.stalls.length} inv ${r.invariantErrors.length}`);
+  console.log(`${id.padEnd(8)} ${r.hours.toFixed(1)}h in ${r.wallMs}ms | firstBoss ${fmtTime(r.milestones.firstBoss)} | snuff ${fmtTime(r.milestones.firstKindle)} | L${r.finalLevel} deepest ${r.finalDeepest} Waking ${r.finalKindles} deaths ${r.deaths} | stair ${r.descent.runs}/${r.descent.deaths}† best ${r.descent.bestFloor} pays ${r.descent.ratio.toFixed(2)}× | stalls ${r.stalls.length} inv ${r.invariantErrors.length}`);
 }
 
 const lines: string[] = [];
 lines.push(`### Run — ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC · ${hours}h · seed ${seed}`);
 lines.push('');
-lines.push('| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Snuff | Severing | Final L | Deepest | Waking  | Deaths | Stalls | Sim ms |');
-lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
+lines.push('| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Snuff | Severing | Final L | Deepest | Waking  | Deaths | Stalls | Stair runs (died) | Best floor | Stair pays (× road rate) | Sim ms |');
+lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
 for (const r of results) {
   const m = r.milestones;
-  lines.push(`| ${r.strategy} | ${fmtTime(m.autoAttack)} | ${fmtTime(m.firstDeath)} | ${fmtTime(m.firstBoss)} | ${fmtTime(m.regions[2] ?? null)} | ${fmtTime(m.regions[3] ?? null)} | ${fmtTime(m.firstKindle)} | ${fmtTime(m.firstSigil)} | ${r.finalLevel} | ${r.finalDeepest} | ${r.finalKindles} | ${r.deaths} | ${r.stalls.length} | ${r.wallMs} |`);
+  lines.push(`| ${r.strategy} | ${fmtTime(m.autoAttack)} | ${fmtTime(m.firstDeath)} | ${fmtTime(m.firstBoss)} | ${fmtTime(m.regions[2] ?? null)} | ${fmtTime(m.regions[3] ?? null)} | ${fmtTime(m.firstKindle)} | ${fmtTime(m.firstSigil)} | ${r.finalLevel} | ${r.finalDeepest} | ${r.finalKindles} | ${r.deaths} | ${r.stalls.length} | ${r.descent.runs} (${r.descent.deaths}) | ${r.descent.bestFloor} | ${r.descent.ratio.toFixed(2)} | ${r.wallMs} |`);
 }
 lines.push('');
 lines.push('Marrow earned per hour (first 12 buckets):');

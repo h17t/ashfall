@@ -295,6 +295,44 @@ export interface GameState {
   deathScreen: number;
   /** pending offline summary produced on load (cleared by UI ack) */
   offline: OfflineSummary | null;
+  /** the Stair */
+  descent: DescentState;
+}
+
+/** A Descent in progress: floor, the boons taken, the haul not yet banked. */
+export interface DescentRun {
+  floor: number;
+  /** kills made on this floor / kills the floor needs */
+  kills: number;
+  need: number;
+  /** boon ids taken, in order (repeats stack) */
+  boons: string[];
+  /** three boon ids on offer after a cleared floor; the run waits until one is chosen or the haul banked */
+  offer: string[] | null;
+  haul: Decimal;
+  haulMats: Record<string, number>;
+  /** where the player came from, restored on withdrawal */
+  from: { zone: string; tier: number };
+  /** seconds spent in this run and on this floor */
+  t: number;
+  floorT: number;
+  /** kills this run (momentum) */
+  runKills: number;
+  /** second-wind charges left */
+  secondWind: number;
+  /** whether the current enemy has been hit yet (First Cut) */
+  hitOnce: boolean;
+  /** seconds of Lantern-Oil left */
+  oilT: number;
+}
+
+export interface DescentState {
+  run: DescentRun | null;
+  runs: number;
+  bestFloor: number;
+  bankedTotal: Decimal;
+  /** the last run's outcome, for the Stair screen */
+  last: { floor: number; banked: Decimal; died: boolean; boons: string[] } | null;
 }
 
 export interface OfflineSummary {
@@ -345,7 +383,10 @@ export type Action =
   | { type: 'upgradeDraught'; kind: 'count' | 'potency' }
   | { type: 'respec'; stats: Record<StatKey, number> }
   | { type: 'ackOffline' }
-  | { type: 'ackDeath' };
+  | { type: 'ackDeath' }
+  | { type: 'descend' }
+  | { type: 'chooseBoon'; index: number }
+  | { type: 'descentWithdraw' };
 
 // ---------------- Events ----------------
 
@@ -370,4 +411,9 @@ export type GameEvent =
   | { type: 'cast'; spell: string }
   | { type: 'snuffed'; vestige: Decimal }
   | { type: 'notice'; text: string }
+  | { type: 'descentFloor'; floor: number }
+  | { type: 'descentOffer'; floor: number; boons: string[] }
+  | { type: 'boonTaken'; boon: string; floor: number }
+  | { type: 'descentBanked'; floor: number; haul: Decimal; mult: number; banked: Decimal }
+  | { type: 'descentLost'; floor: number; haul: Decimal }
   | { type: 'error'; text: string };

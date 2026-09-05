@@ -34,6 +34,8 @@ export interface PolicyParams {
   bossRetryLevels: number;
   /** avoid over-clicking during the Backdraft phase (learned vs. lazy) */
   respectsMechanics: boolean;
+  /** the Stair: when to descend, how deep, how much nerve (absent = never descends) */
+  descent?: { every: number; withdrawAt: number; nerve: number };
 }
 
 export interface PolicyMemory {
@@ -281,21 +283,36 @@ export const STRATEGIES: Record<string, () => Strategy> = {
     id: 'greedy', description: 'Clicks 4/s, dodges most telegraphs, pushes early, levels the weapon stat.',
     clickRate: 4, dodgeSkill: 0.85, perfectSkill: 0.5, riposteAware: true, estusAt: 0.4, retreatAt: 0.15,
     levelPlan: 'weaponBest', soulsReserve: 0, pushLead: 6, bossRetryLevels: 2, respectsMechanics: true,
+    descent: { every: 10 * 60, withdrawAt: 10, nerve: 0.35 },
+  }),
+  reckless: () => makePolicy({
+    id: 'reckless', description: 'Greedy who never climbs out: pushes the Stair until it kills them. The cost of pushing, measured.',
+    clickRate: 4, dodgeSkill: 0.85, perfectSkill: 0.5, riposteAware: true, estusAt: 0.4, retreatAt: 0.15,
+    levelPlan: 'weaponBest', soulsReserve: 0, pushLead: 6, bossRetryLevels: 2, respectsMechanics: true,
+    descent: { every: 8 * 60, withdrawAt: 40, nerve: 0.08 },
+  }),
+  nostair: () => makePolicy({
+    id: 'nostair', description: 'Greedy without ever taking the Stair: the control for the Descent economy.',
+    clickRate: 4, dodgeSkill: 0.85, perfectSkill: 0.5, riposteAware: true, estusAt: 0.4, retreatAt: 0.15,
+    levelPlan: 'weaponBest', soulsReserve: 0, pushLead: 6, bossRetryLevels: 2, respectsMechanics: true,
   }),
   optimal: () => makePolicy({
     id: 'optimal', description: 'Near-perfect play: rhythmic clicking, perfect dodges, respects boss mechanics.',
     clickRate: 4.5, dodgeSkill: 0.97, perfectSkill: 0.85, riposteAware: true, estusAt: 0.45, retreatAt: 0.2,
     levelPlan: 'weaponBest', soulsReserve: 0, pushLead: 5, bossRetryLevels: 1, respectsMechanics: true,
+    descent: { every: 8 * 60, withdrawAt: 14, nerve: 0.3 },
   }),
   casual: () => makePolicy({
     id: 'casual', description: 'Clicks 2/s, dodges half the time, over-levels before pushing, spams during bosses.',
     clickRate: 2, dodgeSkill: 0.5, perfectSkill: 0.2, riposteAware: true, estusAt: 0.35, retreatAt: 0.25,
     levelPlan: 'balanced', soulsReserve: 0, pushLead: 2, bossRetryLevels: 3, respectsMechanics: false,
+    descent: { every: 15 * 60, withdrawAt: 6, nerve: 0.5 },
   }),
   idle: () => makePolicy({
     id: 'idle', description: 'Clicks for the first 8 minutes to bootstrap, then relies on auto-attack and the cortege; only pushes when safely over-levelled.',
     clickRate: 2.5, clickUntil: 8 * 60, dodgeSkill: 0.3, perfectSkill: 0.1, riposteAware: false, estusAt: 0.4, retreatAt: 0.3,
     levelPlan: 'balanced', soulsReserve: 0, pushLead: -6, bossRetryLevels: 4, respectsMechanics: false,
+    descent: { every: 40 * 60, withdrawAt: 4, nerve: 0.6 },
   }),
   noclick: () => makePolicy({
     id: 'noclick', description: 'Never clicks. Measures the pure idle floor: auto-attack (from 6 min) and shades.',

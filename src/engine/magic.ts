@@ -6,6 +6,7 @@
 import { D, Decimal } from './num';
 import { getSpell, getWeapon, getZone, SPELLS, WEAPONS } from '@/content';
 import type { GameState, GameEvent, StatKey, SchoolKey } from './types';
+import { runFx } from './descent';
 import type { Mods } from './mods';
 import { statCurve } from './formulas';
 import { registerActionHandler } from './registry';
@@ -102,7 +103,7 @@ registerTickHook((state, mods, events) => {
       const id = p.recited[i];
       if (!id) continue;
       const sp = getSpell(id);
-      if ((p.cooldowns[id] ?? 0) > 0 || p.fp < sp.fp) continue;
+      if ((p.cooldowns[id] ?? 0) > 0 || (p.fp < sp.fp && !(state.descent.run && runFx(state.descent.run).freeCasts > 0))) continue;
       if (sp.effect.kind === 'heal' && p.hp > p.hpMax * 0.6) continue;
       castSpell(state, mods, events, id);
     }

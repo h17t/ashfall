@@ -17,21 +17,23 @@ interface Props {
   material?: 'parchment' | 'stone' | 'leather';
   /** a label for assistive tech when there is no visible title */
   label?: string;
+  /** false: no scrim tap, Escape, drag or close mark; the sheet's own buttons are the only way out */
+  dismissable?: boolean;
 }
 
-export function Sheet({ open, onClose, title, children, material = 'parchment', label }: Props) {
+export function Sheet({ open, onClose, title, children, material = 'parchment', label, dismissable = true }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState(0);
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && dismissable) onClose(); };
     window.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     ref.current?.focus();
     return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = prev; setDrag(0); };
-  }, [open, onClose]);
+  }, [open, onClose, dismissable]);
   // the drag: native touch listeners (passive: false) so a downward pull at the top of the inner
   // scroll follows the finger instead of becoming a document scroll and a pointercancel
   useEffect(() => {
@@ -45,23 +47,23 @@ export function Sheet({ open, onClose, title, children, material = 'parchment', 
       if (dy > 0) { e.preventDefault(); setDrag(dy); }
       else if (dy < -4) tracking = false;
     };
-    const onEnd = () => { if (!tracking) return; tracking = false; if (dy > 90) onClose(); else setDrag(0); };
+    const onEnd = () => { if (!tracking) return; tracking = false; if (dy > 90 && dismissable) onClose(); else setDrag(0); };
     el.addEventListener('touchstart', onStart, { passive: true });
     el.addEventListener('touchmove', onMove, { passive: false });
     el.addEventListener('touchend', onEnd); el.addEventListener('touchcancel', onEnd);
     return () => { el.removeEventListener('touchstart', onStart); el.removeEventListener('touchmove', onMove); el.removeEventListener('touchend', onEnd); el.removeEventListener('touchcancel', onEnd); };
-  }, [open, onClose]);
+  }, [open, onClose, dismissable]);
   if (!open || typeof document === 'undefined') return null;
   return createPortal(
     <div className="sheet-root fixed inset-0 z-[70]" role="presentation">
-      <div className="absolute inset-0 sheet-scrim" onClick={onClose} aria-hidden style={{ opacity: Math.max(0.2, 1 - drag / 300) }} />
+      <div className="absolute inset-0 sheet-scrim" onClick={dismissable ? onClose : undefined} aria-hidden style={{ opacity: Math.max(0.2, 1 - drag / 300) }} />
       <div ref={ref} className="sheet absolute inset-x-0 bottom-0 outline-none" role="dialog" aria-modal="true" aria-label={label ?? (typeof title === 'string' ? title : 'Details')} tabIndex={-1}
         style={{ transform: drag ? `translateY(${drag}px)` : undefined, transition: drag ? 'none' : undefined }}>
         <Slab material={material} seed="sheet" rough={7} ornament="none" shadow={false} outer="sheet-body" className="flex flex-col">
           <div className="sheet-grip mx-auto mt-2 mb-1" aria-hidden />
           <div className="flex items-start justify-between gap-3 px-5 pt-1">
             {title ? <div className="t-display text-[20px] leading-tight" style={{ color: material === 'parchment' ? 'var(--ink)' : 'var(--parchment)' }}>{title}</div> : <span />}
-            <button className="sheet-close t-num text-[22px] leading-none" onClick={onClose} aria-label="Close">×</button>
+            {dismissable ? <button className="sheet-close t-num text-[22px] leading-none" onClick={onClose} aria-label="Close">×</button> : <span />}
           </div>
           <div ref={scrollRef} className="sheet-scroll overflow-y-auto px-5 pb-6 pt-2 text-[16px] leading-snug">{children}</div>
         </Slab>

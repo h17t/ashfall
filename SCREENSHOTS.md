@@ -31,6 +31,8 @@ Captured headless at 1400×900 from the built game (`npm run build && npx vite p
 | ![Quality](art/mobile/m4-settings.png) | **Four quality tiers** and the detected one. |
 | ![Install](art/mobile/m4-install.png) | **Keep the Lantern**, offered once after the first lord. |
 | ![Landscape](art/mobile/m2-combat-landscape.png) | **A phone on its side.** |
+| ![The offer](art/mobile/m5-boons.png) | **The Stair's offer**: one of three boons, or the way out. |
+| ![The Stair](art/mobile/m5-stair.png) | **The Stair page**: the way down, the records, every boon. |
 
 ## The plates
 

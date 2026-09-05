@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { startLoop } from './loop';
 import { loadFromStorage, startAutosave, saveToStorage } from './persist';
 import { useSettings } from './settings';
@@ -6,6 +6,10 @@ import { AwayReport } from './components/AwayReport';
 import { startHaptics } from './haptics';
 import { startPwa } from './pwa';
 import { InstallSheet } from './components/InstallSheet';
+import { StairPanel } from './components/StairPanel';
+import { DescentStrip } from './components/DescentStrip';
+import { BoonSheet } from './components/BoonSheet';
+import { HaulSheet } from './components/HaulSheet';
 import { useSwipe } from './shell/useSwipe';
 import { applyOffline, canRecruit, canSnuff, vestigePreview, canSever } from '@/engine';
 import { SHADES, BALANCE } from '@/content';
@@ -21,8 +25,14 @@ import { startAudio } from './audio';
 import { useHotkeys } from './hooks/useHotkeys';
 import { Grain } from '@/render/Grain';
 import { FireLight } from '@/render/FireLight';
-// the cinematics carry gsap; they are not needed before the first lord or the first death, so they load after the shell
-const Cinema = lazy(() => import('@/render/cinematics/Cinema').then((m) => ({ default: m.Cinema })));
+// the cinematics carry gsap; they are not needed before the first lord or the first death, so the
+// chunk loads after the shell. Loaded by hand rather than React.lazy: a Suspense boundary that
+// suspends during a tap left a sibling's hook list half-built in production (React 19.2).
+function CinemaLoader() {
+  const [C, setC] = useState<ComponentType | null>(null);
+  useEffect(() => { let on = true; import('@/render/cinematics/Cinema').then((m) => { if (on) setC(() => m.Cinema); }); return () => { on = false; }; }, []);
+  return C ? <C /> : null;
+}
 import { LanternPanel } from './components/LanternPanel';
 import { WeaponsPanel } from './components/WeaponsPanel';
 import { MapPanel } from './components/MapPanel';
@@ -74,11 +84,14 @@ export default function App() {
   const snuffReady = useSel((s) => canSnuff(s) === null && vestigePreview(s).gte(s.prestige.vestigeTotal.mul(0.5).add(1)));
   const severingVisible = useSel((s) => s.prestige.wakings >= BALANCE.prestige.severingAt || s.prestige.severings > 0);
   const severingReady = useSel((s) => canSever(s) === null);
-  const badges = { cortege: recruitable, arsenal: keepsakeHeld, lantern: snuffReady || (severingVisible && severingReady) };
+  const stairVisible = useSel((s) => !!s.flags.descentUnlocked);
+  const stairNew = useSel((s) => !!s.flags.descentUnlocked && s.descent.runs === 0 && !s.descent.run);
+  const badges = { cortege: recruitable, arsenal: keepsakeHeld, lantern: snuffReady || (severingVisible && severingReady) || stairNew };
 
   const combat = (
     <>
       <Encounter />
+      <DescentStrip />
       {layout === 'portrait' ? <ActionBar /> : <div className="flex flex-col gap-3"><ActionBar /><AutomationBar /><Log /></div>}
     </>
   );
@@ -90,6 +103,7 @@ export default function App() {
     lantern: <Section id="lantern" tabs={[
       { id: 'rest', label: 'Rest', node: <LanternPanel /> },
       { id: 'road', label: 'Road', node: <MapPanel /> },
+      ...(stairVisible ? [{ id: 'stair', label: 'Stair', badge: stairNew, node: <StairPanel /> }] : []),
       { id: 'snuff', label: 'Snuff', badge: snuffReady, node: <SnuffPanel /> },
       ...(severingVisible ? [{ id: 'severing', label: 'Severing', badge: severingReady, node: <SeveringPanel /> }] : []),
       { id: 'lore', label: 'Lore', node: <BestiaryPanel /> },
@@ -110,9 +124,11 @@ export default function App() {
     <div className={`shell shell-${layout} relative ${reduceFx ? 'reduce-fx' : ''}`}>
       <FireLight />
       <Grain />
-      <Suspense fallback={null}><Cinema /></Suspense>
+      <CinemaLoader />
       <AwayReport />
       <InstallSheet />
+      <BoonSheet />
+      <HaulSheet />
       <Fx />
       <Lantern />
       {layout !== 'portrait' && <Hints />}
@@ -125,7 +141,7 @@ export default function App() {
           <div className="shell-main" ref={mainRef}>
             {pillar === 'combat' ? (
               <div className="flex flex-col flex-1 min-h-0">
-                <div className="px-2 flex flex-col"><Encounter /></div>
+                <div className="px-2 flex flex-col"><Encounter /><DescentStrip /></div>
                 <ActionBar />
                 <Section id="combat-extra"><AutomationBar /><div className="mt-3"><Log /></div></Section>
               </div>

@@ -248,3 +248,19 @@ Artifacts: `art/mobile/m4-settings.png` (the quality control), `art/mobile/m4-in
 **Payload.** `tools/audit/budget.mjs` serves `dist/` itself with gzip (a throttled test against `vite preview`, which sends raw bytes, measures nothing real), then fails the build if the shell is over 240 KB gzipped, the precache over 2.6 MB, or a tap on Strike takes longer than three seconds to land on a 390×844 phone over 1.6 Mbps with 150 ms of latency and the CPU slowed four times. Splitting the cinematics took the shell from 199 to 170 KB gzipped and the time to a landed strike from 2.5 to 2.3 s.
 
 **Reading the shots.** The quality control wraps to two rows of thumb-wide segments; the caption names the detected tier and what the chosen one costs. The install sheet uses the lantern plate and two 56px buttons. One thing to carry to the onboarding milestone: the first hint still says "click it (or press F)" on a phone.
+
+### Round 12 — Pass 3, Milestone 5 (the Stair)
+
+Artifacts: `art/mobile/m5-stair.png` (the Stair page), `art/mobile/m5-strip.png` (a run in Combat), `art/mobile/m5-boons.png` (the offer), `art/mobile/m5-haul.png` (the climb out), `scripts/shot-stair.mjs`.
+
+**The page.** A paragraph that says the whole rule, one wide Descend button that names what floor 1 will fight like, three tiles (descents, deepest floor, banked ever), the last run in a sentence, and every boon as a row with its rarity on the right and its lore behind a tap. The stair borrows the Nadir's picture for now; it gets its own in Milestone 10.
+
+**The strip.** Under the arena, above the hand: floor and kills on the first line with the boon count (tap for the list), the haul and what it banks on the second, Withdraw on the right at 48px. The first cut had the boon count in a tall box and the haul line truncated at "b..."; the box became text and the strip two lines.
+
+**The offer.** Stone, not parchment: it is a decision, not reading. Three cards tall enough for name, rule and lore, bordered by rarity (ash grey, wisp blue, the fire's orange); the chosen one fills. Two buttons at the thumb: Withdraw with the exact sum it banks, and Take with the boon's name. No close mark, no scrim tap, no drag: the stair waits. The Sheet grew a `dismissable` flag for it.
+
+**The climb out.** Haul, multiplier, banked in a ledger with the remains plate beside it; the boons carried as chips. The first capture showed ∞ for every number: the sheet was formatting a string as a Decimal.
+
+**Cinematics.** Walking down and climbing out no longer play a region card (the stair is not arriving anywhere), and Unmade. on the stair says what the stair kept.
+
+**A production-only crash.** Tapping a boon card crashed the page about half the time on a cold load, in the film-grain component, with React complaining about a hook's dependency list. It never reproduced in development or unminified. The grain read the quality tier through a store hook beside its effect; the tier hook is a plain subscription now and the GL-mode hook's functions are module constants. Four cold captures in a row are clean.

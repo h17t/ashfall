@@ -142,6 +142,32 @@ export const BALANCE = {
     minSeconds: 30,
   },
 
+  // ---- The Stair (Descent Runs) ----
+  descent: {
+    /** floor 1 sits this many global tiers under the deepest tier reached */
+    startBelow: 4,
+    /** global tiers of danger added per floor (a half: two floors per tier of the road) */
+    tierPerFloor: 0.5,
+    /** a kill pays like the road this many tiers under the cycle's deepest, times marrowPerFloor^(floor-1) */
+    marrowBelow: 5,
+    marrowPerFloor: 1.02,
+    /** Grave-Momentum and Patient Knife cannot multiply damage past these */
+    momentumCap: 8,
+    patienceCap: 2.5,
+    /** kills a floor needs */
+    killsPerFloor: 3,
+    /** every nth floor is a lord */
+    bossEvery: 5,
+    /** a floor lord's HP and marrow relative to the floor's tier (the road's lords are 30x / 40x) */
+    bossHpMult: 6,
+    bossMarrowMult: 15,
+    /** bank multiplier = 1 + bankPerFloor * (floor - 1) */
+    bankPerFloor: 0.06,
+    /** marrow per kill on the stair relative to the road at the same tier */
+    marrowMult: 1.0,
+    respawn: 1.0,
+  },
+
   // ---- Prestige ----
   prestige: {
     /** vestige = (cycleMarrow / divisor) ^ exponent * bossBonus */

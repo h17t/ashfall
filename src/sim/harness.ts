@@ -43,6 +43,11 @@ export function runSim(opts: SimOptions): SimResult {
   const t0 = Date.now();
   let prevKindles = 0;
   let prevSigils = 0;
+  let descentDeaths = 0;
+  let runEndEarned = state.stats.marrowEarned;
+  let runEndT = 0;
+  let runStartT = 0;
+  const runRatios: number[] = [];
 
   const view: SimView = { state, mods: computeMods(state), t: 0, rand: () => rand(decisionRng) };
 
@@ -77,9 +82,25 @@ export function runSim(opts: SimOptions): SimResult {
           if (e.level >= 100 && ms.level100 === null) ms.level100 = t;
           break;
         case 'snuffed':
+          runEndEarned = state.stats.marrowEarned; runEndT = t; // the road starts over; a run's payout is measured against this cycle's road
           if (ms.firstKindle === null) ms.firstKindle = t;
           ms.wakings.push(t);
           break;
+        case 'descentLost':
+          descentDeaths++;
+          runEndEarned = state.stats.marrowEarned; runEndT = t;
+          break;
+        case 'descentFloor':
+          if (e.floor === 1) runStartT = t;
+          break;
+        case 'descentBanked': {
+          // the run's income per minute against the road's income per minute since the last run
+          const road = state.stats.marrowEarned.sub(runEndEarned).sub(e.banked);
+          const roadMin = Math.max(0.5, (runStartT - runEndT) / 60), runMin = Math.max(0.1, (t - runStartT) / 60);
+          runRatios.push(road.gt(0) ? e.banked.div(runMin).div(road.div(roadMin)).toNumber() : 0);
+          runEndEarned = state.stats.marrowEarned; runEndT = t;
+          break;
+        }
         case 'error':
           break;
       }
@@ -133,6 +154,7 @@ export function runSim(opts: SimOptions): SimResult {
     stalls,
     invariantErrors,
     notes,
+    descent: { runs: state.descent.runs, deaths: descentDeaths, bestFloor: state.descent.bestFloor, banked: state.descent.bankedTotal.toString(), ratio: runRatios.length ? runRatios.slice().sort((a, b) => a - b)[Math.floor(runRatios.length / 2)] : 0 },
   };
 }
 

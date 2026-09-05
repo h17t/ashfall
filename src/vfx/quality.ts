@@ -4,7 +4,7 @@
  * budget, cinematic length. Auto picks a starting tier from what the device says about itself and
  * then steps down on sustained frame drops (never up, until the next launch).
  */
-import { useSyncExternalStore } from 'react';
+import { useEffect, useState } from 'react';
 import { useSettings } from '@/ui/settings';
 
 export type Tier = 'cinematic' | 'high' | 'balanced' | 'battery';
@@ -59,7 +59,13 @@ export function autoTierName(): Tier { if (!detected) currentTier(); return auto
 let lastPref: string | null = null;
 useSettings.subscribe((st) => { if (st.quality !== lastPref) { lastPref = st.quality; listeners.forEach((l) => l()); } });
 
-/** The effective tier, for React: re-renders on step-down and on a settings change. */
+/**
+ * The effective tier, for React: re-renders on step-down and on a settings change. A plain
+ * subscription rather than useSyncExternalStore: the store hook, used from a memoised component
+ * beside a useEffect, left that component's hook list inconsistent in production (React 19.2).
+ */
 export function useTier(): Tier {
-  return useSyncExternalStore((l) => onTierChange(l), currentTier, () => 'balanced' as Tier);
+  const [tier, setTier] = useState<Tier>(() => currentTier());
+  useEffect(() => { setTier(currentTier()); return onTierChange(() => setTier(currentTier())); }, []);
+  return tier;
 }

@@ -6,6 +6,8 @@
 import { CREEDS, TREE, SEVERING_UNLOCKS } from '@/content';
 import { BALANCE } from '@/content/balance';
 import type { GameState } from './types';
+import { runFx, runDamageMult } from './descent';
+import { BOONS } from '@/content';
 
 export interface Mods {
   dmg: number;
@@ -94,6 +96,18 @@ export function computeMods(state: GameState): Mods {
     m.marrow *= mult;
     m.humanityMult *= Math.pow(1.25, dl);
     add(`the Unmaking ${dl}`, `damage & marrow ×${mult.toFixed(2)}`);
+  }
+  // ---- the Stair: boons last the run ----
+  const run = state.descent?.run;
+  if (run) {
+    const fx = runFx(run);
+    const dmg = runDamageMult(run);
+    if (dmg !== 1) m.dmg *= dmg;
+    m.strain *= fx.strain; m.taken *= fx.taken; m.reprisalMult *= fx.reprisal; m.statusBuild *= fx.statusBuild; m.statusDmg *= fx.statusDmg;
+    m.stamRegen *= fx.stamRegen; m.dodgeCd *= fx.dodgeCd;
+    const seen = new Set<string>();
+    for (const id of run.boons) { if (seen.has(id)) continue; seen.add(id); const n = run.boons.filter((b) => b === id).length; add(`Boon: ${BOONS[id]?.name ?? id}${n > 1 ? ` ×${n}` : ''}`, BOONS[id]?.text ?? ''); }
+    if (fx.momentum > 0 && run.runKills > 0) add('Grave-Momentum', `damage ×${Math.pow(1 + fx.momentum, run.runKills).toFixed(2)} from ${run.runKills} kills`);
   }
   return m;
 }

@@ -10,10 +10,12 @@ import { SHADES } from './shades';
 import { CREEDS } from './creeds';
 import { TREE, SEVERING_UNLOCKS, BRANCH_INFO } from './tree';
 import { MATERIALS, reinforceMaterial } from './materials';
+import { BOONS, BOON_ORDER, RARITY_WEIGHT } from './boons';
 import { BALANCE } from './balance';
 import type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef } from './types';
 
-export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, SHADES, CREEDS, TREE, SEVERING_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial };
+export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, SHADES, CREEDS, TREE, SEVERING_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial, BOONS, BOON_ORDER, RARITY_WEIGHT };
+export type { BoonDef, BoonFx, BoonRarity } from './boons';
 export { UPCOMING_SPELLS } from './spells';
 export type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef };
 
@@ -102,6 +104,12 @@ export function validateContent(): string[] {
     for (const d of Object.keys(b.drops)) if (!MATERIALS[d]) errs.push(`boss ${b.id} drop ${d} missing`);
     if (b.phases.length === 0) errs.push(`boss ${b.id} has no phases`);
     if (b.phases[0]?.at !== 1) errs.push(`boss ${b.id} first phase must start at 1.0`);
+  }
+  for (const b of Object.values(BOONS)) {
+    if (!b.lore || b.lore.length < 30) errs.push(`boon ${b.id} lore too short`);
+    if (!b.text) errs.push(`boon ${b.id} has no text`);
+    if (b.stack < 1) errs.push(`boon ${b.id} stack < 1`);
+    if (Object.keys(b.fx).length === 0) errs.push(`boon ${b.id} does nothing`);
   }
   for (const e of Object.values(ENEMIES)) {
     for (const d of Object.keys(e.drops)) if (!MATERIALS[d]) errs.push(`enemy ${e.id} drop ${d} missing`);

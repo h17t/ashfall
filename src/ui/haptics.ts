@@ -47,7 +47,8 @@ export function startHaptics(): () => void {
         case 'enemyAttack': consider(e.dodged ? (e.perfect ? 'perfectDodge' : 'tap') : 'hurt'); break;
         case 'death': consider('unmade'); break;
         case 'bossKilled': consider('bossFelled'); break;
-        case 'levelUp': consider('levelUp'); break;
+        case 'levelUp': case 'boonTaken': consider('levelUp'); break;
+        case 'descentBanked': consider('bossFelled'); break;
       }
     }
     if (best) haptic(best);

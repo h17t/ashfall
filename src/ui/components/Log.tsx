@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { fmt, type GameEvent } from '@/engine';
-import { MATERIALS, getZone } from '@/content';
+import { MATERIALS, getZone, BOONS } from '@/content';
 import { Slab } from '@/render/materials/Slab';
 
 interface Line { id: number; text: string; cls: string; t: number }
@@ -33,6 +33,11 @@ export function Log() {
         case 'levelUp': break;
         case 'error': push(e.text, 'text-ash italic'); break;
         case 'notice': push(e.text); break;
+        case 'descentFloor': push(e.floor === 1 ? 'You take the stair down. Floor 1.' : `Floor ${e.floor}.`, 'text-wisp'); break;
+        case 'descentOffer': push(`Floor ${e.floor} cleared. The stair offers three boons, or the way out.`, 'text-ember-hot'); break;
+        case 'boonTaken': push(`${BOONS[e.boon]?.name ?? e.boon}: ${BOONS[e.boon]?.text ?? ''}`, 'text-ember-hot'); break;
+        case 'descentBanked': push(`You climb out from floor ${e.floor}. ${fmt(e.haul)} haul × ${e.mult.toFixed(2)} = ${fmt(e.banked)} marrow banked.`, 'text-verdigris'); break;
+        case 'descentLost': push(e.haul.gt(0) ? `The stair keeps ${fmt(e.haul)} marrow of haul. Floor ${e.floor}.` : `The stair took you on floor ${e.floor}.`, 'text-ember-hot'); break;
         case 'snuffed': push(`The flame is snuffed. ${fmt(e.vestige)} Vestige gathered.`, 'text-ember-hot'); break;
       }
     }
