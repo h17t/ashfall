@@ -12,7 +12,7 @@ import { ALL_ASSETS, type AssetEntry } from '../../assets/manifest';
 import { composePlate, type Plate } from './compose';
 import { findSubject } from './subjects';
 import { weaponPlate } from './weapons';
-import { spellPlate, covenantPlate, itemPlate, uiPlate } from './icons';
+import { spellPlate, covenantPlate, itemPlate, uiPlate, boonPlate, artPlate, affixPlate, setPlate, tollPlate } from './icons';
 import { regionLayers } from './regions';
 import { treat } from './treat';
 
@@ -37,6 +37,11 @@ function plateFor(e: AssetEntry): Plate | null {
     case 'creed': return covenantPlate(e.id, e.seed);
     case 'item': return itemPlate(e.id, e.seed);
     case 'ui': return uiPlate(e.id, e.seed);
+    case 'boon': return boonPlate(e.id, e.seed);
+    case 'art': return artPlate(e.id, e.seed);
+    case 'affix': return affixPlate(e.id, e.seed);
+    case 'set': return setPlate(e.id, e.seed);
+    case 'toll': return tollPlate(e.id, e.seed);
     default: return null;
   }
 }
@@ -63,7 +68,7 @@ async function buildOne(e: AssetEntry): Promise<'built' | 'cached' | 'skipped'> 
     if (!plate) throw new Error(`no plate builder for ${key}`);
     const svg = composePlate(plate);
     const png = new Resvg(svg, { fitTo: { mode: 'width', value: e.w * 2 } }).render().asPng();
-    const t = await treat(png, { seed: e.seed, tint: plate.tint ?? null, erode: e.kind === 'spell' || e.kind === 'item' ? 1 : 2 });
+    const t = await treat(png, { seed: e.seed, tint: plate.tint ?? null, erode: e.kind === 'spell' || e.kind === 'item' || e.kind === 'boon' || e.kind === 'art' || e.kind === 'affix' ? 1 : 2 });
     fs.writeFileSync(target, t.webp2x);
     fs.writeFileSync(path.join(OUT, e.files.x1), t.webp1x);
     if (e.files.mask) fs.writeFileSync(path.join(OUT, e.files.mask), t.mask);

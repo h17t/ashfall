@@ -44,7 +44,7 @@ export const Vfx = memo(function Vfx() {
     const frame = (now: number) => {
       const s = useGame.getState().state;
       const e = s.encounter.enemy;
-      const zone = ZONE_ORDER.includes(s.encounter.zone) ? s.encounter.zone : ZONE_ORDER[0];
+      const zone = s.descent.run ? 'stair' : ZONE_ORDER.includes(s.encounter.zone) ? s.encounter.zone : ZONE_ORDER[0];
       const kind = e ? (e.isBoss ? 'boss' : 'enemy') : null;
       snap.zone = zone;
       snap.kind = kind && hasAsset(kind, e!.id) ? kind : null;

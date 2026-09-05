@@ -3,9 +3,9 @@
  * One entry per asset: dimensions, anchor, and where it came from. Flipping `source` to
  * 'authored' and dropping a file in is the only change needed to replace procedural art.
  */
-import { ENEMIES, BOSSES, SHADES, WEAPONS, SPELLS, CREEDS, MATERIALS, ZONES, ZONE_ORDER } from '../src/content';
+import { ENEMIES, BOSSES, SHADES, WEAPONS, SPELLS, CREEDS, MATERIALS, ZONES, ZONE_ORDER, BOONS, ARTS, AFFIXES, SETS, TOLL_PHASES } from '../src/content';
 
-export type AssetKind = 'enemy' | 'boss' | 'shade' | 'weapon' | 'spell' | 'creed' | 'item' | 'region' | 'ui';
+export type AssetKind = 'enemy' | 'boss' | 'shade' | 'weapon' | 'spell' | 'creed' | 'item' | 'region' | 'ui' | 'boon' | 'art' | 'affix' | 'set' | 'toll';
 export type AssetSource = 'generated' | 'procedural' | 'authored';
 
 export interface AssetEntry {
@@ -46,6 +46,13 @@ for (const id of ZONE_ORDER) {
   void ZONES[id];
   put(entry('region', id, 1600, 900, { x: 0.5, y: 1 }, { layers: [0, 1, 2, 3].map((i) => `/art/region/${id}.L${i}@2x.webp`), files: { x2: `/art/region/${id}.L0@2x.webp`, x1: `/art/region/${id}.L0.webp` } }));
 }
+// pass 3: the Stair's own picture, boons, arts, affixes, sets, the hours
+put(entry('region', 'stair', 1600, 900, { x: 0.5, y: 1 }, { layers: [0, 1, 2, 3].map((i) => `/art/region/stair.L${i}@2x.webp`), files: { x2: '/art/region/stair.L0@2x.webp', x1: '/art/region/stair.L0.webp' } }));
+for (const id of Object.keys(BOONS)) put(entry('boon', id, 96, 96, { x: 0.5, y: 0.5 }));
+for (const a of Object.values(ARTS)) put(entry('art', a.id, 96, 96, { x: 0.5, y: 0.5 }));
+for (const id of Object.keys(AFFIXES)) put(entry('affix', id, 96, 96, { x: 0.5, y: 0.5 }));
+for (const id of Object.keys(SETS)) put(entry('set', id, 128, 128, { x: 0.5, y: 0.5 }));
+for (const p of TOLL_PHASES) put(entry('toll', p.id, 192, 96, { x: 0.5, y: 1 }));
 // UI materials: tileable grain, foxing, hatch, slab edges are SVG at runtime; the lantern plate is an asset.
 put(entry('ui', 'lantern', 320, 240, { x: 0.5, y: 0.9 }));
 put(entry('ui', 'remains', 128, 64, { x: 0.5, y: 0.5 }));

@@ -416,3 +416,12 @@ html.toll-dusk .arena-stage::after { content: ''; position: absolute; inset: 0; 
 .war-track { flex: 1; height: 8px; background: color-mix(in srgb, var(--ash) 35%, transparent); }
 .war-fill { display: block; height: 100%; }
 .act-art.is-on { box-shadow: inset 0 0 0 2px var(--ember-hot); }
+
+/* ---- pass 3 art hooks ---- */
+.boon-card { position: relative; padding-left: 74px; }
+.boon-icon { position: absolute; left: 10px; top: 14px; width: 54px; height: 54px; }
+.act-art-icon { width: 26px; height: 26px; margin: 0 auto; }
+.hour-tile { position: relative; overflow: hidden; }
+.hour-plate { position: absolute; inset: 0; opacity: 0.55; z-index: 0; }
+.hour-plate img { width: 100%; height: 100%; object-fit: cover; }
+.hour-tile > .t-display, .hour-tile > .t-num { position: relative; z-index: 1; text-shadow: 0 1px 2px var(--void), 0 0 6px var(--void); }

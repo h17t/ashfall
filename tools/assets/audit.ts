@@ -5,18 +5,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { ALL_ASSETS, MANIFEST } from '../../assets/manifest';
-import { ENEMIES, BOSSES, SHADES, WEAPONS, SPELLS, CREEDS, MATERIALS, ZONES } from '../../src/content';
+import { ENEMIES, BOSSES, SHADES, WEAPONS, SPELLS, CREEDS, MATERIALS, ZONES, BOONS, ARTS, AFFIXES, SETS, TOLL_PHASES } from '../../src/content';
 import { PALETTE } from './palette';
 
 const OUT = 'assets/generated';
-const MIN_BYTES: Record<string, number> = { enemy: 6000, boss: 9000, shade: 6000, weapon: 2500, spell: 1200, creed: 1800, item: 900, region: 12000, ui: 1500 };
+const MIN_BYTES: Record<string, number> = { enemy: 6000, boss: 9000, shade: 6000, weapon: 2500, spell: 1200, creed: 1800, item: 900, region: 12000, ui: 1500, boon: 1000, art: 1000, affix: 800, set: 1600, toll: 2500 };
 const MIN_LEVELS = 24;
 const MIN_SPREAD = 6;
 
 export async function auditAssets(): Promise<string[]> {
   const errs: string[] = [];
   // 1. every content entity has a manifest entry
-  const need: [string, string[]][] = [['enemy', Object.keys(ENEMIES)], ['boss', Object.keys(BOSSES)], ['shade', Object.keys(SHADES)], ['weapon', Object.keys(WEAPONS)], ['spell', Object.keys(SPELLS)], ['creed', Object.keys(CREEDS)], ['item', Object.keys(MATERIALS)], ['region', Object.keys(ZONES)]];
+  const need: [string, string[]][] = [['enemy', Object.keys(ENEMIES)], ['boss', Object.keys(BOSSES)], ['shade', Object.keys(SHADES)], ['weapon', Object.keys(WEAPONS)], ['spell', Object.keys(SPELLS)], ['creed', Object.keys(CREEDS)], ['item', Object.keys(MATERIALS)], ['region', [...Object.keys(ZONES), 'stair']], ['boon', Object.keys(BOONS)], ['art', Object.values(ARTS).map((a) => a.id)], ['affix', Object.keys(AFFIXES)], ['set', Object.keys(SETS)], ['toll', TOLL_PHASES.map((p) => p.id)]];
   for (const [kind, ids] of need) for (const id of ids) if (!MANIFEST[`${kind}:${id}`]) errs.push(`no manifest entry for ${kind}:${id}`);
   // 2. every manifest entry has files; files are illustrations, not fills
   for (const e of ALL_ASSETS) {

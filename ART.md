@@ -308,3 +308,19 @@ Artifacts: `art/mobile/m9-dispatch.png` (the three roads), `art/mobile/m9-holdfa
 **The war.** A board above the creeds: five bars scaled to the leader, yours in the fire's colour, the leader in gold, the round's remaining hours, the dominion holder and what your side pays for being where it is.
 
 **The Art.** A button in the recitation row with "Art" where the slot number goes and the Art's name; it lights when ready, carries its cooldown, and outlines itself while a stance or a stoking is live. Mastery sits under the weapon's infusions: rank, kills to the next, the Art's line and its power.
+
+### Round 17 — Pass 3, Milestone 10 (content and art for the new mechanics)
+
+Artifacts: `art/sheet-pass3.png` (55 plates: boons, arts, affixes, sets, the hours), refreshed `art/mobile/m5-boons.png`, `m5-strip.png` (the Stair's own picture behind the fight), `m7-forge.png`, `m8-toll.png`.
+
+**Boons.** Twenty-seven rings cut, not cast: rougher than a spell's ring, in the rarity's metal (bone, the wisp's blue, the fire), the rare and epic ones with a struck line, and a motif inside from the same vocabulary the spells use, so the language holds across the game. The first sheet had two motifs vanishing into the ink (a blood drop on black, a veil at half strength); both were lifted a step.
+
+**Arts.** Four square iron plates with the Art struck into them: three blades for Flurry, one for Crush, the oath for Reprisal Stance, a flame for Stoke. They sit on the hand's Art button at 26px and under the weapon at 40px and still read.
+
+**Affixes and sets.** An affix is a shard of slag with its set's light in it and a small motif; a set is an iron seal beside the creeds' wax, with two rings and the motif in the set's colour. Fifteen shards and five seals; the shard shape is one silhouette so a row of them reads as a family.
+
+**The hours.** Four horizon strips: the same ridge and two ruins, and the light where the hour keeps it: low left and pale at Dawn, high and gold by Day, low right and red at Dusk, a small blue moon and stars in the Black Hour. They sit behind the hour tiles at half strength.
+
+**The Stair.** Its own four layers now: one great descent through the centre of the frame, arches marching down with it, rubble at the feet, a wisp-blue light above and a lantern's ember below. The engine still calls the run's zone the Nadir; only the eye is told otherwise.
+
+**Words.** Every affix has a line of lore now, shown on the reforge sheet under its rule.

@@ -47,6 +47,7 @@ Captured headless at 1400×900 from the built game (`npm run build && npx vite p
 | ![Weapons](art/sheet-weapons.png) | Thirty-two weapons; enchanted blades carry a hot edge. |
 | ![Icons](art/sheet-icons.png) | Spell rings, creed seals, materials. |
 | ![Silhouettes](art/silhouettes.png) | The silhouette sheet at 100px: sixty-one subjects in pure ink. |
+| ![Pass 3](art/sheet-pass3.png) | Boons, Arts, affixes, sets and the hours of the Toll. |
 
 ## Bible sheets
 

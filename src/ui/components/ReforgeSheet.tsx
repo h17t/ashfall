@@ -5,19 +5,22 @@ import { forgeCost, canReforge, affixesOf, lockedOf, affixPool, fmt, D, type Gam
 import { AFFIXES, AFFIX_ORDER, MATERIALS, SETS, TIER_NAMES, getWeapon, BALANCE } from '@/content';
 import { useEvents } from '../hooks/useEvents';
 import { haptic } from '../haptics';
+import { Plate } from '@/render/Plate';
 
 /** One affix as a row: tier, name, what it does, and its lock. */
-export function AffixRow({ weapon, affix, tier, locked, canLock, onLock }: { weapon?: string; affix: string; tier: 1 | 2 | 3; locked: boolean; canLock?: boolean; onLock?: () => void }) {
+export function AffixRow({ weapon, affix, tier, locked, canLock, onLock, lore }: { weapon?: string; affix: string; tier: 1 | 2 | 3; locked: boolean; canLock?: boolean; onLock?: () => void; lore?: boolean }) {
   const d = AFFIXES[affix];
   if (!d) return null;
   const mag = d.mag[tier - 1];
   const val = d.stat === 'bleed' || d.stat === 'poison' || d.stat === 'frost' ? `+${mag}` : `${d.stat === 'taken' ? '−' : '+'}${Math.round(mag * 1000) / 10}%`;
   return (
     <div className={`affix-row t${tier} ${locked ? 'is-locked' : ''}`}>
+      <span className="w-9 h-9 shrink-0" aria-hidden><Plate kind="affix" id={affix} className="w-full h-full object-contain" /></span>
       <span className="affix-tier">{TIER_NAMES[tier]}</span>
       <span className="flex-1 min-w-0">
         <span className="t-display text-[16px]" style={{ color: 'var(--parchment)' }}>{d.name}</span>
         <span className="block text-[13px]" style={{ color: 'var(--bone)' }}>{d.text} {val} · {SETS[d.set].name}</span>
+        {lore && <span className="block text-[13px] italic mt-0.5" style={{ color: 'color-mix(in srgb, var(--bone) 75%, transparent)' }}>{d.lore}</span>}
       </span>
       {onLock && <button role="switch" aria-checked={locked} aria-label={`Lock ${d.name}${weapon ? ` on ${getWeapon(weapon).name}` : ''}`} className={`switch ${locked ? 'is-on' : ''}`} disabled={!locked && !canLock} onClick={onLock}><span className="switch-knob" aria-hidden /></button>}
     </div>
@@ -46,7 +49,7 @@ export const ReforgeSheet = memo(function ReforgeSheet({ weapon, onClose }: { we
         <p className="text-[14px] leading-snug" style={{ color: 'var(--bone)' }}>Three slots, rolled from what the Study has opened. Lock an affix to keep it through the next roll; each lock raises the price ×{BALANCE.forge.lockCostMult}. A locked affix never changes.</p>
         <div key={flash} className={`flex flex-col gap-1 ${flash ? 'forge-flash' : ''}`}>
           {list.length === 0 && <div className="text-[15px] italic" style={{ color: 'color-mix(in srgb, var(--bone) 70%, transparent)' }}>Bare steel. Nothing has been forged into it yet.</div>}
-          {list.map((a) => <AffixRow key={a.id} weapon={weapon} affix={a.id} tier={a.tier} locked={lockedIds.includes(a.id)} canLock={lockedIds.length < BALANCE.forge.maxLocked} onLock={() => { haptic('tap'); dispatch({ type: 'lockAffix', weapon, affix: a.id }); }} />)}
+          {list.map((a) => <AffixRow key={a.id} weapon={weapon} affix={a.id} tier={a.tier} locked={lockedIds.includes(a.id)} canLock={lockedIds.length < BALANCE.forge.maxLocked} lore onLock={() => { haptic('tap'); dispatch({ type: 'lockAffix', weapon, affix: a.id }); }} />)}
         </div>
         <div className="flex items-center justify-between text-[14px]" style={{ color: 'var(--bone)' }}>
           <span>Price</span>

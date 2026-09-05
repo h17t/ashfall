@@ -3,7 +3,7 @@ import type { Plate, Layer } from './compose';
 import { rng, blob, taper, jitter, flame, type Pt } from './svg-parts';
 import { humanoid } from './parts';
 import type { PaletteKey } from './palette';
-import { SPELLS, CREEDS, MATERIALS } from '../../src/content';
+import { SPELLS, CREEDS, MATERIALS, BOONS, AFFIXES, ARTS, SETS, TOLL_PHASES } from '../../src/content';
 
 const ring = (c: number, rad: number, r: ReturnType<typeof rng>, tone = 0.3): Layer[] => [
   { kind: 'mass', pts: blob(c, c, rad, rad, r, 0.06, 24), z: 1, tone },
@@ -127,4 +127,101 @@ export function uiPlate(id: string, seed: number): Plate {
   // revenant: the player, seen from behind-ish, holding an mote
   const L = humanoid(r, { head: 'hood', cloak: 0.9, weapon: { kind: 'sword', raised: false }, height: 1.05, bulk: 0.9, eyes: 'none', fx: [{ kind: 'glow', cx: 128 - 40, cy: 200, r: 26, color: 'emberHot', z: 9 }] });
   return { id, w: 256, h: 320, seed, tint: 'ember', layers: L };
+}
+
+
+// ---------------------------------------------------------------------------
+// Pass 3: boons, arts, affixes, sets, the hours
+// ---------------------------------------------------------------------------
+
+const BOON_MOTIF: Record<string, [string, PaletteKey]> = {
+  tallowEdge: ['sword', 'ember'], marrowGreed: ['orb', 'gold'], keenEye: ['crystal', 'parchment'], stoneComposure: ['ring', 'bone'], quickWick: ['flame', 'bone'], rendering: ['hand', 'ember'], saltedBlade: ['drop', 'verdigris'], coldBreath: ['mist', 'wisp'], gildedHands: ['hand', 'gold'],
+  leechWick: ['drop', 'bloodBright'], graveMomentum: ['arrows', 'ember'], patientKnife: ['spear', 'parchment'], thornedShroud: ['veil', 'bone'], reliquaryDraught: ['drop', 'emberHot'], wideReprisal: ['oath', 'ember'], firstCut: ['arrow', 'emberHot'], shortStair: ['step', 'wisp'], usurersBank: ['ring', 'gold'], openVein: ['drop', 'bloodBright'], woundDeepens: ['skull', 'verdigris'],
+  glassMarrow: ['crystal', 'wisp'], avarice: ['sun', 'gold'], secondWaking: ['lantern', 'emberHot'], severTheCost: ['ring', 'wisp'], critRot: ['skull', 'bloodBright'], lanternOil: ['flame', 'emberHot'], unendingWick: ['flame', 'wisp'],
+};
+/** A boon: a spell-like ring in the rarity's metal, the motif inside. */
+export function boonPlate(id: string, seed: number): Plate {
+  const r = rng(seed);
+  const c = 48;
+  const [m, color] = BOON_MOTIF[id] ?? ['orb', 'bone'];
+  const rarity = BOONS[id]?.rarity ?? 'common';
+  const tint: PaletteKey = rarity === 'epic' ? 'ember' : rarity === 'rare' ? 'wisp' : 'bone';
+  const L: Layer[] = [
+    // a rougher ring than a spell's: the stair's boons are cut, not cast
+    { kind: 'mass', pts: blob(c, c, 44, 44, r, rarity === 'epic' ? 0.14 : 0.1, 18), z: 1, tone: rarity === 'common' ? 0.35 : 0.2 },
+    { kind: 'detail', pts: blob(c, c, 37, 37, r, 0.06, 20), color: 'ink', alpha: 0.92, z: 2 },
+    ...(rarity !== 'common' ? [{ kind: 'line', pts: blob(c, c, 40, 40, r, 0.04, 20), width: rarity === 'epic' ? 2.2 : 1.4, z: 3 } as Layer] : []),
+    ...motif(m, c, r, color),
+  ];
+  return { id, w: 96, h: 96, seed, tint, fire: [0.2, 1.0], layers: L, bleed: 1.8 };
+}
+
+const ART_MOTIF: Record<string, [string, PaletteKey]> = { flurry: ['arrows', 'parchment'], crush: ['sword', 'ember'], stance: ['oath', 'wisp'], stoke: ['flame', 'emberHot'] };
+/** An Art: a square iron plate with the motif struck into it. */
+export function artPlate(id: string, seed: number): Plate {
+  const r = rng(seed);
+  const c = 48;
+  const [m, color] = ART_MOTIF[id] ?? ['sword', 'bone'];
+  const L: Layer[] = [
+    { kind: 'mass', pts: jitter([[c - 40, c - 40], [c + 40, c - 40], [c + 40, c + 40], [c - 40, c + 40]], r, 2.5), smooth: false, z: 1, tone: 0.3 },
+    { kind: 'detail', pts: jitter([[c - 33, c - 33], [c + 33, c - 33], [c + 33, c + 33], [c - 33, c + 33]], r, 1.5), color: 'ink', alpha: 0.9, smooth: false, z: 2 },
+    { kind: 'line', pts: jitter([[c - 36, c - 36], [c + 36, c - 36], [c + 36, c + 36], [c - 36, c + 36]], r, 1), width: 1.4, closed: true, smooth: false, z: 3 },
+    ...motif(m, c, r, color),
+  ];
+  void ARTS;
+  return { id, w: 96, h: 96, seed, tint: color === 'ember' || color === 'emberHot' ? 'ember' : 'wisp', fire: [0.2, 1.0], layers: L, bleed: 1.6 };
+}
+
+const AFFIX_MOTIF: Record<string, string> = { brutal: 'sword', hungry: 'orb', keen: 'crystal', heavy: 'hand', wounding: 'drop', venomed: 'drop', rimed: 'mist', swift: 'arrows', draining: 'drop', stalwart: 'ring', warding: 'veil', gilded: 'sun', vengeful: 'oath', breathing: 'flame', usurious: 'ring' };
+const SET_COLOR: Record<string, PaletteKey> = { usurer: 'gold', butcher: 'bloodBright', mason: 'bone', thief: 'parchment', wick: 'emberHot' };
+/** An affix: a shard of slag with its set's light in it and the motif cut small. */
+export function affixPlate(id: string, seed: number): Plate {
+  const r = rng(seed);
+  const c = 48;
+  const def = AFFIXES[id];
+  const color = SET_COLOR[def?.set ?? 'mason'] ?? 'bone';
+  const L: Layer[] = [
+    { kind: 'mass', pts: jitter([[c - 22, c + 34], [c - 30, c - 6], [c - 8, c - 36], [c + 26, c - 22], [c + 32, c + 14], [c + 10, c + 38]], r, 2.5), smooth: false, z: 1, tone: def?.set === 'butcher' ? 0.15 : 0.4 },
+    { kind: 'detail', pts: jitter([[c - 14, c + 22], [c - 20, c - 4], [c - 4, c - 26], [c + 18, c - 14], [c + 22, c + 10], [c + 6, c + 26]], r, 1.5), color: 'ink', alpha: 0.8, smooth: false, z: 2 },
+    { kind: 'glow', cx: c + 6, cy: c - 6, r: 16, color, z: 9 },
+    ...motif(AFFIX_MOTIF[id] ?? 'orb', c, r, color).map((l) => (l.kind === 'detail' ? { ...l, alpha: 0.75 } : l)),
+  ];
+  return { id, w: 96, h: 96, seed, tint: null, fire: [0.2, 1.0], layers: L, bleed: 1.6 };
+}
+
+const SET_MOTIF: Record<string, string> = { usurer: 'orb', butcher: 'skull', mason: 'ring', thief: 'crystal', wick: 'flame' };
+/** A set: an iron seal (the creeds' are wax), the motif in the set's light. */
+export function setPlate(id: string, seed: number): Plate {
+  const r = rng(seed);
+  const c = 64;
+  const color = SET_COLOR[id] ?? 'bone';
+  const L: Layer[] = [
+    { kind: 'mass', pts: blob(c, c + 2, 58, 56, r, 0.08, 28), z: 1, tone: 0.28 },
+    { kind: 'detail', pts: blob(c, c, 50, 48, r, 0.04, 26), color: 'ink', alpha: 0.85, z: 2 },
+    { kind: 'line', pts: blob(c, c, 44, 42, r, 0.03, 26), width: 1.6, z: 3 },
+    { kind: 'line', pts: blob(c, c, 54, 52, r, 0.03, 26), width: 1.1, z: 3 },
+    ...motif(SET_MOTIF[id] ?? 'ring', c, r, color),
+  ];
+  void SETS;
+  return { id, w: 128, h: 128, seed, tint: id === 'wick' ? 'ember' : id === 'butcher' ? 'blood' : null, fire: [0.2, 1.0], layers: L, bleed: 2 };
+}
+
+/** An hour of the Toll: a horizon strip, the light where the hour keeps it. */
+export function tollPlate(id: string, seed: number): Plate {
+  const r = rng(seed);
+  const W = 192, H = 96;
+  const ph = TOLL_PHASES.find((p) => p.id === id);
+  const L: Layer[] = [];
+  // far ridge, near ground, a ruin or two
+  L.push({ kind: 'mass', pts: [[0, H], [0, 58], ...Array.from({ length: 12 }, (_, i) => [i * (W / 11), 58 - r.range(0, 18)] as Pt), [W, 60], [W, H]], z: 1, tone: 0.5 });
+  L.push({ kind: 'mass', pts: [[0, H], [0, 76], ...Array.from({ length: 10 }, (_, i) => [i * (W / 9), 76 - r.range(0, 10)] as Pt), [W, 78], [W, H]], z: 2, tone: 0.2 });
+  L.push({ kind: 'mass', pts: jitter([[128, 78], [132, 34], [146, 30], [150, 78]], r, 1.5), smooth: false, z: 2, tone: 0.3 });
+  L.push({ kind: 'mass', pts: jitter([[40, 78], [46, 48], [60, 52], [58, 78]], r, 1.5), smooth: false, z: 2, tone: 0.35 });
+  if (id === 'dawn') { L.push({ kind: 'glow', cx: 30, cy: 60, r: 40, color: 'bone', z: 9 }); L.push({ kind: 'glow', cx: 30, cy: 60, r: 18, color: 'parchment', z: 9 }); }
+  else if (id === 'day') { L.push({ kind: 'glow', cx: 96, cy: 14, r: 44, color: 'gold', z: 9 }); L.push({ kind: 'glow', cx: 96, cy: 14, r: 18, color: 'parchment', z: 9 }); }
+  else if (id === 'dusk') { L.push({ kind: 'glow', cx: 166, cy: 62, r: 36, color: 'ember', z: 9 }); L.push({ kind: 'glow', cx: 60, cy: 70, r: 20, color: 'verdigris', z: 9 }); }
+  else { L.push({ kind: 'glow', cx: 96, cy: 40, r: 16, color: 'wisp', z: 9 }); for (let i = 0; i < 6; i++) L.push({ kind: 'detail', pts: blob(r.range(10, W - 10), r.range(6, 40), 1.6, 1.6, r, 0.2, 6), color: 'parchment', alpha: 0.7, z: 8 }); }
+  void ph;
+  const tint: PaletteKey | null = id === 'dawn' ? 'bone' : id === 'day' ? 'gold' : id === 'dusk' ? 'ember' : 'wisp';
+  return { id, w: W, h: H, seed, tint, fire: id === 'dawn' ? [0.15, 0.6] : id === 'dusk' ? [0.86, 0.65] : [0.5, 0.15], layers: L, bleed: 1.4 };
 }

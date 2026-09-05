@@ -117,6 +117,7 @@ export function validateContent(): string[] {
   for (const a of Object.values(AFFIXES)) {
     if (!SETS[a.set]) errs.push(`affix ${a.id} set ${a.set} missing`);
     if (a.mag.length !== 3 || !(a.mag[0] < a.mag[1] && a.mag[1] < a.mag[2])) errs.push(`affix ${a.id} tiers must climb`);
+    if (!a.lore || a.lore.length < 30) errs.push(`affix ${a.id} lore too short`);
     if (a.gate?.kind === 'creature' && !ENEMIES[a.gate.id ?? '']) errs.push(`affix ${a.id} gate creature missing`);
   }
   for (const a of Object.values(AFFLICTIONS)) if (!a.lore || a.lore.length < 30 || !a.cost || !a.gain) errs.push(`affliction ${a.id} incomplete`);

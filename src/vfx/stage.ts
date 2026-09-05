@@ -24,6 +24,7 @@ const AMBIENT: Record<string, Ambient> = {
   undercroft: { motes: 0, ash: 2, wisps: 5, heat: 0, moteColor: PAL.wisp },
   renderworks: { motes: 18, ash: 8, wisps: 0, heat: 0.7, moteColor: PAL.emberHot },
   nadir: { motes: 0, ash: 1, wisps: 8, heat: 0, moteColor: PAL.wisp },
+  stair: { motes: 2, ash: 3, wisps: 6, heat: 0.05, moteColor: PAL.wisp },
 };
 
 export interface Snapshot {

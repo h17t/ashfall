@@ -153,6 +153,14 @@ const STYLES: Record<string, RegionStyle> = {
     fore: (r) => [path(ground(r, 830, 40, 40)), path(blob(100, 880, 340, 200, r, 0.45, 22)), path(blob(1500, 900, 360, 220, r, 0.45, 22))],
     glow: [{ x: 780, y: 200, r: 90, color: 'wisp' }],
   },
+  stair: {
+    tint: 'wisp', sky: 'void',
+    // the Stair: one great descent through the centre, arches marching down with it, rubble at the feet
+    mid: (r) => [path(ground(r, 520, 60, 40)), ...stair(r, 900, 120, 30, 70, -1), ...stair(r, 560, 160, 26, 70, 1), arch(760, 180, 300, 520), arch(420, 120, 220, 560), arch(1140, 120, 220, 560)],
+    near: (r) => [path(ground(r, 700, 50, 40)), ...stair(r, 200, 460, 12, 130, 1), ...stair(r, 1400, 480, 12, 130, -1), path(blob(800, 720, 260, 90, r, 0.4, 20))],
+    fore: (r) => [path(ground(r, 840, 30, 40)), path(blob(140, 890, 320, 190, r, 0.45, 22)), path(blob(1480, 900, 340, 200, r, 0.45, 22)), ...stair(r, 700, 900, 6, 220, 1)],
+    glow: [{ x: 800, y: 260, r: 110, color: 'wisp' }, { x: 800, y: 620, r: 60, color: 'ember' }],
+  },
 };
 
 export const REGION_IDS = Object.keys(STYLES);

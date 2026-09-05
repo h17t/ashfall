@@ -64,7 +64,7 @@ function SetsRow() {
       <div className="flex flex-wrap gap-1">
         {(Object.keys(SETS) as SetId[]).filter((k) => p[k] > 0).map((k) => (
           <Tooltip key={k} tip={<div><div className="t-display text-[17px]">{SETS[k].name}</div><div className="text-[14px] italic mt-1" style={{ color: 'var(--bone)' }}>{SETS[k].lore}</div><ol className="mt-2 text-[14px] list-none flex flex-col gap-1">{SETS[k].bonus.map((b, i) => <li key={i} style={{ color: p[k] >= SET_PIECES[i] ? 'var(--parchment)' : 'color-mix(in srgb, var(--bone) 55%, transparent)' }}><span className="t-num">{SET_PIECES[i]}</span> · {b}</li>)}</ol></div>}>
-            <span className="boon-chip"><span className="t-display">{SETS[k].name}</span>&nbsp;<span className="t-num" style={{ color: setTier(p[k]) > 0 ? 'var(--ember-hot)' : 'var(--bone)' }}>{p[k]}</span></span>
+            <span className="boon-chip"><span className="w-6 h-6 -my-1 mr-1 inline-block" aria-hidden><Plate kind="set" id={k} className="w-full h-full object-contain" /></span><span className="t-display">{SETS[k].name}</span>&nbsp;<span className="t-num" style={{ color: setTier(p[k]) > 0 ? 'var(--ember-hot)' : 'var(--bone)' }}>{p[k]}</span></span>
           </Tooltip>
         ))}
       </div>
@@ -85,7 +85,7 @@ function Mastery({ id }: { id: string }) {
       <div className="flex items-center justify-between"><span className="t-label">Mastery · {MASTERY_RANK_NAMES[rank]}</span><span className="t-num text-[12px]" style={{ color: 'var(--bone)' }}>{kills}{next !== null ? `/${next}` : ''} kills · +{rank * 4}% damage</span></div>
       <div className="study-track"><div className="study-fill" style={{ width: `${Math.round(frac * 100)}%` }} /></div>
       <Tooltip tip={<div><div className="t-display text-[17px]">{art.name}</div><div className="text-[14px] mt-1" style={{ color: 'var(--parchment)' }}>{art.text}</div><div className="text-[14px] italic mt-2" style={{ color: 'var(--bone)' }}>{art.lore}</div><div className="t-label mt-2">{art.cooldown}s cooldown · opens at {MASTERY_RANKS[0]} kills · +15% power per rank after</div></div>}>
-        <div className="text-[14px]" style={{ color: rank >= 1 ? 'var(--parchment)' : 'color-mix(in srgb, var(--bone) 65%, transparent)' }}><span className="t-display">{art.name}</span> · {rank >= 1 ? `${art.text} Power ×${power.toFixed(2)}.` : `opens at ${MASTERY_RANKS[0]} kills with this weapon.`}</div>
+        <div className="flex items-center gap-2 text-[14px]" style={{ color: rank >= 1 ? 'var(--parchment)' : 'color-mix(in srgb, var(--bone) 65%, transparent)' }}><span className="w-10 h-10 shrink-0" style={{ opacity: rank >= 1 ? 1 : 0.5 }} aria-hidden><Plate kind="art" id={art.id} className="w-full h-full object-contain" /></span><span><span className="t-display">{art.name}</span> · {rank >= 1 ? `${art.text} Power ×${power.toFixed(2)}.` : `opens at ${MASTERY_RANKS[0]} kills with this weapon.`}</span></div>
       </Tooltip>
     </div>
   );

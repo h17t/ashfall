@@ -4,6 +4,7 @@ import { Sheet } from '../shell/Sheet';
 import { BOONS, type BoonRarity } from '@/content';
 import { bankedPreview, bankMult, fmt, D } from '@/engine';
 import { haptic } from '../haptics';
+import { Plate } from '@/render/Plate';
 
 const RARITY_LABEL: Record<BoonRarity, string> = { common: 'Common', rare: 'Rare', epic: 'Epic' };
 
@@ -42,6 +43,7 @@ export const BoonSheet = memo(function BoonSheet() {
             const on = picked === id;
             return (
               <button key={id} role="radio" aria-checked={on} className={`boon-card ${b.rarity} ${on ? 'is-on' : ''}`} onClick={() => { haptic('tap'); setPicked(id); }}>
+                <span className="boon-icon" aria-hidden><Plate kind="boon" id={id} className="w-full h-full object-contain" /></span>
                 <span className="flex items-baseline justify-between gap-2">
                   <span className="t-display text-[19px] leading-tight">{b.name}{counts[id] ? <span className="t-num text-[13px] ml-2" style={{ color: 'var(--bone)' }}>held ×{counts[id]}</span> : null}</span>
                   <span className="boon-rarity">{RARITY_LABEL[b.rarity]}</span>

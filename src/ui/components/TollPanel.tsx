@@ -4,6 +4,7 @@ import { tollPhase, tollRemaining, tollUntilBlack, tollFraction, hasAffliction, 
 import { TOLL_PHASES, TOLL_CYCLE_SECONDS, AFFLICTIONS, AFFLICTION_ORDER, CREEDS } from '@/content';
 import { Tooltip } from './Tooltip';
 import { haptic } from '../haptics';
+import { Plate } from '@/render/Plate';
 
 function mmss(s: number): string { const m = Math.floor(s / 60), r = Math.floor(s % 60); return `${m}:${String(r).padStart(2, '0')}`; }
 const PHASE_COLOR: Record<string, string> = { dawn: 'var(--bone)', day: 'var(--gold)', dusk: 'var(--verdigris)', black: 'var(--wisp)' };
@@ -66,7 +67,7 @@ export const TollPanel = memo(function TollPanel() {
         <div className="grid grid-cols-4 gap-1">
           {TOLL_PHASES.map((p) => (
             <Tooltip key={p.id} tip={<div><div className="t-display text-[17px]">{p.name}</div><div className="text-[14px] italic mt-1" style={{ color: 'var(--bone)' }}>{p.lore}</div><ul className="mt-2 text-[14px] flex flex-col gap-1">{p.effects.map((e) => <li key={e} className="flex gap-2 items-baseline"><span className="toll-bullet" style={{ background: PHASE_COLOR[p.id] }} />{e}</li>)}</ul><div className="t-label mt-2">{p.minutes} minutes of a {TOLL_CYCLE_SECONDS / 60} minute turn</div></div>}>
-              <div className={`hour-tile ${p.id === phaseId ? 'is-now' : ''}`} style={{ borderColor: PHASE_COLOR[p.id] }}><span className="t-display text-[14px]">{p.name.replace('The ', '')}</span><span className="t-num text-[11px]" style={{ color: 'var(--bone)' }}>{p.minutes}m</span></div>
+              <div className={`hour-tile ${p.id === phaseId ? 'is-now' : ''}`} style={{ borderColor: PHASE_COLOR[p.id] }}><span className="hour-plate" aria-hidden><Plate kind="toll" id={p.id} className="w-full h-full object-cover" /></span><span className="t-display text-[14px]">{p.name.replace('The ', '')}</span><span className="t-num text-[11px]" style={{ color: 'var(--bone)' }}>{p.minutes}m</span></div>
             </Tooltip>
           ))}
         </div>

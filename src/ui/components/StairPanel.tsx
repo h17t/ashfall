@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { useGame, useSel } from '../store';
+import { Plate } from '@/render/Plate';
 import { canDescend, floorTier, fmt, D } from '@/engine';
 import { BOONS, BOON_ORDER, type BoonRarity } from '@/content';
 import { Tooltip } from './Tooltip';
@@ -48,6 +49,7 @@ export const StairPanel = memo(function StairPanel() {
           {BOON_ORDER.map((id) => { const b = BOONS[id]; return (
             <Tooltip key={id} mode="wrap" tip={<div><div className="t-display text-[18px]">{b.name}</div><div className="text-[15px] mt-1" style={{ color: 'var(--parchment)' }}>{b.text}</div><div className="text-[14px] italic mt-2" style={{ color: 'var(--bone)' }}>{b.lore}</div><div className="t-label mt-2">{RARITY_LABEL[b.rarity]} · up to ×{b.stack} in a run</div></div>}>
               <div className={`boon-row ${b.rarity}`}>
+                <span className="w-9 h-9 shrink-0" aria-hidden><Plate kind="boon" id={id} className="w-full h-full object-contain" /></span>
                 <span className="t-display text-[16px]">{b.name}</span>
                 <span className="text-[13px] truncate flex-1" style={{ color: 'var(--bone)' }}>{b.text}</span>
                 <span className="boon-rarity">{RARITY_LABEL[b.rarity]}</span>

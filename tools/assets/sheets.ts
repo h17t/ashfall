@@ -26,3 +26,4 @@ await sheet(['enemy', 'shade'], 'art/sheet-enemies-parchment.png', 200, 270, 9, 
 await sheet(['boss'], 'art/sheet-bosses.png', 260, 330, 6, '#241E1A');
 await sheet(['weapon'], 'art/sheet-weapons.png', 180, 200, 8, '#241E1A');
 await sheet(['spell', 'creed', 'item', 'ui'], 'art/sheet-icons.png', 140, 160, 10, '#241E1A');
+await sheet(['boon', 'art', 'affix', 'set', 'toll'], 'art/sheet-pass3.png', 140, 160, 10, '#241E1A');

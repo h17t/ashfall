@@ -2,6 +2,7 @@ import { memo, useCallback } from 'react';
 import { useGame, useSel } from '../store';
 import { masteryRank, artFor, canArt } from '@/engine';
 import { getSpell } from '@/content';
+import { Plate } from '@/render/Plate';
 
 /**
  * The thumb zone. Everything the hand does often lives here: Strike (the big one), Dodge,
@@ -22,7 +23,7 @@ export const ActionBar = memo(function ActionBar() {
   const recited = useSel((s) => s.player.recited.join(','));
   const cds = useSel((s) => s.player.recited.map((id) => (id ? Math.ceil(s.player.cooldowns[id] ?? 0) : 0)).join(','));
   const fp = useSel((s) => Math.floor(s.player.fp));
-  const art = useSel((s) => { const inst = s.player.weapons[s.player.weapon]; if (masteryRank(inst) < 1) return ''; const a = artFor(s); return JSON.stringify({ name: a.name, cd: Math.ceil(s.player.artCd ?? 0), ready: canArt(s) === null, on: !!s.player.artBuff }); });
+  const art = useSel((s) => { const inst = s.player.weapons[s.player.weapon]; if (masteryRank(inst) < 1) return ''; const a = artFor(s); return JSON.stringify({ name: a.name, id: a.id, cd: Math.ceil(s.player.artCd ?? 0), ready: canArt(s) === null, on: !!s.player.artBuff }); });
   const strike = useCallback(() => dispatch({ type: 'click' }), [dispatch]);
   const ids = recited.split(',');
   const cdList = cds.split(',').map(Number);
@@ -30,9 +31,10 @@ export const ActionBar = memo(function ActionBar() {
     <div className="action-bar" role="group" aria-label="Actions">
       {(slots > 0 || art) && (
         <div className="action-spells" role="group" aria-label="Recitations and the Art">
-          {art && (() => { const a = JSON.parse(art) as { name: string; cd: number; ready: boolean; on: boolean }; return (
+          {art && (() => { const a = JSON.parse(art) as { name: string; cd: number; ready: boolean; on: boolean; id: string }; return (
             <button className={`act act-spell act-art ${a.ready ? 'is-ready' : ''} ${a.on ? 'is-on' : ''}`} disabled={!a.ready || dead} aria-label={`${a.name}${a.cd > 0 ? `, ${a.cd} seconds` : ''}`} onPointerDown={(e) => { e.preventDefault(); if (a.ready) dispatch({ type: 'art' }); }}>
               <span className="act-key">Art</span>
+              <span className="act-art-icon" aria-hidden><Plate kind="art" id={a.id} className="w-full h-full object-contain" /></span>
               <span className="act-name">{a.name}</span>
               {a.cd > 0 && <span className="act-cd t-num">{a.cd}s</span>}
             </button>

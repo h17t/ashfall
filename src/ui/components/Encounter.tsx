@@ -34,7 +34,7 @@ export const Encounter = memo(function Encounter() {
   const attackDmg = useSel((s) => s.encounter.enemy?.attackDamage ?? 0);
   const attackPct = useSel((s) => s.encounter.enemy ? Math.round((s.encounter.enemy.attackDamage / Math.max(1, s.player.hpMax)) * 100) : 0);
   const attackId = useSel((s) => s.encounter.enemy?.attackId ?? '');
-  const zone = useSel((s) => s.encounter.zone);
+  const zone = useSel((s) => (s.descent.run ? 'stair' : s.encounter.zone));
   const zoneName = useSel((s) => (s.descent.run ? 'The Stair' : getZone(s.encounter.zone).name));
   const hour = useSel((s) => tollPhase(s).name);
   const tier = useSel((s) => s.encounter.tier);
