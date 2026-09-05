@@ -12,6 +12,7 @@ const browser = await chromium.launch({ executablePath });
 const fail = [];
 for (const d of [{ name: 'upright', w: 390, h: 844 }, { name: 'sideways', w: 844, h: 390 }]) {
   const ctx = await browser.newContext({ viewport: { width: d.w, height: d.h }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
+  await ctx.addInitScript(() => { window.__lt = []; try { new PerformanceObserver((l) => { for (const e of l.getEntries()) if (e.duration > 300) window.__lt.push(`${Math.round(e.startTime / 1000)}s ${Math.round(e.duration)}ms`); }).observe({ entryTypes: ['longtask'] }); } catch { /* not every browser */ } });
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -56,7 +57,7 @@ for (const d of [{ name: 'upright', w: 390, h: 844 }, { name: 'sideways', w: 844
     if (!ok) refused++;
     tapped.set(pick, (tapped.get(pick) ?? 0) + 1);
     const took = Date.now() - tapAt;
-    if (took > 1500) slow.push(`${pick} ${took}ms ` + await page.evaluate(() => `[html: ${document.documentElement.className.trim() || '-'}; dialog: ${document.querySelector('[role="dialog"]')?.getAttribute('aria-label') ?? '-'}; hp ${Math.round(__ashfall.getState().state.player.hp)}]`));
+    if (took > 1500) slow.push(`${pick} ${took}ms ` + await page.evaluate(() => { const s = __ashfall.getState().state; return `[t=${Math.round(performance.now() / 1000)}s html: ${document.documentElement.className.trim() || '-'}; dialog: ${document.querySelector('[role="dialog"]')?.getAttribute('aria-label') ?? '-'}; hp ${Math.round(s.player.hp)}; deathScreen ${s.deathScreen}; enemy ${s.encounter.enemy?.id ?? '-'}]`; }));
     if (rnd() < 0.3) await page.evaluate(() => { const g = __ashfall.getState(); for (let t = 0; t < 10; t += 0.5) g.stepBy(0.5); });
     if (i % 25 === 0) {
       const bad = await page.evaluate((re) => { const m = document.body.innerText.match(new RegExp(re)); return m ? document.body.innerText.slice(Math.max(0, m.index - 40), m.index + 40).replace(/\s+/g, ' ') : null; }, BAD_TEXT.source);
@@ -68,6 +69,9 @@ for (const d of [{ name: 'upright', w: 390, h: 844 }, { name: 'sideways', w: 844
   for (const b of state.bad) fail.push(`${d.name}: the save carries a broken number at ${b}`);
   for (const e of errors) fail.push(`${d.name}: ${e}`);
   if (slow.length) console.log('  slow taps: ' + slow.slice(0, 8).join(', '));
+  const lt = await page.evaluate(() => window.__lt ?? []);
+  if (lt.length) console.log(`  long tasks over 300ms: ${lt.slice(0, 12).join(', ')}`);
+  for (const x of lt) { const ms = Number(x.split(' ')[1]); if (ms > 2000) fail.push(`${d.name}: the page froze for ${ms}ms at ${x.split(' ')[0]}`); }
   console.log('  most tapped: ' + [...tapped].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, v]) => `${k} ×${v}`).join(', '));
   console.log(`${d.name}: ${TAPS} taps on ${tapped.size} distinct controls, ${refused} refused, ${errors.length} errors, level ${state.level}, marrow ${state.marrow}, kills ${state.kills}`);
   await ctx.close();
