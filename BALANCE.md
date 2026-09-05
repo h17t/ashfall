@@ -104,7 +104,69 @@ Six hours, seed 7: `bold` (greedy under Thin Blood, Short Breath, Iron Composure
 
 Six hours, seed 7: greedy L111, 8 expeditions, 2 raids answered by the garrison, 31,875 war contribution, 1,063 Arts; bold L181, 9 expeditions into the dark with none lost this seed; idle L81, 2 expeditions, 14 raids never answered; casual 6 expeditions and 5 raids. Holdfasts show 0 at the end of every run because each strategy Snuffs and the holdfasts fall with the cycle. First Snuff greedy 0.91 h (floor 0.8 h holds).
 
+## Rev 9 — Pass 3, Milestone 11 (the closing run)
+
+Twelve hours, seed 7, every strategy, every mechanic on. First lord: greedy 6.4 min, casual 17 min, idle 1.4 h. First Snuff: greedy 54.5 min, optimal 53.5 min, casual 1.54 h, idle 5.19 h, authored 5.12 h, noclick 5.67 h. Final level: greedy 457, optimal 456, nostair 449, bold 417, casual 402, reckless 342, idle 172, authored 161, noclick 151. Deaths in twelve hours: optimal 1, greedy 3, idle 0, reckless 23. The Stair: 70 to 88 runs for the clicking strategies, none lost by the ones that climb out at ten, 18 of 87 lost by reckless. No stalls, no invariant violations, at septillion-scale marrow.
+
+Two notes for the next tuner. The skilled first Snuff has moved from 1.8 h (rev 3) to 0.9 h across the pass: the Study, the affixes, the Toll and the afflictions each added a little, and the pacing test's floor moved from 1 h to 0.8 h to say so; the brief's 3 to 7 h window remains a cadence the simulator does not model (it Snuffs the moment it is stuck) rather than a wall. And the "Stair pays" column now reads near zero for the clicking strategies because the income it is compared against includes the holdfasts and the expeditions that arrived after it was defined; the stair's own yield is unchanged from rev 4, and the column wants redefining against kill marrow alone before it is read again.
+
 ## Latest simulator run
+
+### Run — 2026-09-05 12:32 UTC · 12h · seed 7
+
+| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Snuff | Severing | Final L | Deepest | Waking  | Deaths | Stalls | Stair runs (died) | Best floor | Stair pays (× road rate) | Sim ms |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| greedy | 2.1m | 38.5m | 6.4m | 6.4m | 13.2m | 54.5m | 2.83h | 457 | 31 | 4 | 3 | 0 | 70 (0) | 10 | 0.00 | 33280 |
+| bold | 2.1m | 17.6m | 6.4m | 6.4m | 15.7m | 1.08h | 3.18h | 417 | 31 | 5 | 18 | 0 | 70 (1) | 10 | 0.00 | 32376 |
+| reckless | 2.1m | 7.8m | 6.4m | 6.4m | 17.9m | 1.40h | 3.42h | 342 | 31 | 5 | 23 | 0 | 87 (18) | 40 | 0.20 | 34158 |
+| nostair | 2.1m | 29.0m | 6.4m | 6.4m | 13.6m | 1.08h | 3.16h | 449 | 31 | 3 | 13 | 0 | 0 (0) | 0 | 0.00 | 30029 |
+| optimal | 2.4m | 2.58h | 7.2m | 7.2m | 18.0m | 53.5m | 2.88h | 456 | 31 | 6 | 1 | 0 | 88 (0) | 14 | 0.00 | 31229 |
+| casual | 6.0m | 2.91h | 17.0m | 17.0m | 32.0m | 1.54h | 4.17h | 402 | 31 | 6 | 11 | 0 | 46 (0) | 6 | 0.06 | 28727 |
+| idle | 6.0m | — | 1.40h | 1.40h | 2.09h | 5.19h | 8.54h | 172 | 30 | 3 | 0 | 0 | 16 (0) | 4 | 0.33 | 20668 |
+| authored | 6.0m | 5.91h | 1.99h | 1.99h | 2.35h | 5.12h | 8.32h | 161 | 29 | 3 | 1 | 0 | 15 (0) | 17 | 0.36 | 33983 |
+| noclick | 6.0m | 8.57h | 1.53h | 1.53h | 2.53h | 5.67h | 9.38h | 151 | 30 | 5 | 2 | 0 | 0 (0) | 0 | 0.00 | 20147 |
+
+Marrow earned per hour (first 12 buckets):
+
+| Strategy | h1 | h2 | h3 | h4 | h5 | h6 | h7 | h8 | h9 | h10 | h11 | h12 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| greedy | 6.63M | 633M | 25.0B | 150B | 44.3B | 877T | 9.90Qi | 5.65Sx | 1.32Sp | 25.8Sp | 76.6Sp |
+| bold | 3.94M | 107M | 15.6B | 32.4B | 92.2B | 6.93T | 13.3Qi | 5.98Sx | 2.01Sp | 59.9Sp | 198Sp |
+| reckless | 2.36M | 28.2M | 2.86B | 123B | 1.44T | 2.64T | 7.38T | 435Qa | 298Qi | 7.76Sx | 1.73Sp |
+| nostair | 4.98M | 146M | 9.33B | 18.3B | 86.5B | 201B | 75.1Qa | 18.7Qi | 2.27Sx | 271Sx | 10.5Sp |
+| optimal | 8.92M | 950M | 41.4B | 115B | 126B | 376T | 11.2Qi | 3.35Sx | 211Sx | 3.59Sp | 93.0Sp |
+| casual | 1.10M | 7.06M | 140M | 8.42B | 11.0B | 54.2B | 131B | 111T | 1.72Qi | 201Qi | 18.5Sx |
+| idle | 14.1K | 83.2K | 440K | 2.48M | 6.52M | 10.4M | 124M | 13.0B | 32.2B | 37.4B | 447B |
+| authored | 15.9K | 36.7K | 332K | 3.62M | 9.59M | 6.18M | 267M | 19.4B | 32.9B | 125B | 493B |
+| noclick | 8.66K | 51.2K | 490K | 2.28M | 6.26M | 12.7M | 15.0M | 2.99B | 26.4B | 35.1B | 227B |
+
+Expeditions, holdfasts, the war, the arts:
+
+- **greedy**: 8 expeditions (0 shades lost), 0 holdfasts held, 2 raids (0 repelled by hand), war contribution 85189, 2152 Arts used
+- **bold**: 9 expeditions (0 shades lost), 0 holdfasts held, 2 raids (0 repelled by hand), war contribution 83313, 2055 Arts used
+- **reckless**: 1 expeditions (0 shades lost), 0 holdfasts held, 5 raids (0 repelled by hand), war contribution 131346, 2153 Arts used
+- **nostair**: 1 expeditions (0 shades lost), 0 holdfasts held, 3 raids (0 repelled by hand), war contribution 65554, 2017 Arts used
+- **optimal**: 4 expeditions (0 shades lost), 0 holdfasts held, 2 raids (0 repelled by hand), war contribution 89744, 2120 Arts used
+- **casual**: 6 expeditions (0 shades lost), 0 holdfasts held, 5 raids (0 repelled by hand), war contribution 60580, 2160 Arts used
+- **idle**: 6 expeditions (0 shades lost), 0 holdfasts held, 14 raids (0 repelled by hand), war contribution 14888, 2387 Arts used
+- **authored**: 6 expeditions (0 shades lost), 0 holdfasts held, 0 raids (0 repelled by hand), war contribution 18029, 2449 Arts used
+- **noclick**: 6 expeditions (0 shades lost), 0 holdfasts held, 14 raids (0 repelled by hand), war contribution 14040, 2304 Arts used
+
+Bosses (first kill):
+
+- **greedy**: The Pyre-Warden 6.4m, The Fenwright 13.2m, The Archivist 28.3m, The Lantern-Warden 54.1m, The Keeper 1.97h, The Renderer 2.79h
+- **bold**: The Pyre-Warden 6.4m, The Fenwright 15.7m, The Archivist 37.3m, The Lantern-Warden 1.08h, The Keeper 2.31h, The Renderer 3.16h
+- **reckless**: The Pyre-Warden 6.4m, The Fenwright 17.9m, The Archivist 37.6m, The Lantern-Warden 1.39h, The Keeper 2.34h, The Renderer 3.42h
+- **nostair**: The Pyre-Warden 6.4m, The Fenwright 13.6m, The Archivist 31.8m, The Lantern-Warden 1.08h, The Keeper 2.15h, The Renderer 3.12h
+- **optimal**: The Pyre-Warden 7.2m, The Fenwright 18.0m, The Archivist 36.1m, The Lantern-Warden 53.5m, The Keeper 1.99h, The Renderer 2.81h
+- **casual**: The Pyre-Warden 17.0m, The Fenwright 32.0m, The Archivist 49.3m, The Lantern-Warden 1.54h, The Keeper 3.11h, The Renderer 4.14h
+- **idle**: The Pyre-Warden 1.40h, The Fenwright 2.09h, The Archivist 3.56h, The Lantern-Warden 5.19h, The Keeper 7.53h
+- **authored**: The Pyre-Warden 1.99h, The Fenwright 2.35h, The Archivist 3.44h, The Lantern-Warden 5.12h, The Keeper 7.24h
+- **noclick**: The Pyre-Warden 1.53h, The Fenwright 2.53h, The Archivist 3.66h, The Lantern-Warden 5.67h, The Keeper 7.77h
+
+Targets: first boss 6–16 min · first Snuff 3–7 h · first Severing 30–60 h · auto-attack by 10 min
+
+<details><summary>Previous runs</summary>
 
 ### Run — 2026-09-05 08:25 UTC · 12h · seed 7
 
@@ -150,7 +212,7 @@ Stalls (no progress event for 20+ min):
 
 Targets: first boss 6–16 min · first Snuff 3–7 h · first Severing 30–60 h · auto-attack by 10 min
 
-<details><summary>Previous runs</summary>
+---
 
 ### Run — 2026-09-05 08:08 UTC · 12h · seed 7
 
@@ -232,46 +294,6 @@ Bosses (first kill):
 Stalls (no progress event for 20+ min):
 
 - **reckless** stalled 11.86h from 8.6m at The Nadir tier -4 (cleared -1), level 18
-- **idle** stalled 26.8m from 7.32h at The Sanctum of the Vigil tier 4 (cleared 4), level 88
-- **noclick** stalled 22.3m from 9.17h at The Sanctum of the Vigil tier 4 (cleared 4), level 92
-
-Targets: first boss 6–16 min · first Snuff 3–7 h · first Severing 30–60 h · auto-attack by 10 min
-
----
-
-### Run — 2026-09-05 07:54 UTC · 12h · seed 7
-
-| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Snuff | Severing | Final L | Deepest | Waking  | Deaths | Stalls | Stair runs (died) | Best floor | A run pays (× road since last) | Sim ms |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| greedy | 3.1m | 2.90h | 8.6m | 8.6m | 18.5m | 1.10h | 3.20h | 396 | 31 | 7 | 5 | 0 | 68 (0) | 10 | 0.00 | 21541 |
-| nostair | 3.1m | 1.13h | 8.6m | 8.6m | 17.1m | 1.81h | 4.23h | 372 | 31 | 5 | 17 | 0 | 0 (0) | 0 | 0.00 | 14436 |
-| optimal | 3.7m | 2.66h | 9.4m | 9.4m | 20.8m | 1.00h | 3.42h | 406 | 31 | 7 | 1 | 0 | 84 (0) | 14 | 0.00 | 21525 |
-| casual | 6.0m | 3.84h | 17.7m | 17.7m | 34.5m | 2.02h | 5.38h | 259 | 31 | 5 | 19 | 0 | 44 (0) | 6 | 0.01 | 18069 |
-| idle | 6.0m | — | 2.34h | 2.34h | 3.07h | 8.92h | — | 110 | 21 | 3 | 0 | 1 | 14 (0) | 4 | 0.01 | 6786 |
-| noclick | 6.0m | — | 2.43h | 2.43h | 3.54h | 10.24h | — | 63 | 21 | 2 | 0 | 1 | 0 (0) | 0 | 0.00 | 6257 |
-
-Marrow earned per hour (first 12 buckets):
-
-| Strategy | h1 | h2 | h3 | h4 | h5 | h6 | h7 | h8 | h9 | h10 | h11 | h12 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| greedy | 6.66M | 118M | 7.68B | 22.0B | 48.0B | 60.9B | 1.07T | 29.9Qa | 4.68Qi | 1.64Sx | 21.5Sx |
-| nostair | 2.01M | 6.54M | 146M | 5.88B | 13.0B | 72.7B | 85.9B | 2.75T | 192Qa | 42.0Qi | 9.21Sx |
-| optimal | 8.23M | 364M | 51.8B | 90.6B | 57.4B | 208B | 54.4T | 1.02Qi | 760Qi | 18.1Sx | 359Sx |
-| casual | 392K | 6.09M | 10.3M | 343M | 5.10B | 12.9B | 13.2B | 20.6B | 78.0B | 1.64T | 11.8Qa |
-| idle | 11.3K | 27.4K | 66.9K | 235K | 456K | 2.20M | 3.75M | 3.72M | 4.12M | 1.05M | 10.3M |
-| noclick | 5.82K | 22.0K | 59.4K | 203K | 332K | 991K | 2.76M | 3.99M | 4.09M | 4.54M | 2.30M |
-
-Bosses (first kill):
-
-- **greedy**: The Pyre-Warden 8.6m, The Fenwright 18.5m, The Archivist 36.0m, The Lantern-Warden 1.10h, The Keeper 2.22h, The Renderer 4.77h
-- **nostair**: The Pyre-Warden 8.6m, The Fenwright 17.1m, The Archivist 34.9m, The Lantern-Warden 1.81h, The Keeper 3.13h, The Renderer 4.17h
-- **optimal**: The Pyre-Warden 9.4m, The Fenwright 20.8m, The Archivist 37.1m, The Lantern-Warden 59.8m, The Keeper 2.05h, The Renderer 3.03h
-- **casual**: The Pyre-Warden 17.7m, The Fenwright 34.5m, The Archivist 1.06h, The Lantern-Warden 2.01h, The Keeper 3.98h, The Renderer 5.28h
-- **idle**: The Pyre-Warden 2.34h, The Fenwright 3.07h, The Archivist 5.20h, The Lantern-Warden 8.91h
-- **noclick**: The Pyre-Warden 2.43h, The Fenwright 3.54h, The Archivist 6.20h, The Lantern-Warden 10.24h
-
-Stalls (no progress event for 20+ min):
-
 - **idle** stalled 26.8m from 7.32h at The Sanctum of the Vigil tier 4 (cleared 4), level 88
 - **noclick** stalled 22.3m from 9.17h at The Sanctum of the Vigil tier 4 (cleared 4), level 92
 

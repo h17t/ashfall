@@ -126,9 +126,9 @@ export const Encounter = memo(function Encounter() {
         <Gauge value={hpNum} max={hpMaxNum} tone={isBoss ? 'ember' : 'blood'} height={isBoss ? 14 : 11} />
         <Gauge value={broken ? composure : strain} max={composure} tone={broken ? 'ember' : 'bone'} height={4} cut={1} className="mt-1.5" />
         <div className="flex gap-4 mt-2 t-label min-h-[14px]">
-          {bleed > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--blood-bright)', marginRight: 6 }} />Bleed {Math.round(bleed)}%</span>}
-          {poison > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--verdigris)', marginRight: 6 }} />Poisoned {poison.toFixed(0)}s</span>}
-          {frost > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--wisp)', marginRight: 6 }} />Frostbitten {frost.toFixed(0)}s</span>}
+          {bleed > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden className="status-mark status-bleed" />Bleed {Math.round(bleed)}%</span>}
+          {poison > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden className="status-mark status-poison" />Poisoned {poison.toFixed(0)}s</span>}
+          {frost > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden className="status-mark status-frost" />Frostbitten {frost.toFixed(0)}s</span>}
           {isBoss && mechanicText && <span className="t-lore normal-case tracking-normal text-[14px] ml-auto text-right max-w-[70%]" style={{ letterSpacing: 0 }}>{mechanicText}</span>}
         </div>
       </div>

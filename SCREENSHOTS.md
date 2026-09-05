@@ -38,6 +38,18 @@ Captured headless at 1400×900 from the built game (`npm run build && npx vite p
 | ![The Toll](art/mobile/m8-toll.png) | **The Toll**: the dial, the hour, the afflictions. |
 | ![Dispatch](art/mobile/m9-dispatch.png) | **Dispatch**: three roads for a shade to walk. |
 
+## The device matrix
+
+| | |
+|---|---|
+| ![iPhone SE](art/devices/iphone-se.png) | **iPhone SE**, 375×667: the smallest phone the game is designed for. |
+| ![Galaxy S22](art/devices/galaxy-s22.png) | **Galaxy S22**, 360×780. |
+| ![iPad](art/devices/ipad.png) | **iPad**, upright: the phone shape, wider; sideways it is two columns. |
+| ![Desktop](art/devices/desktop.png) | **Desktop**, 1440×900. |
+
+| | |
+|---|---|
+
 ## The plates
 
 | | |

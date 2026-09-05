@@ -29,7 +29,7 @@ export const SnuffPanel = memo(function SnuffPanel() {
       <div className="border border-ash/50 p-2 text-[14px] flex flex-col gap-1">
         <div className="flex justify-between"><span className="text-bone/70">Vestige held</span><span className="font-num text-ember-hot">{fmt(D(vestige))}</span><span className="text-bone/70">of {fmt(D(total))} ever</span></div>
         <div className="flex justify-between"><span className="text-bone/70">This cycle</span><span className="font-num text-parchment">{fmt(D(cycleMarrow))} marrow · {cycleBosses} lords · {cycleTime} min</span></div>
-        <Tooltip tip="Vestige = (cycle marrow ÷ 5,000)^0.42 × 1.15 per lord felled × 1.06 per tier of depth reached × your Vestige bonuses. The curve is sub-linear: rendering twice as often gathers more than waiting twice as long.">
+        <Tooltip label="How Vestige is reckoned" tip="Vestige = (cycle marrow ÷ 5,000)^0.42 × 1.15 per lord felled × 1.06 per tier of depth reached × your Vestige bonuses. The curve is sub-linear: rendering twice as often gathers more than waiting twice as long.">
           <div className="flex justify-between cursor-help"><span className="text-bone/70">Snuffing now gathers</span><span className="font-num text-ember-hot text-[16px]">+{fmt(D(preview))} Vestige</span></div>
         </Tooltip>
       </div>
@@ -103,7 +103,7 @@ function Tree() {
                 const shape = isAuto ? '15,1 29,15 15,29 1,15' : '15,1 27,8 27,22 15,29 3,22 3,8';
                 return (
                   <div key={n.id} className="absolute flex flex-col items-center" style={{ left: p.x - COL / 2, top: p.y - 15, width: COL }}>
-                    <Tooltip tip={<div><div className="font-display text-[16px]">{n.name}</div><div>{n.desc}</div><div className="font-num mt-1" style={{ color: 'var(--ash)' }}>rank {rank}/{n.maxRank} · next costs {C[n.id]} Vestige{n.requires.length ? ` · requires ${n.requires.map((r) => TREE[r].name).join(', ')}` : ''}</div>{why && !maxed && <div className="mt-1" style={{ color: 'var(--blood)' }}>{why}</div>}</div>}>
+                    <Tooltip label={n.name} tip={<div><div className="font-display text-[16px]">{n.name}</div><div>{n.desc}</div><div className="font-num mt-1" style={{ color: 'var(--ash)' }}>rank {rank}/{n.maxRank} · next costs {C[n.id]} Vestige{n.requires.length ? ` · requires ${n.requires.map((r) => TREE[r].name).join(', ')}` : ''}</div>{why && !maxed && <div className="mt-1" style={{ color: 'var(--blood)' }}>{why}</div>}</div>}>
                       <button
                         className="block relative"
                         disabled={!!why}

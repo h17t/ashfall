@@ -14,7 +14,7 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
   - [x] M8 Afflictions and the Toll: eight stacking curses with a readout, a 40-minute world clock with four hours, creed hours, Black Hour spawns and pay, generous absence credit, save v6 + v5 fixture, bold sim strategy, BALANCE.md rev 7
   - [x] M9 stretch: Cortege Dispatch (three roads, Echoes), Holdfasts (claim, garrison, produce, raids), the Creed War (standings, underdog, dominion), Weapon Mastery (ranks, four Arts), save v7 + v6 fixture, sim extension, BALANCE.md rev 8
   - [x] M10 content and art for everything new: boon, art, affix, set and toll plates plus a stair region through the pipeline (audited, on art/sheet-pass3.png), affix lore, icons wired into every new screen
-  - [ ] M11 test and polish: device matrix, audits, onboarding, accessibility, QA.md, balance
+  - [x] M11 test and polish: device matrix (six profiles, screenshots), accessibility and contrast audit, PWA manifest audit, touch-aware onboarding hints, plain type and colour-safe statuses, QA.md, final 12h balance run
 - **Pass 2 (art direction & presentation) complete.** Engine untouched; all 102 engine/UI tests pass unchanged. See ART.md for the bible and the review log.
   - [x] M1 audit & bible (ART.md, palette/type/silhouette sheets, mockups A/B/C)
   - [x] M2 pipeline: tools/assets, treatment chain, manifest, audit wired into `npm test`; 153 plates built

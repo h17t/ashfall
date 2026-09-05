@@ -12,6 +12,10 @@ export interface Settings {
   /** VFX quality tier; auto picks from the device and steps down on frame drops */
   quality: 'auto' | 'cinematic' | 'high' | 'balanced' | 'battery';
   showTutorial: boolean;
+  /** a plain humanist face with wider spacing, for dyslexic readers */
+  plainType: boolean;
+  /** a status palette that does not lean on red against green */
+  colorblind: boolean;
   set: (patch: Partial<Omit<Settings, 'set'>>) => void;
 }
 
@@ -35,6 +39,8 @@ export const useSettings = create<Settings>((set, get) => ({
   haptics: true,
   quality: 'auto',
   showTutorial: true,
+  plainType: false,
+  colorblind: false,
   ...load(),
   set: (patch) => {
     set(patch);

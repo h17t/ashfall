@@ -324,3 +324,17 @@ Artifacts: `art/sheet-pass3.png` (55 plates: boons, arts, affixes, sets, the hou
 **The Stair.** Its own four layers now: one great descent through the centre of the frame, arches marching down with it, rubble at the feet, a wisp-blue light above and a lantern's glow below. The engine still calls the run's zone the Nadir; only the eye is told otherwise.
 
 **Words.** Every affix has a line of lore now, shown on the reforge sheet under its rule.
+
+### Round 18 — Pass 3, Milestone 11 (test and polish)
+
+Artifacts: `art/devices/iphone-se.png`, `iphone-14.png`, `pixel-7.png`, `galaxy-s22.png`, `ipad.png`, `desktop.png` (the device matrix, each after the critical path), `QA.md`.
+
+**Six devices.** The matrix runs load, a landed strike, a level at the Lantern, the settings page and the way back to combat on each profile, screenshots it, and fails on a page error, a missing control, a wrong layout or a page that scrolls sideways. Its first run found three things no phone screenshot had: the Lantern's eight sub-tabs ran off the right edge at 360px with Lore and Settings unreachable (rows wrap now, 8px apart, which the touch audit then insisted on); the level buttons were a bare "+" to a screen reader (they name the stat); an iPad held upright, tried at two columns, squeezed the fight to a third of the width, so upright tablets keep the phone shape and get two columns turned sideways. A span 12px past the edge at 360px made the page scroll sideways; the shell clips now.
+
+**Reading.** Plain type turns the whole game into a humanist sans with wider spacing; the display face goes too, because a dyslexic reader does not want an antique face for headings either. Colour-safe statuses add a shape to each mark (square, diamond, ring) and move the poison gauge off green.
+
+**Accessibility and contrast.** Every control named, every image with alt, every dialog labelled, focus visible, reduced motion honoured; text contrast measured where the surface is a flat colour and reported honestly as measured (most of the game's text sits on painted slabs the audit cannot judge, and says so).
+
+**The shell, lighter.** With five mechanics of panels added, the first landed strike on slow 4G at four times slower CPU had crept from 2.3 s to 2.7 s and once past 3 s on a busy runner. The fourteen section panels now load behind the combat shell (one chunk each, cached for the page's life, by the same hand-rolled loader the cinematics use), the shell fell from 202 to 181 KB gzipped, and the budget audit takes the better of two cold loads so a runner's hiccup cannot fail a build the phone would pass. Time to a landed strike: 2.7 s.
+
+**Closing the pass.** ART.md began this pass with a phone shell and ends with sixty-one silhouettes, fifty-five new plates, six device captures and nine mechanics that were not there. The one room left is the onboarding: the hints know the hand now, but a first-time player's first minute deserves a rehearsal on a real phone, which QA.md asks for.

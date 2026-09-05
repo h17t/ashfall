@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { useSel } from '../store';
+import { useSettings } from '../settings';
 import { fmt, D } from '@/engine';
 import { Gauge } from '@/render/Gauge';
 
@@ -12,6 +13,7 @@ export const StatusStrip = memo(function StatusStrip() {
   const stam = useSel((s) => Math.round(s.player.stamina));
   const stamMax = useSel((s) => s.player.staminaMax);
   const poisoned = useSel((s) => s.player.poisoned > 0);
+  const colorblind = useSettings((s) => s.colorblind);
   const remains = useSel((s) => s.remains?.marrow.toString() ?? null);
   return (
     <div className="status-strip" aria-label="Status">
@@ -24,7 +26,7 @@ export const StatusStrip = memo(function StatusStrip() {
         <span className="t-label whitespace-nowrap">Level <span className="t-num text-[14px]" style={{ color: 'var(--parchment)' }}>{level}</span></span>
       </div>
       <div className="grid grid-cols-[3fr_2fr] gap-2 mt-1.5">
-        <Gauge value={hp} max={hpMax} tone={poisoned ? 'verdigris' : 'blood'} height={10} text={`${hp} / ${hpMax}`} label="HP" />
+        <Gauge value={hp} max={hpMax} tone={poisoned ? (colorblind ? 'wisp' : 'verdigris') : 'blood'} height={10} text={`${hp} / ${hpMax}`} label="HP" />
         <Gauge value={stam} max={stamMax} tone={stam < 10 ? 'gold' : 'stamina'} height={10} cut={1} text={`${stam}`} label="Stamina" />
       </div>
     </div>

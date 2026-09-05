@@ -6,13 +6,10 @@ import { AwayReport } from './components/AwayReport';
 import { startHaptics } from './haptics';
 import { startPwa } from './pwa';
 import { InstallSheet } from './components/InstallSheet';
-import { StairPanel } from './components/StairPanel';
 import { DescentStrip } from './components/DescentStrip';
 import { RaidStrip } from './components/RaidStrip';
 import { BoonSheet } from './components/BoonSheet';
 import { HaulSheet } from './components/HaulSheet';
-import { OrdersPanel } from './components/OrdersPanel';
-import { TollPanel } from './components/TollPanel';
 import { tollPhase } from '@/engine';
 import { useSwipe } from './shell/useSwipe';
 import { applyOffline, canRecruit, canSnuff, vestigePreview, canSever } from '@/engine';
@@ -37,28 +34,37 @@ function CinemaLoader() {
   useEffect(() => { let on = true; import('@/render/cinematics/Cinema').then((m) => { if (on) setC(() => m.Cinema); }); return () => { on = false; }; }, []);
   return C ? <C /> : null;
 }
-import { LanternPanel } from './components/LanternPanel';
-import { WeaponsPanel } from './components/WeaponsPanel';
-import { MapPanel } from './components/MapPanel';
-import { KeepsakePanel } from './components/KeepsakePanel';
-import { SettingsPanel } from './components/SettingsPanel';
-import { CortegePanel } from './components/CortegePanel';
-import { MagicPanel } from './components/MagicPanel';
-import { CreedPanel } from './components/CreedPanel';
-import { SnuffPanel } from './components/SnuffPanel';
-import { SeveringPanel } from './components/SeveringPanel';
-import { BestiaryPanel } from './components/BestiaryPanel';
 import { BottomNav, type Pillar } from './shell/BottomNav';
 import { ActionBar } from './shell/ActionBar';
 import { StatusStrip } from './shell/StatusStrip';
 import { Section } from './shell/Section';
 import { useLayout } from './shell/useViewport';
+import { loadable } from './shell/loadable';
+// the section panels load after the combat shell; each is one chunk, cached for the page's life
+const LanternPanel = loadable(() => import('./components/LanternPanel').then((m) => m.LanternPanel));
+const WeaponsPanel = loadable(() => import('./components/WeaponsPanel').then((m) => m.WeaponsPanel));
+const MapPanel = loadable(() => import('./components/MapPanel').then((m) => m.MapPanel));
+const KeepsakePanel = loadable(() => import('./components/KeepsakePanel').then((m) => m.KeepsakePanel));
+const SettingsPanel = loadable(() => import('./components/SettingsPanel').then((m) => m.SettingsPanel));
+const CortegePanel = loadable(() => import('./components/CortegePanel').then((m) => m.CortegePanel));
+const MagicPanel = loadable(() => import('./components/MagicPanel').then((m) => m.MagicPanel));
+const CreedPanel = loadable(() => import('./components/CreedPanel').then((m) => m.CreedPanel));
+const SnuffPanel = loadable(() => import('./components/SnuffPanel').then((m) => m.SnuffPanel));
+const SeveringPanel = loadable(() => import('./components/SeveringPanel').then((m) => m.SeveringPanel));
+const BestiaryPanel = loadable(() => import('./components/BestiaryPanel').then((m) => m.BestiaryPanel));
+const StairPanel = loadable(() => import('./components/StairPanel').then((m) => m.StairPanel));
+const TollPanel = loadable(() => import('./components/TollPanel').then((m) => m.TollPanel));
+const OrdersPanel = loadable(() => import('./components/OrdersPanel').then((m) => m.OrdersPanel));
+
 
 const PILLAR_KEY = 'mournwake.pillar';
 
 export default function App() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const reduceFx = useSettings((s) => s.reduceFx);
+  const plainType = useSettings((s) => s.plainType);
+  const colorblind = useSettings((s) => s.colorblind);
+  useEffect(() => { const cls = document.documentElement.classList; cls.toggle('plain-type', plainType); cls.toggle('cb-safe', colorblind); }, [plainType, colorblind]);
   const layout = useLayout();
   const [pillar, setPillarState] = useState<Pillar>(() => { try { return (localStorage.getItem(PILLAR_KEY) as Pillar) || 'combat'; } catch { return 'combat'; } });
   const setPillar = (p: Pillar) => { setPillarState(p); try { localStorage.setItem(PILLAR_KEY, p); } catch { /* ignore */ } };

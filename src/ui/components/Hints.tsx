@@ -9,18 +9,20 @@ import { Slab } from '@/render/materials/Slab';
  * Onboarding that teaches by playing. Each hint appears once, in the moment it is relevant,
  * and dismisses itself when the player does the thing. No text wall.
  */
+const TOUCH = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
 interface Hint { id: string; text: string; until?: (e: GameEvent[]) => boolean; }
 
 const HINTS: Record<string, Hint> = {
-  click: { id: 'click', text: 'Strike the enemy: click it (or press F).', until: (ev) => ev.some((e) => e.type === 'hit' && e.source === 'player') },
-  telegraph: { id: 'telegraph', text: 'The red bar is a wind-up. Dodge (Space) just before it fills for a perfect dodge and a damage buff.', until: (ev) => ev.some((e) => e.type === 'enemyAttack' && e.dodged) },
+  click: { id: 'click', text: TOUCH ? 'Tap Strike, the big button under the fight. Hold nothing; tap again.' : 'Strike the enemy: click it (or press F).', until: (ev) => ev.some((e) => e.type === 'hit' && e.source === 'player') },
+  telegraph: { id: 'telegraph', text: TOUCH ? 'The red bar is a wind-up. Tap Dodge just before it fills for a perfect dodge and a damage buff.' : 'The red bar is a wind-up. Dodge (Space) just before it fills for a perfect dodge and a damage buff.', until: (ev) => ev.some((e) => e.type === 'enemyAttack' && e.dodged) },
   strain: { id: 'strain', text: 'The pale bar under its health is its composure. Fill it and the Reprisal window opens: strike then for ×3 or more.', until: (ev) => ev.some((e) => e.type === 'hit' && e.reprisal) },
   stamina: { id: 'stamina', text: 'Out of stamina, your hits land weak and build no strain. Find a rhythm; the bar refills fast.' },
-  levelUp: { id: 'levelUp', text: 'You can afford a level. Open the Lantern tab: each stat shows exactly what its next point buys.', until: (ev) => ev.some((e) => e.type === 'levelUp') },
+  levelUp: { id: 'levelUp', text: TOUCH ? 'You can afford a level. Open Lantern in the bar below: each stat shows what its next point buys.' : 'You can afford a level. Open the Lantern tab: each stat shows exactly what its next point buys.', until: (ev) => ev.some((e) => e.type === 'levelUp') },
   death: { id: 'death', text: 'Your marrow fell where you are unmade. Fight back to that tier, one kill per tier, to reclaim them. Die first and they are gone.', until: (ev) => ev.some((e) => e.type === 'remainsRecovered' || e.type === 'remainsLost') },
-  cleared: { id: 'cleared', text: 'Tier cleared. The Road tab lets you push on, or stay and farm. Every tier past this one is a choice.' },
+  cleared: { id: 'cleared', text: 'Tier cleared. Lantern, then Road, lets you push on or stay and farm. Every tier past this one is a choice.' },
   boss: { id: 'boss', text: 'The arena is open. Bosses have phases; each one punishes a lazy habit. Read the phase text under its name.' },
-  shade: { id: 'shade', text: 'A shade will answer for 400 marrow (Cortege tab). Beside you it fights your fight; hunting, it earns while you are away.' },
+  shade: { id: 'shade', text: 'A shade will answer for 400 marrow (Cortege, in the bar below). Beside you it fights your fight; hunting, it earns while you are away.' },
   offline: { id: 'offline', text: 'Everyone hunts while you are gone, for up to 12 hours. Offline never costs you anything.' },
   snuff: { id: 'snuff', text: 'A lord has fallen. The Snuff tab shows what the flame would gather: Vestige buys permanent might. Snuffing resets the road but never your knowledge.' },
 };

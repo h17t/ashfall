@@ -44,6 +44,9 @@ export const SettingsPanel = memo(function SettingsPanel() {
       <Toggle label="Sound (synthesized, off by default)" value={st.sound} onChange={(v) => st.set({ sound: v })} />
       {st.sound && <label className="flex items-center justify-between"><span className="text-bone">Volume</span><input type="range" min={0} max={1} step={0.05} value={st.volume} onChange={(e) => st.set({ volume: Number(e.target.value) })} /></label>}
       <Toggle label="Show hints" value={st.showTutorial} onChange={(v) => st.set({ showTutorial: v })} />
+      <div className="border-t border-ash/50 pt-2 font-display text-[16px] text-parchment">Reading</div>
+      <Toggle label="Plain type (a humanist face with wider spacing, for dyslexic readers)" value={st.plainType} onChange={(v) => st.set({ plainType: v })} />
+      <Toggle label="Colour-safe statuses (bleed, poison and frost told apart without red against green)" value={st.colorblind} onChange={(v) => st.set({ colorblind: v })} />
 
       <div className="border-t border-ash/50 pt-2 font-display text-[16px] text-parchment">Save</div>
       <div className="flex gap-2 flex-wrap">

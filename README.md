@@ -22,7 +22,7 @@ On a phone, install it from the browser (the game offers after the first lord) a
 ```
 npm test           # Vitest: engine formulas, combat, death, saves, shades, magic, prestige, bosses, economy properties, pacing
 npm run typecheck
-npm run ci         # everything CI runs: tests, banned terms, hover, build, payload budget, touch targets, interruptions
+npm run ci         # everything CI runs: tests, banned terms, hover, build, payload budget, PWA manifest, touch targets, accessibility, device matrix, interruptions
 npm run sim        # headless balance simulation; writes BALANCE.md
 npm run sim -- --hours 200 --strategies greedy,idle --seed 3 --verbose
 ```

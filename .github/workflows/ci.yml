@@ -15,9 +15,13 @@ jobs:
         run: npm run build
       - name: payload budget (shell gz, precache, time to playable on slow 4G at 4x CPU)
         run: npm run audit:budget
-      - name: touch-target and interruption audits at a phone viewport
+      - name: PWA completeness (manifest, icons, Apple tags, service worker)
+        run: npm run audit:manifest
+      - name: touch targets, accessibility and contrast, the device matrix, interruptions
         run: |
           npx vite preview --port 4173 &
           sleep 3
           node tools/audit/touch-targets.mjs
+          node tools/audit/a11y.mjs
+          node tools/audit/devices.mjs
           node tools/audit/interrupt.mjs

@@ -65,7 +65,7 @@ function StatRow({ stat, canAfford, onLevel }: { stat: StatKey; canAfford: boole
         </div>
         <div className="h-[2px] mt-0.5" style={{ background: 'color-mix(in srgb, var(--ash) 40%, transparent)' }}><div className="h-full" style={{ width: `${Math.min(100, (statCurve(pts) / 1.2) * 100)}%`, background: 'linear-gradient(90deg, var(--ember), var(--ember-hot))' }} /></div>
       </Tooltip>
-      <button className={`btn text-[13px] px-2 ${canAfford ? 'btn-ember' : ''}`} disabled={!canAfford} onClick={onLevel}>+</button>
+      <button className={`btn text-[13px] px-2 ${canAfford ? 'btn-ember' : ''}`} disabled={!canAfford} onClick={onLevel} aria-label={`Level ${STAT_NAMES[stat]}`}>+</button>
     </div>
   );
 }

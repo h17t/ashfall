@@ -11,11 +11,11 @@ import { haptic } from '../haptics';
  * children too; `wrap` (default) makes the whole wrapper the tap target, for rows and cards that
  * carry no other action.
  */
-interface Props { tip: ReactNode; children: ReactNode; className?: string; title?: ReactNode; mode?: 'wrap' | 'inline' }
+interface Props { tip: ReactNode; children: ReactNode; className?: string; title?: ReactNode; mode?: 'wrap' | 'inline'; /** an accessible name for a wrap whose children carry no text */ label?: string }
 
 const LONG = 420;
 
-export function Tooltip({ tip, children, className = '', title, mode = 'wrap' }: Props) {
+export function Tooltip({ tip, children, className = '', title, mode = 'wrap', label }: Props) {
   const [open, setOpen] = useState(false);
   const timer = useRef(0);
   const fired = useRef(false);
@@ -38,7 +38,7 @@ export function Tooltip({ tip, children, className = '', title, mode = 'wrap' }:
     );
   }
   return (
-    <span className={`tip-wrap ${className}`} role="button" tabIndex={0} aria-haspopup="dialog" {...press}
+    <span className={`tip-wrap ${className}`} role="button" tabIndex={0} aria-haspopup="dialog" aria-label={label} {...press}
       onClick={() => { if (fired.current) { fired.current = false; return; } setOpen(true); }}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true); } }}>
       {children}

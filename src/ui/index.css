@@ -425,3 +425,23 @@ html.toll-dusk .arena-stage::after { content: ''; position: absolute; inset: 0; 
 .hour-plate { position: absolute; inset: 0; opacity: 0.55; z-index: 0; }
 .hour-plate img { width: 100%; height: 100%; object-fit: cover; }
 .hour-tile > .t-display, .hour-tile > .t-num { position: relative; z-index: 1; text-shadow: 0 1px 2px var(--void), 0 0 6px var(--void); }
+
+/* ---- reading: plain type, colour-safe statuses ---- */
+html.plain-type { --font-body: "Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif; --font-display: "Verdana", "Segoe UI", system-ui, sans-serif; }
+html.plain-type body { letter-spacing: 0.02em; line-height: 1.55; word-spacing: 0.08em; }
+html.plain-type .t-display, html.plain-type .font-display { letter-spacing: 0.04em; text-transform: none; font-variant: normal; }
+/* status marks carry a shape as well as a colour: a square for bleed, a diamond for poison, a ring for frost */
+.status-mark { display: inline-block; width: 9px; height: 9px; margin-right: 6px; vertical-align: -1px; }
+.status-bleed { background: var(--blood-bright); }
+.status-poison { background: var(--verdigris); transform: rotate(45deg); }
+.status-frost { background: transparent; border: 2px solid var(--wisp); border-radius: 50%; }
+html.cb-safe .status-bleed { background: var(--ember-hot); }
+html.cb-safe .status-poison { background: var(--parchment); }
+html.cb-safe .status-frost { border-color: var(--wisp); }
+html.cb-safe .hp-poisoned, html.cb-safe .bar-poison { background: var(--parchment) !important; }
+
+/* sub-tab rows wrap on a phone: eight Lantern tabs are two rows, never a row cut off at the edge */
+.shell-portrait .subtabs { flex-wrap: wrap; row-gap: 8px; }
+
+/* the page never scrolls sideways: anything that pokes past the edge is clipped, not scrolled to */
+.shell { overflow-x: clip; }
