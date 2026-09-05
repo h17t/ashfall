@@ -1,16 +1,14 @@
 // Accessibility: every control has a name, every image an alt, every dialog a label, focus is
 // visible, and the text on screen clears the contrast floor against the surface it sits on.
 // Walks every pillar and sub-tab at 390×844. Usage: node tools/audit/a11y.mjs [url]
-import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
+import { chromium, executablePath } from './browser.mjs';
 const url = process.argv[2] ?? 'http://localhost:4173/';
 const css = readFileSync('src/ui/index.css', 'utf8');
 const problems = [];
 if (!/:focus-visible\s*\{[^}]*outline/.test(css)) problems.push('no :focus-visible outline rule in index.css');
 if (!/prefers-reduced-motion/.test(css)) problems.push('no prefers-reduced-motion rule in index.css');
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const browser = await chromium.launch({ executablePath });
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block' });
 const page = await ctx.newPage();
 page.on('pageerror', (e) => problems.push('page error: ' + e.message));

@@ -1,9 +1,7 @@
 // Touch-feel smoke: tap latency on Strike, multi-touch (Strike while Dodge is held), swipe between
 // pillars, drag-to-dismiss a sheet, long-press opening details, and the haptic patterns fired.
-import { createRequire } from 'node:module';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+import { chromium, executablePath } from '../tools/audit/browser.mjs';
+const browser = await chromium.launch({ executablePath });
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
 const page = await ctx.newPage();
 page.on('pageerror', (e) => console.log('PAGEERROR', e.message));

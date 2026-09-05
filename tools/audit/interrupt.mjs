@@ -6,11 +6,9 @@
 //   C. suspension: the clock jumps two hours while the page is open -> the away report opens and
 //      marrow was earned; the same after a reload against the stale save.
 // Usage: node tools/audit/interrupt.mjs [url]
-import { createRequire } from 'node:module';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
+import { chromium, executablePath } from './browser.mjs';
 const url = process.argv[2] ?? 'http://localhost:4173/';
-const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const EXE = executablePath;
 const AUTOSAVE_MS = 10_000;
 const phone = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, serviceWorkers: 'block' };
 const fail = [];

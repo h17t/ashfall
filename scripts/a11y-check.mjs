@@ -1,8 +1,6 @@
 // Keyboard walk: tab through the page and report what receives focus, plus the visible focus ring.
-import { createRequire } from 'node:module';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+import { chromium, executablePath } from '../tools/audit/browser.mjs';
+const browser = await chromium.launch({ executablePath });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
 await page.goto('http://localhost:4173/', { waitUntil: 'networkidle' });
 await page.waitForTimeout(800);

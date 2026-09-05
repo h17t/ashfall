@@ -1,12 +1,10 @@
 // Touch-target audit. Renders the built game at a phone viewport, walks every visible interactive
 // element on every pillar (and every sub-tab), and fails on anything smaller than 48×48 CSS px or
 // closer than 8px to another interactive element. Usage: node tools/audit/touch-targets.mjs [url]
-import { createRequire } from 'node:module';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
+import { chromium, executablePath } from './browser.mjs';
 const url = process.argv[2] ?? 'http://localhost:4173/';
 const MIN = 48, GAP = 8;
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const browser = await chromium.launch({ executablePath });
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
 const page = await ctx.newPage();
 page.on('pageerror', (e) => console.log('PAGEERROR', e.message));

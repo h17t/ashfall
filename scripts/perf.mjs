@@ -1,11 +1,9 @@
 // Frame-time probe. Usage: node scripts/perf.mjs [url]. Loads a heavy state (boss, full cortege, DoTs, spam clicks)
 // and reports rAF intervals over 4 seconds. Not a benchmark of the engine (see scripts/bench.ts): a check that
 // the presentation layer leaves 60fps on the table.
-import { createRequire } from 'node:module';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
+import { chromium, executablePath } from '../tools/audit/browser.mjs';
 const url = process.argv[2] ?? 'http://localhost:4173/';
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--disable-frame-rate-limit'] });
+const browser = await chromium.launch({ executablePath, args: ['--disable-frame-rate-limit'] });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
 if (process.env.PERF_LITE) await page.addInitScript(() => { document.addEventListener('DOMContentLoaded', () => document.documentElement.classList.add('perf-lite')); });
 if (process.env.PERF_REDUCE) await page.addInitScript(() => localStorage.setItem('mournwake.settings', JSON.stringify({ reduceFx: true })));

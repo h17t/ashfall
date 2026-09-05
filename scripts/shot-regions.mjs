@@ -1,11 +1,9 @@
 // One capture per region, in-game, with the stage running. Usage: node scripts/shot-regions.mjs [outdir]
-import { createRequire } from 'node:module';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
+import { chromium, executablePath } from '../tools/audit/browser.mjs';
 const sharp = require('/home/user/mournwake/node_modules/sharp');
 const out = process.argv[2] ?? 'art/review';
 const zones = ['tollroad', 'mire', 'archive', 'sanctum', 'undercroft', 'renderworks', 'nadir'];
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const browser = await chromium.launch({ executablePath });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
 page.on('pageerror', (e) => console.log('PAGEERROR', e.message));
 await page.goto('http://localhost:4173/', { waitUntil: 'networkidle' });

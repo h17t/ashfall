@@ -1,8 +1,6 @@
 // Headless smoke test for the synthesized audio: cues, the region bed, reverb swap, hush and tolls.
-import { createRequire } from 'node:module';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--autoplay-policy=no-user-gesture-required'] });
+import { chromium, executablePath } from '../tools/audit/browser.mjs';
+const browser = await chromium.launch({ executablePath, args: ['--autoplay-policy=no-user-gesture-required'] });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));

@@ -5,12 +5,10 @@
 //      load through Chromium with the network throttled to 1.6 Mbps / 150 ms RTT and the CPU
 //      slowed 4x, until the arena is on screen AND a tap on Strike takes hit points off the enemy.
 // Usage: node tools/audit/budget.mjs [url]   (run after `vite build`, against `vite preview`)
-import { createRequire } from 'node:module';
 import { readFileSync, statSync, existsSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import path from 'node:path';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
+import { chromium, executablePath } from './browser.mjs';
 
 import { createServer } from 'node:http';
 import { createGzip } from 'node:zlib';
@@ -69,7 +67,7 @@ for (const i of manifest.icons) { const f = path.join(dist, i.src.replace(/^\.\/
 
 // 3. time to playable on a throttled phone: the better of two cold loads, so a busy CI runner's
 //    hiccup does not fail a build the phone would have passed
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const browser = await chromium.launch({ executablePath });
 let tArena = Infinity, tPlay = Infinity;
 for (let attempt = 0; attempt < 2; attempt++) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, serviceWorkers: 'block' });

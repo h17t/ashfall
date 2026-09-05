@@ -1,10 +1,8 @@
 // The device matrix: the critical path on six profiles, with a screenshot of each, failing on a page
 // error or a missing control. iPhone SE, iPhone 14, Pixel 7, Galaxy S22, iPad, desktop.
 // Usage: node tools/audit/devices.mjs [url]
-import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
-const require = createRequire('/opt/node22/lib/node_modules/');
-const { chromium } = require('playwright');
+import { chromium, executablePath } from './browser.mjs';
 const url = process.argv[2] ?? 'http://localhost:4173/';
 const DEVICES = [
   { name: 'iphone-se', w: 375, h: 667, dpr: 2, mobile: true },
@@ -15,7 +13,7 @@ const DEVICES = [
   { name: 'desktop', w: 1440, h: 900, dpr: 1, mobile: false },
 ];
 mkdirSync('art/devices', { recursive: true });
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const browser = await chromium.launch({ executablePath });
 const fail = [];
 for (const d of DEVICES) {
   const ctx = await browser.newContext({ viewport: { width: d.w, height: d.h }, deviceScaleFactor: d.dpr, isMobile: d.mobile, hasTouch: d.mobile, serviceWorkers: 'block' });
