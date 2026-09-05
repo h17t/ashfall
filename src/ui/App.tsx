@@ -10,6 +10,7 @@ import { StairPanel } from './components/StairPanel';
 import { DescentStrip } from './components/DescentStrip';
 import { BoonSheet } from './components/BoonSheet';
 import { HaulSheet } from './components/HaulSheet';
+import { OrdersPanel } from './components/OrdersPanel';
 import { useSwipe } from './shell/useSwipe';
 import { applyOffline, canRecruit, canSnuff, vestigePreview, canSever } from '@/engine';
 import { SHADES, BALANCE } from '@/content';
@@ -85,18 +86,21 @@ export default function App() {
   const severingVisible = useSel((s) => s.prestige.wakings >= BALANCE.prestige.severingAt || s.prestige.severings > 0);
   const severingReady = useSel((s) => canSever(s) === null);
   const stairVisible = useSel((s) => !!s.flags.descentUnlocked);
+  const ordersVisible = useSel((s) => !!s.flags.ordersUnlocked);
+  const ordersNew = useSel((s) => !!s.flags.ordersUnlocked && s.orders.rules.length === 0);
   const stairNew = useSel((s) => !!s.flags.descentUnlocked && s.descent.runs === 0 && !s.descent.run);
-  const badges = { cortege: recruitable, arsenal: keepsakeHeld, lantern: snuffReady || (severingVisible && severingReady) || stairNew };
+  const badges = { combat: ordersNew, cortege: recruitable, arsenal: keepsakeHeld, lantern: snuffReady || (severingVisible && severingReady) || stairNew };
+  const extras = <Section id="combat-extra" tabs={[...(ordersVisible ? [{ id: 'orders', label: 'Orders', badge: ordersNew, node: <OrdersPanel /> }] : []), { id: 'log', label: 'Log', node: <Log /> }]} />;
 
   const combat = (
     <>
       <Encounter />
       <DescentStrip />
-      {layout === 'portrait' ? <ActionBar /> : <div className="flex flex-col gap-3"><ActionBar /><AutomationBar /><Log /></div>}
+      {layout === 'portrait' ? <ActionBar /> : <div className="flex flex-col gap-3"><ActionBar /><AutomationBar />{extras}</div>}
     </>
   );
   const sections: Record<Pillar, ReactNode> = {
-    combat: layout === 'portrait' ? <Section id="combat-extra"><AutomationBar /><div className="mt-3"><Log /></div></Section> : combat,
+    combat: layout === 'portrait' ? extras : combat,
     cortege: <Section id="cortege"><CortegePanel /></Section>,
     arsenal: <Section id="arsenal" tabs={[{ id: 'weapons', label: 'Weapons', node: <WeaponsPanel /> }, { id: 'magic', label: 'Magic', node: <MagicPanel /> }, { id: 'keepsakes', label: 'Keepsakes', badge: keepsakeHeld, node: <KeepsakePanel /> }]} />,
     creeds: <Section id="creeds"><CreedPanel /></Section>,
@@ -138,12 +142,13 @@ export default function App() {
         <>
           <StatusStrip />
           <Hints />
-          <div className="shell-main" ref={mainRef}>
+          <div className={`shell-main ${pillar === 'combat' ? 'is-combat' : ''}`} ref={mainRef}>
             {pillar === 'combat' ? (
               <div className="flex flex-col flex-1 min-h-0">
                 <div className="px-2 flex flex-col"><Encounter /><DescentStrip /></div>
                 <ActionBar />
-                <Section id="combat-extra"><AutomationBar /><div className="mt-3"><Log /></div></Section>
+                <div className="px-2 pt-2"><AutomationBar /></div>
+                {extras}
               </div>
             ) : sections[pillar]}
           </div>

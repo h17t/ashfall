@@ -37,7 +37,7 @@ async function audit(where) {
       if (r.width === 0 || r.height === 0) continue;
       if (r.bottom < 0 || r.top > window.innerHeight) continue; // off-screen rows are audited when scrolled (below)
       // rows clipped by their scroll container are not on screen; only the visible part counts
-      const sc = el.closest('.section-scroll, .sheet-scroll');
+      const sc = el.closest('.shell-main.is-combat, .section-scroll, .sheet-scroll');
       const full = { w: r.width, h: r.height };
       let scope = 'page';
       if (sc) { const c = sc.getBoundingClientRect(); const top = Math.max(r.top, c.top), bottom = Math.min(r.bottom, c.bottom); if (bottom - top < r.height * 0.9) continue; r = { left: r.left, top, width: r.width, height: bottom - top, bottom, right: r.right }; scope = sc.className; }
@@ -69,7 +69,7 @@ for (const p of pillars) {
     const where = t ? `${p}/${t.trim()}` : p;
     // audit at the top and after scrolling the section to its end
     total += await audit(where);
-    const scrolled = await page.evaluate(() => { const el = document.querySelector('.section-scroll'); if (!el) return false; el.scrollTop = el.scrollHeight; return el.scrollTop > 0; });
+    const scrolled = await page.evaluate(() => { const el = document.querySelector('.shell-main.is-combat') ?? document.querySelector('.section-scroll'); if (!el) return false; el.scrollTop = el.scrollHeight; return el.scrollTop > 0; });
     if (scrolled) { await page.waitForTimeout(120); total += await audit(where + ' (scrolled)'); }
   }
 }

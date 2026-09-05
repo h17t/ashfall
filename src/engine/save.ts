@@ -7,6 +7,7 @@ import { newGame, SAVE_VERSION } from './state';
 import type { GameState } from './types';
 import { migrateV1toV2 } from './migrations/v1-to-v2';
 import { migrateV2toV3 } from './migrations/v2-to-v3';
+import { migrateV3toV4 } from './migrations/v3-to-v4';
 
 const DEC_MARK = '§D§';
 
@@ -55,7 +56,7 @@ export class SaveError extends Error {
  * Migration chain: migrations[n] upgrades a raw (revived) state from version n to n+1.
  * Write one whenever the schema changes; never edit an old one.
  */
-export const migrations: Record<number, (raw: any) => any> = { 1: migrateV1toV2, 2: migrateV2toV3 };
+export const migrations: Record<number, (raw: any) => any> = { 1: migrateV1toV2, 2: migrateV2toV3, 3: migrateV3toV4 };
 
 export function parseSave(json: string): GameState {
   if (!json || json.trim() === '') throw new SaveError('The save is empty.', 'empty');

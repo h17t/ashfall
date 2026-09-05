@@ -5,3 +5,4 @@ import './ext-shades';
 import './ext-magic';
 import './ext-prestige';
 import './ext-descent';
+import './ext-orders';

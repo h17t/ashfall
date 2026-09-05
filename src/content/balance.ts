@@ -168,6 +168,18 @@ export const BALANCE = {
     respawn: 1.0,
   },
 
+  // ---- Standing Orders ----
+  orders: {
+    /** rule slots: base once auto-attack is learned, plus one per lord ever felled, to the cap */
+    baseSlots: 2,
+    perLord: 1,
+    maxSlots: 8,
+    /** seconds a rule waits after firing (strike is paced like a fast human hand) */
+    cooldown: 0.3,
+    strikeCooldown: 0.25,
+    economyCooldown: 1.0,
+  },
+
   // ---- Prestige ----
   prestige: {
     /** vestige = (cycleMarrow / divisor) ^ exponent * bossBonus */

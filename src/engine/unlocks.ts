@@ -17,6 +17,10 @@ export function checkUnlocks(state: GameState, mods: Mods, events: GameEvent[]) 
     state.automation.autoAttack = true;
     events.push({ type: 'unlock', what: 'autoAttack', text: 'Revenant Instinct: your hands remember the swing. Auto-attack unlocked. Clicking still adds on top.' });
   }
+  if (!f.ordersUnlocked && f.autoAttack) {
+    f.ordersUnlocked = true;
+    events.push({ type: 'unlock', what: 'orders', text: 'Standing Orders: tell your hands what to do when you are not looking. WHEN this, THEN that, in the order you set. Two orders to begin with; each lord felled grants another.' });
+  }
   if (!f.firstDeath && state.stats.deaths > 0) {
     f.firstDeath = true;
   }

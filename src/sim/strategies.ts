@@ -36,6 +36,8 @@ export interface PolicyParams {
   respectsMechanics: boolean;
   /** the Stair: when to descend, how deep, how much nerve (absent = never descends) */
   descent?: { every: number; withdrawAt: number; nerve: number };
+  /** Standing Orders the strategy writes, in priority order, as slots and kinds allow */
+  orders?: { when: { kind: string; op: '<' | '>'; value: number }[]; then: { kind: string; arg?: string | number }; on?: boolean }[];
 }
 
 export interface PolicyMemory {
@@ -313,6 +315,23 @@ export const STRATEGIES: Record<string, () => Strategy> = {
     clickRate: 2.5, clickUntil: 8 * 60, dodgeSkill: 0.3, perfectSkill: 0.1, riposteAware: false, estusAt: 0.4, retreatAt: 0.3,
     levelPlan: 'balanced', soulsReserve: 0, pushLead: -6, bossRetryLevels: 4, respectsMechanics: false,
     descent: { every: 40 * 60, withdrawAt: 4, nerve: 0.6 },
+  }),
+  authored: () => makePolicy({
+    id: 'authored', description: 'The idle player who wrote good Standing Orders: drink at 35%, strike the Reprisal, dodge the telegraph, level the lowest stat, climb out of the Stair at floor 5.',
+    clickRate: 2.5, clickUntil: 8 * 60, dodgeSkill: 0.3, perfectSkill: 0.1, riposteAware: false, estusAt: 0.4, retreatAt: 0.3,
+    levelPlan: 'none', soulsReserve: 0, pushLead: -6, bossRetryLevels: 4, respectsMechanics: false,
+    descent: { every: 40 * 60, withdrawAt: 99, nerve: 0 },
+    orders: [
+      // the economy first: with two slots these are the two that matter
+      { when: [{ kind: 'marrow', op: '>', value: 1 }], then: { kind: 'levelUp', arg: 'balanced' } },
+      { when: [{ kind: 'hp', op: '<', value: 35 }, { kind: 'draughts', op: '>', value: 0 }], then: { kind: 'drink' } },
+      { when: [{ kind: 'boonOffer', op: '>', value: 1 }, { kind: 'floor', op: '>', value: 4 }], then: { kind: 'withdraw' } },
+      { when: [{ kind: 'boonOffer', op: '>', value: 1 }], then: { kind: 'takeBoon', arg: 'epic' } },
+      { when: [{ kind: 'reprisal', op: '>', value: 1 }], then: { kind: 'strike' } },
+      { when: [{ kind: 'telegraph', op: '>', value: 1 }], then: { kind: 'dodge' } },
+      { when: [{ kind: 'hp', op: '<', value: 30 }, { kind: 'draughts', op: '<', value: 1 }], then: { kind: 'withdraw' } },
+      { when: [{ kind: 'always', op: '>', value: 1 }], then: { kind: 'reinforce' } },
+    ],
   }),
   noclick: () => makePolicy({
     id: 'noclick', description: 'Never clicks. Measures the pure idle floor: auto-attack (from 6 min) and shades.',

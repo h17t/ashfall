@@ -264,3 +264,13 @@ Artifacts: `art/mobile/m5-stair.png` (the Stair page), `art/mobile/m5-strip.png`
 **Cinematics.** Walking down and climbing out no longer play a region card (the stair is not arriving anywhere), and Unmade. on the stair says what the stair kept.
 
 **A production-only crash.** Tapping a boon card crashed the page about half the time on a cold load, in the film-grain component, with React complaining about a hook's dependency list. It never reproduced in development or unminified. The grain read the quality tier through a store hook beside its effect; the tier hook is a plain subscription now and the GL-mode hook's functions are module constants. Four cold captures in a row are clean.
+
+### Round 13 — Pass 3, Milestone 6 (Standing Orders)
+
+Artifacts: `art/mobile/m6-orders.png` (three orders in the editor), `art/mobile/m6-picker.png` (a chip's sheet), `scripts/shot-orders.mjs`.
+
+**The editor.** An order is a sentence laid out as chips: WHEN in the display face, then the condition, the comparison and the value as three chips with a wisp-blue edge; AND for a second condition; THEN and the action with the fire's edge. Every chip is 48px and opens a sheet; the sheet lists the choices with a line of help under each, so the player learns what Composure means by choosing it. A row carries its switch, up and down at 48px, and a red × that asks before removing. Disabled rows fade rather than vanish. The count reads "fired 388" so the player can see an order working.
+
+**The fold.** The first capture put the Orders and Log tabs at the very bottom of the phone with nothing under them: the Combat column was a fixed flex stack, and the section inside it had no height left after the arena and the hand. It had been that way since the shell was built; the log was simply never reachable in portrait. The column scrolls as one now, and the sections inside it flow.
+
+**Still open.** A production-only crash in the film-grain component (a hook dependency list React finds missing) survived the tier-hook rewrite; it reproduces on a cold load about one time in three and never in development. The dev-mode bundle is instrumented to dump the hook list when it happens; the hunt continues in the next milestone if it does not surface first.

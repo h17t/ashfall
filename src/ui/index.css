@@ -358,3 +358,19 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .boon-row { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 4px 10px; border-left: 2px solid var(--ash); }
 .boon-row.rare { border-left-color: var(--wisp); } .boon-row.epic { border-left-color: var(--ember); }
 .stat-tile { padding: 10px 6px; border: 1px solid color-mix(in srgb, var(--ash) 70%, transparent); }
+
+/* ---- Standing Orders ---- */
+.order-row { padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--ash) 80%, transparent); background: color-mix(in srgb, var(--ink) 70%, transparent); }
+.order-row.is-off { opacity: 0.55; }
+.order-kw { font-family: var(--font-display); font-size: 17px; color: var(--ember-hot); min-width: 48px; }
+.order-chip { min-height: 48px; padding: 0 14px; border: 1px solid var(--ash); font-size: 15px; color: var(--parchment); background: color-mix(in srgb, var(--ink) 60%, transparent); }
+.order-chip.when { border-color: color-mix(in srgb, var(--wisp) 60%, var(--ash)); }
+.order-chip.then { border-color: color-mix(in srgb, var(--ember) 70%, var(--ash)); }
+.order-btn { min-width: 48px; min-height: 48px; border: 1px solid color-mix(in srgb, var(--ash) 70%, transparent); color: var(--bone); font-family: var(--font-num); font-size: 18px; }
+.order-btn:disabled { opacity: 0.35; }
+.order-option { display: block; width: 100%; text-align: left; min-height: 48px; padding: 8px 12px; border-bottom: 1px solid color-mix(in srgb, var(--ash) 50%, transparent); }
+
+/* Combat on a phone: the column scrolls as one (arena, hand, reflexes, orders, log); the sections
+   inside it flow rather than scroll, so nothing is trapped under the fold. */
+.shell-portrait .shell-main.is-combat { overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+.shell-portrait .shell-main.is-combat .section, .shell-portrait .shell-main.is-combat .section-scroll { flex: none; overflow: visible; }

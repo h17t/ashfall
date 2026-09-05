@@ -7,6 +7,7 @@ import { D } from '../num';
 
 const fixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v1.json'), 'utf8');
 const fixtureV2 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v2.json'), 'utf8');
+const fixtureV3 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v3.json'), 'utf8');
 
 describe('save migration v1 → v2 (the rename)', () => {
   it('loads the pre-rename fixture and every value survives under its new key', () => {
@@ -95,6 +96,34 @@ describe('save migration v2 → v3 (the Stair)', () => {
       expect(b, at).toEqual(a);
     };
     walk({ ...before, version: undefined }, { ...JSON.parse(JSON.stringify(s)), version: undefined }, 'state');
+  });
+});
+
+/** Every scalar of the old state is still there, untouched, under the same path. */
+function everyScalarSurvives(before: any, after: any) {
+  const walk = (a: any, b: any, at: string) => {
+    if (a && typeof a === 'object' && !Array.isArray(a) && !('mantissa' in a)) { for (const k of Object.keys(a)) walk(a[k], b?.[k], at + '.' + k); return; }
+    if (typeof a === 'string' && a.startsWith('§D§')) { expect(String(b), at).toBe(a.slice(3)); return; }
+    if (Array.isArray(a)) { expect(JSON.stringify(b), at).toBe(JSON.stringify(a).replace(/§D§/g, '')); return; }
+    expect(b, at).toEqual(a);
+  };
+  walk({ ...before, version: undefined }, { ...JSON.parse(JSON.stringify(after)), version: undefined }, 'state');
+}
+
+describe('save migration v3 → v4 (Standing Orders)', () => {
+  it('loads a v3 save made by a 70-minute playthrough with the Stair, and every value survives', () => {
+    const raw = JSON.parse(fixtureV3);
+    expect(raw.v).toBe(3);
+    const s = parseSave(fixtureV3);
+    expect(s.version).toBe(SAVE_VERSION);
+    expect(s.descent.runs).toBe(raw.state.descent.runs);
+    expect(s.descent.bestFloor).toBe(raw.state.descent.bestFloor);
+    expect(s.descent.bankedTotal.toString()).toBe(raw.state.descent.bankedTotal.replace('§D§', ''));
+    expect(s.orders).toEqual({ rules: [], nextId: 1 });
+    everyScalarSurvives(raw.state, s);
+  });
+  it('every fixture from every version loads to the current version', () => {
+    for (const f of [fixture, fixtureV2, fixtureV3]) expect(parseSave(f).version).toBe(SAVE_VERSION);
   });
 });
 

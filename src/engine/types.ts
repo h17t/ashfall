@@ -297,6 +297,8 @@ export interface GameState {
   offline: OfflineSummary | null;
   /** the Stair */
   descent: DescentState;
+  /** Standing Orders */
+  orders: OrdersState;
 }
 
 /** A Descent in progress: floor, the boons taken, the haul not yet banked. */
@@ -333,6 +335,36 @@ export interface DescentState {
   bankedTotal: Decimal;
   /** the last run's outcome, for the Stair screen */
   last: { floor: number; banked: Decimal; died: boolean; boons: string[] } | null;
+}
+
+/** Standing Orders: WHEN <conditions> THEN <action>, evaluated in order every tick. */
+export type OrderCondKind = 'always' | 'hp' | 'stamina' | 'fp' | 'draughts' | 'marrow' | 'enemyHp' | 'composure' | 'reprisal' | 'telegraph' | 'boss' | 'streak' | 'floor' | 'haul' | 'boonOffer';
+export type OrderActKind = 'strike' | 'dodge' | 'drink' | 'cast' | 'levelUp' | 'reinforce' | 'advance' | 'retreat' | 'withdraw' | 'descend' | 'takeBoon' | 'equipBest' | 'recruit';
+export interface OrderCond {
+  kind: OrderCondKind;
+  /** '<' or '>' against `value`; ignored for yes/no kinds, where value 1 means "is" and 0 "is not" */
+  op: '<' | '>';
+  /** percent for hp/stamina/fp/enemyHp/composure; a count for draughts/streak/floor; multiples of the next level's cost for marrow; multiples of the purse for haul */
+  value: number;
+}
+export interface OrderAct {
+  kind: OrderActKind;
+  /** cast: recitation slot (0-based); levelUp: a stat key or 'balanced'; takeBoon: 'epic' | 'rare' | 'first' */
+  arg?: string | number;
+}
+export interface Order {
+  id: number;
+  when: OrderCond[];
+  then: OrderAct;
+  on: boolean;
+  /** times it has fired, ever */
+  fired: number;
+  /** seconds until it may fire again (engine-owned) */
+  cd: number;
+}
+export interface OrdersState {
+  rules: Order[];
+  nextId: number;
 }
 
 export interface OfflineSummary {
@@ -386,7 +418,8 @@ export type Action =
   | { type: 'ackDeath' }
   | { type: 'descend' }
   | { type: 'chooseBoon'; index: number }
-  | { type: 'descentWithdraw' };
+  | { type: 'descentWithdraw' }
+  | { type: 'setOrders'; rules: Order[] };
 
 // ---------------- Events ----------------
 
@@ -416,4 +449,5 @@ export type GameEvent =
   | { type: 'boonTaken'; boon: string; floor: number }
   | { type: 'descentBanked'; floor: number; haul: Decimal; mult: number; banked: Decimal }
   | { type: 'descentLost'; floor: number; haul: Decimal }
+  | { type: 'orderFired'; id: number; action: OrderActKind }
   | { type: 'error'; text: string };

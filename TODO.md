@@ -9,7 +9,7 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
   - [x] M3 touch feel: pointerdown actions, multi-touch, swipe/long-press/pull-to-dismiss, haptic patterns with a toggle, the away report and reallocation as sheets; `scripts/touch-check.mjs`
   - [x] M4 platform: PWA (icons, manifest, splash, install sheet after the first lord), build-time service worker with precache, four quality tiers with auto-detect and step-down, render pause + 1Hz logic when hidden, freeze/event autosave, budget + interruption audits in CI
   - [x] M5 Descent Runs: the Stair (engine module, 27 boons, offer sheet, strip, haul sheet, Stair page), save v3 + v2 fixture test, sim strategies with a control and a reckless, BALANCE.md rev 4
-  - [ ] M6 Standing Orders
+  - [x] M6 Standing Orders: rule engine (15 conditions, 13 actions, earned slots and kinds), chip-and-sheet editor in Combat, save v4 + v3 fixture, authored sim strategy, BALANCE.md rev 5
   - [ ] M7 The Study and Reforging
   - [ ] M8 Afflictions and the Toll
   - [ ] M9 stretch: Dispatch, Holdfasts, Creed War, Weapon Mastery

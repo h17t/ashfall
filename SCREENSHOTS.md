@@ -33,6 +33,7 @@ Captured headless at 1400×900 from the built game (`npm run build && npx vite p
 | ![Landscape](art/mobile/m2-combat-landscape.png) | **A phone on its side.** |
 | ![The offer](art/mobile/m5-boons.png) | **The Stair's offer**: one of three boons, or the way out. |
 | ![The Stair](art/mobile/m5-stair.png) | **The Stair page**: the way down, the records, every boon. |
+| ![Orders](art/mobile/m6-orders.png) | **Standing Orders**: WHEN this, THEN that, as chips. |
 
 ## The plates
 
