@@ -243,7 +243,7 @@ export const Cinema = memo(function Cinema() {
 
   const c = card;
   return (
-    <div ref={root} className={`fixed inset-0 z-[55] ${playing ? '' : 'pointer-events-none'}`} onClick={() => sequencer.skip()} aria-live="polite" role={playing ? 'dialog' : undefined}>
+    <div ref={root} className={`fixed inset-0 z-[55] ${playing ? '' : 'pointer-events-none'}`} onClick={() => sequencer.skip()} aria-live="polite" role={playing ? 'dialog' : undefined} aria-label={playing ? (c?.title ?? 'A moment on the road') : undefined}>
       <div className="cine-bar-top absolute inset-x-0 top-0 h-0" style={{ background: 'var(--void)' }} />
       <div className="cine-bar-bottom absolute inset-x-0 bottom-0 h-0" style={{ background: 'var(--void)' }} />
       <div className="cine-shroud absolute inset-0 opacity-0" style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 55%, color-mix(in srgb, var(--ink) 92%, transparent), var(--void))' }} />

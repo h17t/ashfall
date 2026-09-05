@@ -17,7 +17,7 @@ jobs:
         run: npm run audit:budget
       - name: PWA completeness (manifest, icons, Apple tags, service worker)
         run: npm run audit:manifest
-      - name: touch targets, accessibility and contrast, the device matrix, reachability, interruptions
+      - name: touch targets, accessibility and contrast, the device matrix, reachability, a play-through, interruptions
         run: |
           npx vite preview --port 4173 &
           sleep 3
@@ -25,6 +25,7 @@ jobs:
           node tools/audit/a11y.mjs
           node tools/audit/devices.mjs
           node tools/audit/reach.mjs
+          node tools/audit/playthrough.mjs
           node tools/audit/interrupt.mjs
       - name: the deployed shape (served under a sub-path like GitHub Pages, every plate requested, the service worker installs)
         run: npm run audit:deploy

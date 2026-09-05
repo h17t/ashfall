@@ -66,3 +66,11 @@ each line or write what was wrong.
 
 - [ ] Background the app mid-fight, kill it from the task switcher, reopen: the save is at most a moment old and every kill is there.
 - [ ] Leave it for two hours: the away report opens with the right hours; the Toll clock has moved; expeditions came home.
+
+## The published site
+
+- [ ] Open the Pages address on the phone, fresh (site data cleared): every enemy, weapon and region has its picture; the Stair, the Toll dial and the map draw.
+- [ ] Turn the phone sideways on each pillar: the action bar is on screen without scrolling; every sub-tab can be tapped; the section scrolls to its end.
+- [ ] Turn it back: the place you were in is kept.
+- [ ] Add to Home Screen, open from the icon, go offline: the first region and its foes play.
+
