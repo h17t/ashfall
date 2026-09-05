@@ -8,7 +8,7 @@ A dark-fantasy incremental game that fuses the moment-to-moment tension of a sta
 
 ## Play on a phone
 
-Every push publishes the build to GitHub Pages: open **https://h17t.github.io/ashfall/** on the phone.
+Every push publishes the build to GitHub Pages: open **https://h17t.github.io/ashfall/** on the phone. <!-- banned-terms: allow (the repository keeps its old name) -->
 Play in the browser, or install it: on Android Chrome, the game offers to install after your first
 lord falls (or use the browser menu, "Install app"); on iPhone, Safari's Share button, then "Add to
 Home Screen". Installed, it opens full-screen in portrait and plays without a signal.
