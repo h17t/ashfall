@@ -8,15 +8,15 @@ export const WW = 160;
 type Kind = 'straight' | 'dagger' | 'mace' | 'spear' | 'halberd' | 'great' | 'cleaver' | 'rapier' | 'estoc' | 'katana' | 'twin' | 'club' | 'hammer' | 'bell' | 'staff' | 'talisman' | 'flame' | 'chime' | 'rope';
 
 const SPEC: Record<string, { kind: Kind; tint?: PaletteKey | null; glow?: PaletteKey; big?: number; status?: PaletteKey }> = {
-  hollowSword: { kind: 'straight' }, banditDagger: { kind: 'dagger', status: 'blood' }, pilgrimMace: { kind: 'mace' }, deserterSpear: { kind: 'spear' },
+  revenantSword: { kind: 'straight' }, banditDagger: { kind: 'dagger', status: 'blood' }, pilgrimMace: { kind: 'mace' }, deserterSpear: { kind: 'spear' },
   wardenCleaver: { kind: 'cleaver', glow: 'ember', tint: 'ember' }, gallowsRope: { kind: 'rope', status: 'blood' },
-  ashenStaff: { kind: 'staff', glow: 'soul', tint: 'soul' }, crackedTalisman: { kind: 'talisman', glow: 'gold', tint: 'gold' }, pyromancyFlame: { kind: 'flame', glow: 'ember', tint: 'ember' },
+  weaverStaff: { kind: 'staff', glow: 'wisp', tint: 'wisp' }, litanyBeads: { kind: 'talisman', glow: 'gold', tint: 'gold' }, ruinBrand: { kind: 'flame', glow: 'ember', tint: 'ember' },
   rotwoodClub: { kind: 'club', tint: 'verdigris', status: 'verdigris' }, fenRapier: { kind: 'rapier' }, drownedHalberd: { kind: 'halberd', tint: 'verdigris' }, mothersThorn: { kind: 'dagger', tint: 'verdigris', status: 'verdigris', big: 1.1 }, bellHammer: { kind: 'bell', glow: 'gold', tint: 'gold' },
-  scholarsEstoc: { kind: 'estoc', tint: 'soul' }, custodianGreatmace: { kind: 'mace', big: 1.25 }, crystalSword: { kind: 'straight', tint: 'soul', glow: 'soul' }, nullBlade: { kind: 'straight', tint: 'soul', glow: 'soul', big: 1.1 }, unwrittenEdge: { kind: 'dagger', tint: 'soul', glow: 'soul' },
+  scholarsEstoc: { kind: 'estoc', tint: 'wisp' }, custodianGreatmace: { kind: 'mace', big: 1.25 }, glassSword: { kind: 'straight', tint: 'wisp', glow: 'wisp' }, nullBlade: { kind: 'straight', tint: 'wisp', glow: 'wisp', big: 1.1 }, unwrittenEdge: { kind: 'dagger', tint: 'wisp', glow: 'wisp' },
   sanctumSpear: { kind: 'spear', tint: 'gold', glow: 'gold' }, vigilMaul: { kind: 'hammer', big: 1.2 }, lanternBlade: { kind: 'straight', tint: 'gold', glow: 'gold' }, stormTalisman: { kind: 'talisman', tint: 'gold', glow: 'gold', big: 1.1 },
-  paleDagger: { kind: 'dagger', status: 'blood' }, abyssGreatsword: { kind: 'great', tint: 'soul' }, keepersBlackblade: { kind: 'straight', tint: 'soul', glow: 'soul', big: 1.15 }, wanderersTwinblades: { kind: 'twin', status: 'blood' },
-  kilnGreatsword: { kind: 'great', tint: 'ember', glow: 'ember', big: 1.2 }, cinderKatana: { kind: 'katana', tint: 'ember', glow: 'ember' }, lordsEmberSword: { kind: 'great', tint: 'ember', glow: 'ember', big: 1.1 }, firstBlade: { kind: 'straight', tint: 'ember', glow: 'emberHot', big: 1.2 },
-  abyssalChime: { kind: 'chime', tint: 'soul', glow: 'soul' },
+  paleDagger: { kind: 'dagger', status: 'blood' }, nadirGreatsword: { kind: 'great', tint: 'wisp' }, keepersBlackblade: { kind: 'straight', tint: 'wisp', glow: 'wisp', big: 1.15 }, namelessTwinblades: { kind: 'twin', status: 'blood' },
+  renderGreatsword: { kind: 'great', tint: 'ember', glow: 'ember', big: 1.2 }, tallowKatana: { kind: 'katana', tint: 'ember', glow: 'ember' }, renderersSword: { kind: 'great', tint: 'ember', glow: 'ember', big: 1.1 }, firstBlade: { kind: 'straight', tint: 'ember', glow: 'emberHot', big: 1.2 },
+  nadirChime: { kind: 'chime', tint: 'wisp', glow: 'wisp' },
 };
 
 export function weaponPlate(id: string, seed: number): Plate {
@@ -56,10 +56,10 @@ export function weaponPlate(id: string, seed: number): Plate {
     L.push({ kind: 'mass', pts: spearHead([c + 40 * S, c - 40 * S], [c + 66 * S, c - 68 * S], r, 14), z: 3, tone: 0.45 });
     if (k === 'halberd') L.push({ kind: 'mass', pts: axeHead([c + 36 * S, c - 30 * S], r, 22, 1), z: 3, tone: 0.4 });
   }
-  if (k === 'staff') { L.push({ kind: 'mass', pts: haft([c - 56, c + 64], [c + 36, c - 44], r, 7), z: 2 }); L.push({ kind: 'mass', pts: blob(c + 40, c - 50, 14, 16, r, 0.3, 12), z: 3, tone: 0.3 }); L.push({ kind: 'glow', cx: c + 40, cy: c - 50, r: 20, color: 'soul', z: 9 }); }
+  if (k === 'staff') { L.push({ kind: 'mass', pts: haft([c - 56, c + 64], [c + 36, c - 44], r, 7), z: 2 }); L.push({ kind: 'mass', pts: blob(c + 40, c - 50, 14, 16, r, 0.3, 12), z: 3, tone: 0.3 }); L.push({ kind: 'glow', cx: c + 40, cy: c - 50, r: 20, color: 'wisp', z: 9 }); }
   if (k === 'talisman') { L.push({ kind: 'mass', pts: blob(c, c, 40 * S, 48 * S, r, 0.1, 16), z: 2, tone: 0.3 }); L.push({ kind: 'detail', pts: blob(c, c - 2, 22 * S, 27 * S, r, 0.08, 16), color: 'void', alpha: 0.85, z: 8 }); L.push({ kind: 'mass', pts: rope([c - 4, c - 46 * S], [c + 30, c - 78 * S], r, 4), z: 2 }); L.push({ kind: 'mass', pts: jitter([[c - 6, c - 60 * S], [c + 6, c - 60 * S], [c + 6, c + 60 * S], [c - 6, c + 60 * S]], r, 1), z: 3, tone: 0.5 }); L.push({ kind: 'mass', pts: jitter([[c - 40 * S, c - 10], [c + 40 * S, c - 10], [c + 40 * S, c + 2], [c - 40 * S, c + 2]], r, 1), z: 3, tone: 0.5 }); L.push({ kind: 'detail', pts: taper([c - 8, c - 44], [c + 10, c + 40], 2, 4, r, 0.6, 4), color: 'void', alpha: 0.9, z: 8 }); L.push({ kind: 'glow', cx: c, cy: c - 4, r: 22, color: s.glow ?? 'gold', z: 9 }); }
   if (k === 'flame') { L.push({ kind: 'mass', pts: blob(c, c + 44, 34, 18, r, 0.15, 12), z: 2 }); L.push({ kind: 'mass', pts: flame(c, c + 40, r, 96, 56), z: 3, tone: 0.6 }); L.push({ kind: 'glow', cx: c, cy: c + 4, r: 40, color: 'ember', z: 9 }); L.push({ kind: 'glow', cx: c - 4, cy: c + 20, r: 18, color: 'emberHot', z: 9 }); }
-  if (k === 'chime') { L.push({ kind: 'mass', pts: jitter([[c - 30, c - 50], [c + 30, c - 50], [c + 44, c + 34], [c - 44, c + 34]], r, 2), z: 2, tone: 0.35 }); L.push({ kind: 'mass', pts: haft([c, c - 70], [c, c - 46], r, 6), z: 2 }); L.push({ kind: 'glow', cx: c, cy: c + 10, r: 26, color: 'soul', z: 9 }); }
+  if (k === 'chime') { L.push({ kind: 'mass', pts: jitter([[c - 30, c - 50], [c + 30, c - 50], [c + 44, c + 34], [c - 44, c + 34]], r, 2), z: 2, tone: 0.35 }); L.push({ kind: 'mass', pts: haft([c, c - 70], [c, c - 46], r, 6), z: 2 }); L.push({ kind: 'glow', cx: c, cy: c + 10, r: 26, color: 'wisp', z: 9 }); }
   if (k === 'rope') { L.push({ kind: 'mass', pts: rope([c - 60, c + 30], [c + 10, c - 50], r, 7), z: 2 }); L.push({ kind: 'mass', pts: rope([c + 10, c - 50], [c + 60, c + 20], r, 7), z: 2 }); L.push({ kind: 'mass', pts: blob(c + 10, c - 50, 14, 12, r, 0.2, 10), z: 3 }); L.push({ kind: 'mass', pts: rope([c + 60, c + 20], [c + 30, c + 66], r, 6), z: 2 }); }
   // enchanted blades glow along the edge, not as an orb
   if (s.glow && k !== 'flame' && k !== 'staff' && k !== 'talisman' && k !== 'chime' && k !== 'bell') {

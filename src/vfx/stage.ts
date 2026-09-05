@@ -10,18 +10,18 @@ import { asset, type AssetKind } from '../../assets/manifest';
  */
 const PAL = {
   void: '#0A0908', ink: '#14100E', stone: '#241E1A', ash: '#4A423C', bone: '#C8BBA6', parchment: '#E8DCC4',
-  ember: '#C8560F', emberHot: '#F0902E', blood: '#6E1212', bloodBright: '#A81C1C', verdigris: '#3D5A4C', soul: '#5C7A99', gold: '#B8912F',
+  ember: '#C8560F', emberHot: '#F0902E', blood: '#6E1212', bloodBright: '#A81C1C', verdigris: '#3D5A4C', wisp: '#5C7A99', gold: '#B8912F',
 };
 
-interface Ambient { embers: number; ash: number; wisps: number; heat: number; motes: string }
+interface Ambient { motes: number; ash: number; wisps: number; heat: number; moteColor: string }
 const AMBIENT: Record<string, Ambient> = {
-  approach: { embers: 6, ash: 10, wisps: 0, heat: 0.25, motes: PAL.emberHot },
-  mire: { embers: 0, ash: 4, wisps: 3, heat: 0, motes: PAL.verdigris },
-  archive: { embers: 0, ash: 6, wisps: 1, heat: 0, motes: PAL.soul },
-  sanctum: { embers: 3, ash: 3, wisps: 0, heat: 0.1, motes: PAL.gold },
-  deep: { embers: 0, ash: 2, wisps: 5, heat: 0, motes: PAL.soul },
-  kiln: { embers: 18, ash: 8, wisps: 0, heat: 0.7, motes: PAL.emberHot },
-  abyss: { embers: 0, ash: 1, wisps: 8, heat: 0, motes: PAL.soul },
+  tollroad: { motes: 6, ash: 10, wisps: 0, heat: 0.25, moteColor: PAL.emberHot },
+  mire: { motes: 0, ash: 4, wisps: 3, heat: 0, moteColor: PAL.verdigris },
+  archive: { motes: 0, ash: 6, wisps: 1, heat: 0, moteColor: PAL.wisp },
+  sanctum: { motes: 3, ash: 3, wisps: 0, heat: 0.1, moteColor: PAL.gold },
+  undercroft: { motes: 0, ash: 2, wisps: 5, heat: 0, moteColor: PAL.wisp },
+  renderworks: { motes: 18, ash: 8, wisps: 0, heat: 0.7, moteColor: PAL.emberHot },
+  nadir: { motes: 0, ash: 1, wisps: 8, heat: 0, moteColor: PAL.wisp },
 };
 
 export interface Snapshot {
@@ -67,8 +67,8 @@ export class Stage {
   readonly parts = new Particles();
   private time = 0;
   private last = 0;
-  private snap: Snapshot = { zone: 'approach', kind: null, id: '', big: false, hpFrac: 1, riposteOpen: false, poison: false, frost: false, bleed: 0, dead: false, dim: 0.3, reduceFx: false };
-  private emitAcc = { embers: 0, ash: 0, wisps: 0 };
+  private snap: Snapshot = { zone: 'tollroad', kind: null, id: '', big: false, hpFrac: 1, riposteOpen: false, poison: false, frost: false, bleed: 0, dead: false, dim: 0.3, reduceFx: false };
+  private emitAcc = { motes: 0, ash: 0, wisps: 0 };
 
   // ---- effect state (all decaying toward rest)
   shake = { x: 0, y: 0, amp: 0, t: 0, dur: 0.25 };
@@ -78,7 +78,7 @@ export class Stage {
   figFlash = { color: toRgb(PAL.bloodBright), t: 0, dur: 0.11 };
   punch: Decay = { t: 0, dur: 0.18 };
   freezeUntil = 0;
-  /** the first riposte hit in a window gets the full landing; later hits in the same window only sparks */
+  /** the first reprisal hit in a window gets the full landing; later hits in the same window only sparks */
   private riposteLanded = false;
   desat = 0;      // current, eased
   rim = 0;        // current, eased
@@ -169,25 +169,25 @@ export class Stage {
   }
 
   // ---- impacts (called from the event bridge)
-  hit(opts: { dmgFrac: number; crit: boolean; riposte: boolean; source: string }) {
+  hit(opts: { dmgFrac: number; crit: boolean; reprisal: boolean; source: string }) {
     const f = this.figureRect();
     const px = f.cx + this.parts.rand(-f.w * 0.15, f.w * 0.15), py = f.cy + this.parts.rand(-f.h * 0.15, f.h * 0.2);
-    const n = Math.round(6 + Math.min(30, opts.dmgFrac * 60)) * (opts.crit ? 1.6 : 1) * (opts.riposte ? 2.2 : 1);
+    const n = Math.round(6 + Math.min(30, opts.dmgFrac * 60)) * (opts.crit ? 1.6 : 1) * (opts.reprisal ? 2.2 : 1);
     if (!this.snap.reduceFx) {
       for (let i = 0; i < n; i++) {
-        const a = this.parts.rand(-0.9, 0.9) + (opts.riposte ? 0.6 : 0.3), sp = this.parts.rand(120, 420) * (opts.riposte ? 1.5 : 1);
+        const a = this.parts.rand(-0.9, 0.9) + (opts.reprisal ? 0.6 : 0.3), sp = this.parts.rand(120, 420) * (opts.reprisal ? 1.5 : 1);
         this.parts.emit({ x: px, y: py, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp + 80, life: this.parts.rand(0.4, 0.9), size: this.parts.rand(2, 5), color: i % 4 === 0 ? PAL.bloodBright : PAL.blood, grav: 900, drag: 1.2, blend: 0, shrink: 0.4 });
       }
-      const sparks = opts.riposte ? 40 : opts.crit ? 10 : 3;
+      const sparks = opts.reprisal ? 40 : opts.crit ? 10 : 3;
       for (let i = 0; i < sparks; i++) {
         const a = this.parts.rand(0, Math.PI * 2), sp = this.parts.rand(200, 700);
         this.parts.emit({ x: px, y: py, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: this.parts.rand(0.25, 0.6), size: this.parts.rand(1.5, 3.5), color: PAL.emberHot, grav: 500, drag: 2.5, blend: 1, shrink: 0.8 });
       }
     }
-    this.figFlash.t = 1; this.figFlash.color = toRgb(opts.riposte ? PAL.emberHot : PAL.bloodBright);
+    this.figFlash.t = 1; this.figFlash.color = toRgb(opts.reprisal ? PAL.emberHot : PAL.bloodBright);
     this.punch.t = 1;
-    if (opts.riposte && !this.riposteLanded) { this.riposteLanded = true; this.landRiposte(px, py); }
-    else if (opts.riposte) { this.kick(3, -0.5, 0.5); this.freeze(0.03); }
+    if (opts.reprisal && !this.riposteLanded) { this.riposteLanded = true; this.landRiposte(px, py); }
+    else if (opts.reprisal) { this.kick(3, -0.5, 0.5); this.freeze(0.03); }
     else if (opts.crit) { this.kick(4, 0.7, 0.4); this.shockAt(px, py, 0.5); this.freeze(0.045); }
     else if (opts.source === 'player') this.kick(1.5, 0.6, 0.3);
   }
@@ -207,7 +207,7 @@ export class Stage {
 
   enemyAttack(opts: { dodged: boolean; perfect: boolean; dmgFrac: number }) {
     if (opts.dodged) {
-      if (opts.perfect) { this.flash.t = 0.5; this.flash.color = toRgb(PAL.soul); this.flash.dur = 0.18; this.ca.t = 0.4; }
+      if (opts.perfect) { this.flash.t = 0.5; this.flash.color = toRgb(PAL.wisp); this.flash.dur = 0.18; this.ca.t = 0.4; }
       return;
     }
     this.kick(6 + Math.min(14, opts.dmgFrac * 40), 0.2, -0.9);
@@ -220,7 +220,7 @@ export class Stage {
     if (this.snap.reduceFx) return;
     const n = boss ? 90 : 26;
     for (let i = 0; i < n; i++) {
-      this.parts.emit({ x: f.cx + this.parts.rand(-f.w * 0.3, f.w * 0.3), y: f.y + this.parts.rand(0, f.h * 0.9), vx: this.parts.rand(-30, 30), vy: this.parts.rand(40, 140), life: this.parts.rand(1.5, 3.5), size: this.parts.rand(2, boss ? 6 : 4), color: boss ? (i % 3 ? PAL.emberHot : PAL.gold) : PAL.soul, drag: 0.4, wob: 60, blend: 1, shrink: 0.7 });
+      this.parts.emit({ x: f.cx + this.parts.rand(-f.w * 0.3, f.w * 0.3), y: f.y + this.parts.rand(0, f.h * 0.9), vx: this.parts.rand(-30, 30), vy: this.parts.rand(40, 140), life: this.parts.rand(1.5, 3.5), size: this.parts.rand(2, boss ? 6 : 4), color: boss ? (i % 3 ? PAL.emberHot : PAL.gold) : PAL.wisp, drag: 0.4, wob: 60, blend: 1, shrink: 0.7 });
     }
     if (boss) { this.flash.t = 1; this.flash.color = toRgb(PAL.emberHot); this.flash.dur = 0.5; this.shockAt(f.cx, f.cy, 1.2); this.kick(5, 0, 1); }
   }
@@ -228,7 +228,7 @@ export class Stage {
   status(status: string) {
     const f = this.figureRect();
     if (this.snap.reduceFx) return;
-    const col = status === 'poison' ? PAL.verdigris : status === 'frost' ? PAL.soul : PAL.bloodBright;
+    const col = status === 'poison' ? PAL.verdigris : status === 'frost' ? PAL.wisp : PAL.bloodBright;
     for (let i = 0; i < 24; i++) {
       this.parts.emit({ x: f.cx + this.parts.rand(-f.w * 0.3, f.w * 0.3), y: f.cy + this.parts.rand(-f.h * 0.3, f.h * 0.3), vx: this.parts.rand(-20, 20), vy: status === 'frost' ? this.parts.rand(20, 60) : this.parts.rand(-40, 10), life: this.parts.rand(0.8, 1.6), size: this.parts.rand(2, 4), color: col, grav: status === 'poison' ? 120 : 0, blend: status === 'frost' ? 1 : 0, wob: 20 });
     }
@@ -238,7 +238,7 @@ export class Stage {
   cast() {
     if (this.snap.reduceFx) return;
     for (let i = 0; i < 30; i++) {
-      this.parts.emit({ x: this.w * this.parts.rand(0.05, 0.3), y: this.h * this.parts.rand(0.05, 0.4), vx: this.parts.rand(80, 260), vy: this.parts.rand(20, 120), life: this.parts.rand(0.5, 1.1), size: this.parts.rand(1.5, 4), color: PAL.soul, drag: 1.5, blend: 1 });
+      this.parts.emit({ x: this.w * this.parts.rand(0.05, 0.3), y: this.h * this.parts.rand(0.05, 0.4), vx: this.parts.rand(80, 260), vy: this.parts.rand(20, 120), life: this.parts.rand(0.5, 1.1), size: this.parts.rand(1.5, 4), color: PAL.wisp, drag: 1.5, blend: 1 });
     }
     this.ca.t = 0.4;
   }
@@ -269,7 +269,7 @@ export class Stage {
     if (!frozen) this.time += rawDt;
     const dt = frozen ? 0 : rawDt * this.timeScale;
 
-    // riposte window: dilate, desaturate, rim-light, iris to the figure
+    // reprisal window: dilate, desaturate, rim-light, iris to the figure
     const open = snap.riposteOpen && !snap.dead;
     if (!open) this.riposteLanded = false;
     this.desatTarget = snap.dead ? 0.7 : open ? 0.55 : 0;
@@ -289,14 +289,14 @@ export class Stage {
     // ambient emitters
     const amb = AMBIENT[snap.zone] ?? AMBIENT.approach;
     if (!snap.reduceFx && dt > 0) {
-      this.emitAcc.embers += amb.embers * dt; this.emitAcc.ash += amb.ash * dt; this.emitAcc.wisps += amb.wisps * dt;
-      while (this.emitAcc.embers >= 1) { this.emitAcc.embers--; this.parts.emit({ x: this.w * this.parts.rand(0, 0.55), y: -6, vx: this.parts.rand(10, 40), vy: this.parts.rand(30, 90), life: this.parts.rand(3, 7), size: this.parts.rand(1.5, 3.5), color: this.parts.rand() < 0.3 ? PAL.emberHot : PAL.ember, wob: 25, blend: 1, shrink: 0.5 }); }
+      this.emitAcc.motes += amb.motes * dt; this.emitAcc.ash += amb.ash * dt; this.emitAcc.wisps += amb.wisps * dt;
+      while (this.emitAcc.motes >= 1) { this.emitAcc.motes--; this.parts.emit({ x: this.w * this.parts.rand(0, 0.55), y: -6, vx: this.parts.rand(10, 40), vy: this.parts.rand(30, 90), life: this.parts.rand(3, 7), size: this.parts.rand(1.5, 3.5), color: this.parts.rand() < 0.3 ? PAL.emberHot : PAL.ember, wob: 25, blend: 1, shrink: 0.5 }); }
       while (this.emitAcc.ash >= 1) { this.emitAcc.ash--; this.parts.emit({ x: this.w * this.parts.rand(-0.1, 1.1), y: this.h + 6, vx: this.parts.rand(-15, 5), vy: this.parts.rand(-40, -14), life: this.parts.rand(6, 14), size: this.parts.rand(1.2, 2.8), color: PAL.bone, alpha: 0.55, wob: 18, blend: 0, shrink: 0.2 }); }
-      while (this.emitAcc.wisps >= 1) { this.emitAcc.wisps--; this.parts.emit({ x: this.w * this.parts.rand(0, 1), y: this.h * this.parts.rand(0.1, 0.6), vx: this.parts.rand(-10, 10), vy: this.parts.rand(6, 22), life: this.parts.rand(4, 9), size: this.parts.rand(2, 5), color: amb.motes, alpha: 0.7, wob: 30, blend: 1, shrink: 0.9 }); }
+      while (this.emitAcc.wisps >= 1) { this.emitAcc.wisps--; this.parts.emit({ x: this.w * this.parts.rand(0, 1), y: this.h * this.parts.rand(0.1, 0.6), vx: this.parts.rand(-10, 10), vy: this.parts.rand(6, 22), life: this.parts.rand(4, 9), size: this.parts.rand(2, 5), color: amb.moteColor, alpha: 0.7, wob: 30, blend: 1, shrink: 0.9 }); }
       // status drips on the figure
       if (this.figure && (snap.poison || snap.frost)) {
         const f = this.figureRect();
-        if (this.parts.rand() < 0.35) this.parts.emit({ x: f.cx + this.parts.rand(-f.w * 0.25, f.w * 0.25), y: f.cy + this.parts.rand(-f.h * 0.3, f.h * 0.2), vx: 0, vy: snap.frost ? this.parts.rand(10, 30) : this.parts.rand(-60, -20), life: this.parts.rand(0.6, 1.4), size: this.parts.rand(1.5, 3), color: snap.frost ? PAL.soul : PAL.verdigris, grav: snap.frost ? 0 : 200, blend: snap.frost ? 1 : 0, wob: 4 });
+        if (this.parts.rand() < 0.35) this.parts.emit({ x: f.cx + this.parts.rand(-f.w * 0.25, f.w * 0.25), y: f.cy + this.parts.rand(-f.h * 0.3, f.h * 0.2), vx: 0, vy: snap.frost ? this.parts.rand(10, 30) : this.parts.rand(-60, -20), life: this.parts.rand(0.6, 1.4), size: this.parts.rand(1.5, 3), color: snap.frost ? PAL.wisp : PAL.verdigris, grav: snap.frost ? 0 : 200, blend: snap.frost ? 1 : 0, wob: 4 });
       }
     }
     if (dt > 0) this.parts.update(dt, this.time, 6);
@@ -356,7 +356,7 @@ export class Stage {
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, this.figure.mask); gl.uniform1i(this.uFigure.u_mask, 1);
       let tint = toRgb(PAL.emberHot), tintAmt = 0;
       if (open) { tint = toRgb(PAL.ember); tintAmt = 0.12; }
-      else if (snap.frost) { tint = toRgb(PAL.soul); tintAmt = 0.5; }
+      else if (snap.frost) { tint = toRgb(PAL.wisp); tintAmt = 0.5; }
       else if (snap.poison) { tint = toRgb(PAL.verdigris); tintAmt = 0.55; }
       else if (snap.bleed > 40) { tint = toRgb(PAL.blood); tintAmt = Math.min(0.6, snap.bleed / 150) * (0.8 + 0.2 * Math.sin(this.time * 8)); }
       gl.uniform3f(this.uFigure.u_tint, tint[0], tint[1], tint[2]); gl.uniform1f(this.uFigure.u_tintAmt, tintAmt);

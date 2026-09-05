@@ -14,33 +14,33 @@ interface Hint { id: string; text: string; until?: (e: GameEvent[]) => boolean; 
 const HINTS: Record<string, Hint> = {
   click: { id: 'click', text: 'Strike the enemy: click it (or press F).', until: (ev) => ev.some((e) => e.type === 'hit' && e.source === 'player') },
   telegraph: { id: 'telegraph', text: 'The red bar is a wind-up. Dodge (Space) just before it fills for a perfect dodge and a damage buff.', until: (ev) => ev.some((e) => e.type === 'enemyAttack' && e.dodged) },
-  stagger: { id: 'stagger', text: 'The pale bar under its health is its poise. Fill it and the Riposte window opens: strike then for ×3 or more.', until: (ev) => ev.some((e) => e.type === 'hit' && e.riposte) },
-  stamina: { id: 'stamina', text: 'Out of stamina, your hits land weak and build no stagger. Find a rhythm; the bar refills fast.' },
-  levelUp: { id: 'levelUp', text: 'You can afford a level. Open the Bonfire tab: each stat shows exactly what its next point buys.', until: (ev) => ev.some((e) => e.type === 'levelUp') },
-  death: { id: 'death', text: 'Your souls fell where you died. Fight back to that tier, one kill per tier, to reclaim them. Die first and they are gone.', until: (ev) => ev.some((e) => e.type === 'bloodstainRecovered' || e.type === 'bloodstainLost') },
+  strain: { id: 'strain', text: 'The pale bar under its health is its composure. Fill it and the Reprisal window opens: strike then for ×3 or more.', until: (ev) => ev.some((e) => e.type === 'hit' && e.reprisal) },
+  stamina: { id: 'stamina', text: 'Out of stamina, your hits land weak and build no strain. Find a rhythm; the bar refills fast.' },
+  levelUp: { id: 'levelUp', text: 'You can afford a level. Open the Lantern tab: each stat shows exactly what its next point buys.', until: (ev) => ev.some((e) => e.type === 'levelUp') },
+  death: { id: 'death', text: 'Your marrow fell where you are unmade. Fight back to that tier, one kill per tier, to reclaim them. Die first and they are gone.', until: (ev) => ev.some((e) => e.type === 'remainsRecovered' || e.type === 'remainsLost') },
   cleared: { id: 'cleared', text: 'Tier cleared. The Road tab lets you push on, or stay and farm. Every tier past this one is a choice.' },
   boss: { id: 'boss', text: 'The arena is open. Bosses have phases; each one punishes a lazy habit. Read the phase text under its name.' },
-  phantom: { id: 'phantom', text: 'A phantom will answer for 400 souls (Squad tab). Beside you it fights your fight; hunting, it earns while you are away.' },
+  shade: { id: 'shade', text: 'A shade will answer for 400 marrow (Cortege tab). Beside you it fights your fight; hunting, it earns while you are away.' },
   offline: { id: 'offline', text: 'Everyone hunts while you are gone, for up to 12 hours. Offline never costs you anything.' },
-  kindle: { id: 'kindle', text: 'A lord has fallen. The Kindle tab shows what the flame would gather: Humanity buys permanent strength. Kindling resets the road but never your knowledge.' },
+  snuff: { id: 'snuff', text: 'A lord has fallen. The Snuff tab shows what the flame would gather: Vestige buys permanent might. Snuffing resets the road but never your knowledge.' },
 };
 
 export function Hints() {
   const show = useSettings((s) => s.showTutorial);
-  const [seen, setSeen] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem('ashfall.hints') ?? '[]')); } catch { return new Set(); } });
+  const [seen, setSeen] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem('mournwake.hints') ?? '[]')); } catch { return new Set(); } });
   const [active, setActive] = useState<string | null>(null);
   const dismiss = useCallback((id: string) => {
-    setSeen((prev) => { const n = new Set(prev); n.add(id); try { localStorage.setItem('ashfall.hints', JSON.stringify([...n])); } catch { /* ignore */ } return n; });
+    setSeen((prev) => { const n = new Set(prev); n.add(id); try { localStorage.setItem('mournwake.hints', JSON.stringify([...n])); } catch { /* ignore */ } return n; });
     setActive((a) => (a === id ? null : a));
   }, []);
   // state-driven triggers
-  const canLevel = useSel((s) => s.souls.gte(30) && s.player.level === 1);
+  const canLevel = useSel((s) => s.marrow.gte(30) && s.player.level === 1);
   const cleared = useSel((s) => (s.zones[s.encounter.zone]?.cleared ?? -1) >= 0);
-  const bossOpen = useSel((s) => (s.zones.approach?.cleared ?? -1) >= 3 && (s.zones.approach?.bossKills ?? 0) === 0);
-  const recruitable = useSel((s) => s.souls.gte(400) && s.squad.recruited.length === 0);
+  const bossOpen = useSel((s) => (s.zones.tollroad?.cleared ?? -1) >= 3 && (s.zones.tollroad?.bossKills ?? 0) === 0);
+  const recruitable = useSel((s) => s.marrow.gte(400) && s.cortege.recruited.length === 0);
   const lowStam = useSel((s) => s.player.stamina < 8 && s.stats.clicks > 20);
-  const bossDead = useSel((s) => s.stats.bossKills > 0 && s.prestige.kindles === 0);
-  const hasPhantom = useSel((s) => s.squad.recruited.length > 0);
+  const bossDead = useSel((s) => s.stats.bossKills > 0 && s.prestige.wakings === 0);
+  const hasPhantom = useSel((s) => s.cortege.recruited.length > 0);
   const clicks = useSel((s) => s.stats.clicks);
   const kills = useSel((s) => s.stats.kills.toNumber());
   useEffect(() => {
@@ -48,14 +48,14 @@ export function Hints() {
     const order: [string, boolean][] = [
       ['click', clicks === 0 && kills === 0],
       ['telegraph', kills >= 2],
-      ['stagger', kills >= 5],
+      ['strain', kills >= 5],
       ['stamina', lowStam],
       ['levelUp', canLevel],
       ['cleared', cleared],
-      ['phantom', recruitable],
+      ['shade', recruitable],
       ['boss', bossOpen],
       ['offline', hasPhantom],
-      ['kindle', bossDead],
+      ['snuff', bossDead],
     ];
     for (const [id, cond] of order) if (cond && !seen.has(id)) { setActive(id); return; }
   }, [show, active, seen, clicks, kills, lowStam, canLevel, cleared, recruitable, bossOpen, hasPhantom, bossDead]);

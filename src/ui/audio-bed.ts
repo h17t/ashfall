@@ -19,13 +19,13 @@ interface RegionVoice {
 }
 
 const VOICES: Record<string, RegionVoice> = {
-  approach: { roots: [55, 82.4, 110], shape: 'sawtooth', cutoff: 240, level: 0.05, noise: { type: 'bandpass', freq: 380, q: 0.7, level: 0.05, lfo: 0.07 }, reverb: { seconds: 1.4, damp: 2200, wet: 0.22 } },
+  tollroad: { roots: [55, 82.4, 110], shape: 'sawtooth', cutoff: 240, level: 0.05, noise: { type: 'bandpass', freq: 380, q: 0.7, level: 0.05, lfo: 0.07 }, reverb: { seconds: 1.4, damp: 2200, wet: 0.22 } },
   mire: { roots: [49, 73.4, 98], shape: 'sine', cutoff: 400, level: 0.06, noise: { type: 'lowpass', freq: 500, q: 1.2, level: 0.05, lfo: 0.21 }, ping: { freq: 1240, every: 3.5, level: 0.05, decay: 0.5 }, reverb: { seconds: 2.0, damp: 1400, wet: 0.3 } },
   archive: { roots: [65.4, 98, 196], shape: 'triangle', cutoff: 900, level: 0.035, noise: { type: 'bandpass', freq: 2400, q: 3, level: 0.018, lfo: 0.13 }, reverb: { seconds: 3.4, damp: 3200, wet: 0.4 } },
   sanctum: { roots: [65.4, 82.4, 98, 130.8], shape: 'triangle', cutoff: 700, level: 0.045, ping: { freq: 784, every: 9, level: 0.04, decay: 2.4 }, reverb: { seconds: 5.0, damp: 2600, wet: 0.5 } },
-  deep: { roots: [36.7, 55], shape: 'sine', cutoff: 200, level: 0.07, ping: { freq: 2093, every: 2.4, level: 0.035, decay: 0.35 }, reverb: { seconds: 2.8, damp: 900, wet: 0.42 } },
-  kiln: { roots: [41.2, 61.7, 82.4], shape: 'sawtooth', cutoff: 180, level: 0.07, noise: { type: 'highpass', freq: 3000, q: 0.8, level: 0.02, lfo: 0.6 }, reverb: { seconds: 1.6, damp: 4200, wet: 0.25 } },
-  abyss: { roots: [27.5, 41.2], shape: 'sine', cutoff: 120, level: 0.06, ping: { freq: 110, every: 6, level: 0.06, decay: 3.5 }, reverb: { seconds: 7.0, damp: 700, wet: 0.6 } },
+  undercroft: { roots: [36.7, 55], shape: 'sine', cutoff: 200, level: 0.07, ping: { freq: 2093, every: 2.4, level: 0.035, decay: 0.35 }, reverb: { seconds: 2.8, damp: 900, wet: 0.42 } },
+  renderworks: { roots: [41.2, 61.7, 82.4], shape: 'sawtooth', cutoff: 180, level: 0.07, noise: { type: 'highpass', freq: 3000, q: 0.8, level: 0.02, lfo: 0.6 }, reverb: { seconds: 1.6, damp: 4200, wet: 0.25 } },
+  nadir: { roots: [27.5, 41.2], shape: 'sine', cutoff: 120, level: 0.06, ping: { freq: 110, every: 6, level: 0.06, decay: 3.5 }, reverb: { seconds: 7.0, damp: 700, wet: 0.6 } },
 };
 
 let ctx: AudioContext | null = null;
@@ -173,7 +173,7 @@ export function toll(kind: 'arrival' | 'phase') {
   }
 }
 
-/** The Kindling swell: a rising chord under the ritual's fourth act. */
+/** The Snuffing swell: a rising chord under the ritual's fourth act. */
 export function swell(seconds = 5) {
   if (!ctx || !bus) return;
   const now = ctx.currentTime;

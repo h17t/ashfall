@@ -1,9 +1,9 @@
 import { memo } from 'react';
 
 /** Procedural SVG silhouettes keyed by enemy shape. No external art. */
-export const EnemySprite = memo(function EnemySprite({ shape, phase, staggered, hurt }: { shape: string; phase: number; staggered: boolean; hurt: boolean }) {
-  const fill = staggered ? '#F0902E' : hurt ? '#A81C1C' : '#4A423C';
-  const glow = staggered ? 'drop-shadow(0 0 18px color-mix(in srgb, #F0902E 80%, transparent))' : 'drop-shadow(0 0 12px color-mix(in srgb, #0A0908 90%, transparent))';
+export const EnemySprite = memo(function EnemySprite({ shape, phase, broken, hurt }: { shape: string; phase: number; broken: boolean; hurt: boolean }) {
+  const fill = broken ? '#F0902E' : hurt ? '#A81C1C' : '#4A423C';
+  const glow = broken ? 'drop-shadow(0 0 18px color-mix(in srgb, #F0902E 80%, transparent))' : 'drop-shadow(0 0 12px color-mix(in srgb, #0A0908 90%, transparent))';
   const common = { fill, stroke: '#0A0908', strokeWidth: 1.5 } as const;
   return (
     <svg viewBox="0 0 120 140" className="w-full h-full" style={{ filter: glow, transition: 'filter 0.2s' }}>
@@ -23,7 +23,7 @@ export const EnemySprite = memo(function EnemySprite({ shape, phase, staggered, 
         <g {...common}><rect x="48" y="12" width="24" height="26" rx="4" /><rect x="40" y="40" width="40" height="55" rx="6" /><rect x="20" y="42" width="14" height="45" rx="5" /><rect x="86" y="42" width="14" height="45" rx="5" /><rect x="94" y="0" width="6" height="90" fill="#5C7A99" /><rect x="45" y="95" width="13" height="42" /><rect x="63" y="95" width="13" height="42" /></g>
       )}
       {shape === 'wraith' && (
-        <g {...common} fill={staggered ? '#F0902E' : hurt ? '#A81C1C' : '#4A423C'}><path d="M60 10 Q90 40 80 80 Q95 110 60 135 Q25 110 40 80 Q30 40 60 10 Z" opacity="0.85" /><circle cx="52" cy="40" r="3" fill="#E8DCC4" /><circle cx="68" cy="40" r="3" fill="#E8DCC4" /></g>
+        <g {...common} fill={broken ? '#F0902E' : hurt ? '#A81C1C' : '#4A423C'}><path d="M60 10 Q90 40 80 80 Q95 110 60 135 Q25 110 40 80 Q30 40 60 10 Z" opacity="0.85" /><circle cx="52" cy="40" r="3" fill="#E8DCC4" /><circle cx="68" cy="40" r="3" fill="#E8DCC4" /></g>
       )}
       {shape === 'warden' && (
         <g {...common}><rect x="44" y="8" width="32" height="30" rx="5" /><rect x="34" y="40" width="52" height="62" rx="8" /><rect x="10" y="44" width="20" height="55" rx="6" /><rect x="90" y="44" width="20" height="55" rx="6" /><path d="M100 20 L118 20 L118 110 L108 110 Z" fill={phase >= 1 ? '#F0902E' : '#5C7A99'} /><rect x="40" y="102" width="16" height="38" /><rect x="64" y="102" width="16" height="38" /><circle cx="54" cy="24" r="3" fill="#F0902E" /><circle cx="66" cy="24" r="3" fill="#F0902E" /></g>

@@ -26,9 +26,9 @@ export const Encounter = memo(function Encounter() {
   const phase = useSel((s) => s.encounter.enemy?.phase ?? 0);
   const hp = useSel((s) => s.encounter.enemy?.hp.toString() ?? '0');
   const hpMax = useSel((s) => s.encounter.enemy?.hpMax.toString() ?? '1');
-  const stagger = useSel((s) => s.encounter.enemy?.stagger ?? 0);
-  const poise = useSel((s) => s.encounter.enemy?.poise ?? 1);
-  const riposte = useSel((s) => s.encounter.enemy?.riposte ?? 0);
+  const strain = useSel((s) => s.encounter.enemy?.strain ?? 0);
+  const composure = useSel((s) => s.encounter.enemy?.composure ?? 1);
+  const reprisal = useSel((s) => s.encounter.enemy?.reprisal ?? 0);
   const windup = useSel((s) => s.encounter.enemy?.windup ?? 0);
   const windupTotal = useSel((s) => s.encounter.enemy?.windupTotal ?? 1);
   const attackDmg = useSel((s) => s.encounter.enemy?.attackDamage ?? 0);
@@ -58,7 +58,7 @@ export const Encounter = memo(function Encounter() {
         setHurt(true);
         window.clearTimeout(hurtTimer.current);
         hurtTimer.current = window.setTimeout(() => setHurt(false), 90);
-        if (e.riposte || e.crit) setShake((s) => s + 1);
+        if (e.reprisal || e.crit) setShake((s) => s + 1);
       }
       if (e.type === 'enemyAttack' && !e.dodged) setShake((s) => s + 1);
     }
@@ -67,20 +67,20 @@ export const Encounter = memo(function Encounter() {
 
   const hpNum = Number(hp), hpMaxNum = Number(hpMax);
   const telegraph = windup > 0;
-  const staggered = riposte > 0;
+  const broken = reprisal > 0;
   const onClick = useCallback(() => dispatch({ type: 'click' }), [dispatch]);
   const GL = GL_SUPPORTED && useGlMode() === 'gl';
 
   return (
     <Slab material="stone" seed="arena" rough={7} ornament="scorch" outer={`arena w-full flex ${!GL && shake % 2 ? 'shake' : ''}`} className="flex-1 flex flex-col min-h-0">
-      <div className={`relative flex-1 min-h-[520px] cursor-pointer overflow-hidden ${staggered ? 'riposte-glow' : ''}`} onMouseDown={onClick}>
+      <div className={`relative flex-1 min-h-[520px] cursor-pointer overflow-hidden ${broken ? 'reprisal-glow' : ''}`} onMouseDown={onClick}>
         {GL ? (
           <Vfx />
         ) : (
           <>
             <Backdrop zone={zone} dim={isBoss ? 0.5 : 0.3} />
-            <div className={`absolute inset-x-0 bottom-[12%] top-[8%] flex items-end justify-center transition-transform ${staggered ? 'scale-[1.04]' : ''}`}>
-              {name && <Figure kind={isBoss ? 'boss' : 'enemy'} id={id} hurt={hurt} staggered={staggered} poison={poison > 0} frost={frost > 0} bleed={bleed} big={isBoss} />}
+            <div className={`absolute inset-x-0 bottom-[12%] top-[8%] flex items-end justify-center transition-transform ${broken ? 'scale-[1.04]' : ''}`}>
+              {name && <Figure kind={isBoss ? 'boss' : 'enemy'} id={id} hurt={hurt} broken={broken} poison={poison > 0} frost={frost > 0} bleed={bleed} big={isBoss} />}
             </div>
           </>
         )}
@@ -94,20 +94,20 @@ export const Encounter = memo(function Encounter() {
           {!isBoss && lore && <div className="t-lore text-[14px] mt-2 max-w-[360px] leading-snug" style={{ textShadow: '0 1px 2px var(--void)' }}>{lore}</div>}
         </div>
 
-        {staggered && (
+        {broken && (
           <div className="absolute inset-x-0 top-[38%] text-center t-display text-[46px] pointer-events-none" style={{ color: 'var(--ember-hot)', letterSpacing: '0.42em', textShadow: '0 0 28px color-mix(in srgb, var(--ember-hot) 90%, transparent), 0 2px 0 var(--void)' }}>
-            Riposte
+            Reprisal
           </div>
         )}
-        {hymn && !staggered && (
-          <div className="absolute inset-x-0 top-[30%] text-center t-display text-[20px] pointer-events-none" style={{ color: 'var(--soul)', letterSpacing: '0.3em', textShadow: '0 0 16px color-mix(in srgb, var(--soul) 80%, transparent)' }}>
+        {hymn && !broken && (
+          <div className="absolute inset-x-0 top-[30%] text-center t-display text-[20px] pointer-events-none" style={{ color: 'var(--wisp)', letterSpacing: '0.3em', textShadow: '0 0 16px color-mix(in srgb, var(--wisp) 80%, transparent)' }}>
             The hymn sounds. Hold your blade.
           </div>
         )}
-        {telegraph && blind && !staggered && (
+        {telegraph && blind && !broken && (
           <div className="absolute inset-x-0 bottom-4 text-center t-label" style={{ color: 'color-mix(in srgb, var(--bone) 72%, transparent)' }}>Something moves in the dark.</div>
         )}
-        {telegraph && !blind && !staggered && (
+        {telegraph && !blind && !broken && (
           <div className="absolute inset-x-0 bottom-4 pl-10 pr-10 lg:pr-[120px] pointer-events-none">
             <div className="t-label mb-1 flex justify-between" style={{ color: 'var(--parchment)' }}><span><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--blood-bright)', marginRight: 8, clipPath: 'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)' }} />{attackId}</span><span className="t-num">{attackDmg} · {attackPct}% of you · dodge</span></div>
             <Gauge value={windupTotal - windup} max={windupTotal} tone="blood" height={5} cut={1} />
@@ -116,18 +116,18 @@ export const Encounter = memo(function Encounter() {
         <FloatingNumbers />
       </div>
 
-      {/* the foot: health, poise, statuses */}
+      {/* the foot: health, composure, statuses */}
       <div className="relative px-7 lg:pr-[120px] pt-3 pb-5" style={{ background: 'linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--void) 35%, transparent) 100%)' }}>
         <div className="flex justify-between items-end mb-1">
           <div className="t-label" style={{ color: isBoss ? 'var(--ember-hot)' : undefined }}>{isBoss ? `Phase ${phase + 1} · ${phaseName}` : tier >= 0 ? <TierProgress /> : ' '}</div>
           <span className="t-num text-[18px]" style={{ color: 'var(--parchment)' }}>{fmt(hpNum)} <span style={{ color: 'color-mix(in srgb, var(--bone) 72%, transparent)' }}>/ {fmt(hpMaxNum)}</span></span>
         </div>
         <Gauge value={hpNum} max={hpMaxNum} tone={isBoss ? 'ember' : 'blood'} height={isBoss ? 14 : 11} />
-        <Gauge value={staggered ? poise : stagger} max={poise} tone={staggered ? 'ember' : 'bone'} height={4} cut={1} className="mt-1.5" />
+        <Gauge value={broken ? composure : strain} max={composure} tone={broken ? 'ember' : 'bone'} height={4} cut={1} className="mt-1.5" />
         <div className="flex gap-4 mt-2 t-label min-h-[14px]">
           {bleed > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--blood-bright)', marginRight: 6 }} />Bleed {Math.round(bleed)}%</span>}
           {poison > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--verdigris)', marginRight: 6 }} />Poisoned {poison.toFixed(0)}s</span>}
-          {frost > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--soul)', marginRight: 6 }} />Frostbitten {frost.toFixed(0)}s</span>}
+          {frost > 0 && <span style={{ color: 'var(--parchment)' }}><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--wisp)', marginRight: 6 }} />Frostbitten {frost.toFixed(0)}s</span>}
           {isBoss && mechanicText && <span className="t-lore normal-case tracking-normal text-[14px] ml-auto text-right max-w-[70%]" style={{ letterSpacing: 0 }}>{mechanicText}</span>}
         </div>
       </div>

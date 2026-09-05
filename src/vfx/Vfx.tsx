@@ -15,7 +15,7 @@ const modeListeners = new Set<() => void>();
 export function setGlMode(m: 'gl' | 'dom') {
   if (m === glMode) return;
   glMode = m;
-  // the last rung of the ladder: a machine that cannot hold the GL stage also loses the ambient motion (grain step, embers, drift, flame)
+  // the last rung of the ladder: a machine that cannot hold the GL stage also loses the ambient motion (grain step, motes, drift, flame)
   document.documentElement.classList.toggle('perf-lite', m === 'dom');
   modeListeners.forEach((l) => l());
 }
@@ -37,7 +37,7 @@ export const Vfx = memo(function Vfx() {
     stageRef.current = stage;
     stage.onGiveUp = () => setGlMode('dom');
     let raf = 0;
-    const snap: Snapshot = { zone: 'approach', kind: null, id: '', big: false, hpFrac: 1, riposteOpen: false, poison: false, frost: false, bleed: 0, dead: false, dim: 0.3, reduceFx: false };
+    const snap: Snapshot = { zone: 'tollroad', kind: null, id: '', big: false, hpFrac: 1, riposteOpen: false, poison: false, frost: false, bleed: 0, dead: false, dim: 0.3, reduceFx: false };
     const frame = (now: number) => {
       const s = useGame.getState().state;
       const e = s.encounter.enemy;
@@ -48,7 +48,7 @@ export const Vfx = memo(function Vfx() {
       snap.id = e?.id ?? '';
       snap.big = !!e?.isBoss;
       snap.hpFrac = s.player.hpMax > 0 ? s.player.hp / s.player.hpMax : 1;
-      snap.riposteOpen = (e?.riposte ?? 0) > 0;
+      snap.riposteOpen = (e?.reprisal ?? 0) > 0;
       snap.poison = (e?.statuses.poison.active ?? 0) > 0;
       snap.frost = (e?.statuses.frost.active ?? 0) > 0;
       snap.bleed = e?.statuses.bleed.buildup ?? 0;
@@ -67,7 +67,7 @@ export const Vfx = memo(function Vfx() {
       const shakeOn = useSettings.getState().screenShake;
       for (const ev of events) {
         switch (ev.type) {
-          case 'hit': stage.hit({ dmgFrac: Math.min(1, ev.dmg.toNumber() / hpMax), crit: ev.crit, riposte: ev.riposte, source: ev.source }); break;
+          case 'hit': stage.hit({ dmgFrac: Math.min(1, ev.dmg.toNumber() / hpMax), crit: ev.crit, reprisal: ev.reprisal, source: ev.source }); break;
           case 'enemyAttack': stage.enemyAttack({ dodged: ev.dodged, perfect: ev.perfect, dmgFrac: shakeOn ? ev.dmg / Math.max(1, s.player.hpMax) : 0 }); break;
           case 'kill': stage.kill(ev.isBoss); break;
           case 'statusProc': if (ev.target === 'enemy') stage.status(ev.status); break;

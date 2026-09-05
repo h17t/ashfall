@@ -4,34 +4,34 @@ import { useSettings } from '../settings';
 import type { GameEvent } from '@/engine';
 
 /**
- * Screen-level juice: impact flash, damage-scaled shake, riposte time-dilation with a chromatic
+ * Screen-level juice: impact flash, damage-scaled shake, reprisal time-dilation with a chromatic
  * edge, ash burst on death. All CSS. Honors reduce-effects and the screen-shake toggle.
  */
 export const Fx = memo(function Fx() {
   const reduceFx = useSettings((s) => s.reduceFx);
   const shakeOn = useSettings((s) => s.screenShake);
   const [flash, setFlash] = useState<{ key: number; color: string } | null>(null);
-  const [riposte, setRiposte] = useState(0);
+  const [reprisal, setRiposte] = useState(0);
   const [ash, setAsh] = useState(0);
   const shakeEl = useRef<HTMLDivElement>(null);
   const onEvents = useCallback((events: GameEvent[]) => {
     for (const e of events) {
-      if (e.type === 'stagger' && !reduceFx) setRiposte(Date.now());
+      if (e.type === 'strain' && !reduceFx) setRiposte(Date.now());
       if (e.type === 'death') { setAsh(Date.now()); setFlash({ key: Date.now(), color: 'color-mix(in srgb, #6E1212 35%, transparent)' }); }
       if (e.type === 'bossKilled') setFlash({ key: Date.now(), color: 'color-mix(in srgb, #F0902E 25%, transparent)' });
       if (e.type === 'enemyAttack' && !e.dodged && shakeOn && !reduceFx) shake(shakeEl.current, Math.min(12, 3 + e.dmg / 40));
-      if (e.type === 'hit' && e.riposte && shakeOn && !reduceFx) shake(shakeEl.current, 8);
+      if (e.type === 'hit' && e.reprisal && shakeOn && !reduceFx) shake(shakeEl.current, 8);
       if (e.type === 'statusProc' && e.target === 'enemy') setFlash({ key: Date.now(), color: 'color-mix(in srgb, #5C7A99 12%, transparent)' });
     }
   }, [reduceFx, shakeOn]);
   useEvents(onEvents);
   useEffect(() => { if (!flash) return; const t = window.setTimeout(() => setFlash(null), 320); return () => window.clearTimeout(t); }, [flash]);
-  useEffect(() => { if (!riposte) return; document.documentElement.classList.add('riposte-time'); const t = window.setTimeout(() => document.documentElement.classList.remove('riposte-time'), 650); return () => window.clearTimeout(t); }, [riposte]);
+  useEffect(() => { if (!reprisal) return; document.documentElement.classList.add('reprisal-time'); const t = window.setTimeout(() => document.documentElement.classList.remove('reprisal-time'), 650); return () => window.clearTimeout(t); }, [reprisal]);
   return (
     <>
       <div ref={shakeEl} className="pointer-events-none fixed inset-0 z-40" />
       {flash && <div key={flash.key} className="pointer-events-none fixed inset-0 z-40" style={{ background: flash.color, animation: 'flash 0.32s ease-out forwards' }} />}
-      {riposte > 0 && !reduceFx && <div key={riposte} className="pointer-events-none fixed inset-0 z-40 chromatic-edge" />}
+      {reprisal > 0 && !reduceFx && <div key={reprisal} className="pointer-events-none fixed inset-0 z-40 chromatic-edge" />}
       {ash > 0 && !reduceFx && <AshBurst key={ash} />}
     </>
   );

@@ -53,10 +53,10 @@ export const SettingsPanel = memo(function SettingsPanel() {
       <div className="text-[13px] text-bone/70">Autosaves every 10 seconds, when the tab is hidden, and on close. A rolling backup is kept; if the main save is ever unreadable the backup loads instead and the damaged copy is preserved.</div>
 
       <div className="border-t border-ash/50 pt-2 font-display text-[16px] text-blood-bright">Hard delete</div>
-      <div className="text-[13px] text-bone/70">Erases the save, the backup and every trace. Type <span className="font-num text-parchment">HOLLOW</span> to confirm.</div>
+      <div className="text-[13px] text-bone/70">Erases the save, the backup and every trace. Type <span className="font-num text-parchment">UNMADE</span> to confirm.</div>
       <div className="flex gap-2">
         <input className="bg-ink border border-ash/50 text-parchment text-[13px] px-2 py-1 w-28 font-num" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
-        <button className="btn text-[13px] border-blood text-blood-bright" disabled={confirm !== 'HOLLOW'} onClick={() => { hardDelete(); setConfirm(''); setMsg('Everything is ash. A new ember stirs.'); }}>Delete everything</button>
+        <button className="btn text-[13px] border-blood text-blood-bright" disabled={confirm !== 'UNMADE'} onClick={() => { hardDelete(); setConfirm(''); setMsg('Everything is ash. A new mote stirs.'); }}>Delete everything</button>
       </div>
 
       <div className="border-t border-ash/50 pt-2 font-display text-[16px] text-parchment">Active modifiers</div>
@@ -71,20 +71,20 @@ export const SettingsPanel = memo(function SettingsPanel() {
 function Stats() {
   const kills = useSel((s) => s.stats.kills.toString());
   const deaths = useSel((s) => s.stats.deaths);
-  const earned = useSel((s) => s.stats.soulsEarned.toString());
-  const lost = useSel((s) => s.stats.soulsLost.toString());
+  const earned = useSel((s) => s.stats.marrowEarned.toString());
+  const lost = useSel((s) => s.stats.marrowLost.toString());
   const clicks = useSel((s) => s.stats.clicks);
-  const ripostes = useSel((s) => s.stats.ripostes);
+  const reprisals = useSel((s) => s.stats.reprisals);
   const perfect = useSel((s) => s.stats.perfectDodges);
   const play = useSel((s) => Math.floor(s.stats.playTime));
   return (
     <div className="border-t border-ash/50 pt-2 text-[13px] grid grid-cols-2 gap-x-3 gap-y-0.5 text-bone/70">
       <span>Kills</span><span className="font-num text-parchment text-right">{fmt(Number(kills))}</span>
       <span>Deaths</span><span className="font-num text-parchment text-right">{deaths}</span>
-      <span>Souls earned</span><span className="font-num text-parchment text-right">{fmt(Number(earned))}</span>
-      <span>Souls lost to the ash</span><span className="font-num text-parchment text-right">{fmt(Number(lost))}</span>
+      <span>Marrow earned</span><span className="font-num text-parchment text-right">{fmt(Number(earned))}</span>
+      <span>Marrow lost to the ash</span><span className="font-num text-parchment text-right">{fmt(Number(lost))}</span>
       <span>Clicks</span><span className="font-num text-parchment text-right">{fmt(clicks)}</span>
-      <span>Ripostes</span><span className="font-num text-parchment text-right">{fmt(ripostes)}</span>
+      <span>Reprisals</span><span className="font-num text-parchment text-right">{fmt(reprisals)}</span>
       <span>Perfect dodges</span><span className="font-num text-parchment text-right">{fmt(perfect)}</span>
       <span>Time at the fire</span><span className="font-num text-parchment text-right">{Math.floor(play / 3600)}h {Math.floor((play % 3600) / 60)}m</span>
     </div>

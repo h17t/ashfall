@@ -2,13 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { newGame, advance, D, type GameState } from '..';
 import { BOSSES, ZONES, ZONE_ORDER, cycleBossFor, getZone } from '@/content';
 
-function arena(bossZone: string, tier: number, kindles = 0): GameState {
+function arena(bossZone: string, tier: number, wakings = 0): GameState {
   const s = newGame(11);
-  s.prestige.kindles = kindles;
+  s.prestige.wakings = wakings;
   for (const z of ZONE_ORDER) if (!s.unlockedZones.includes(z)) s.unlockedZones.push(z);
   advance(s, 0.1);
   for (const z of ZONE_ORDER) { advance(s, 0, [{ type: 'travel', zone: z, tier: 0 }]); advance(s, 0.1); s.zones[z].cleared = getZone(z).tiers.length - 1; s.zones[z].secretFound = true; s.zones[z].bossKills = tier === -3 ? 1 : 0; }
-  s.player.stats.vig = 99; s.player.level = 300; // the test player must survive boss hits
+  s.player.stats.vit = 99; s.player.level = 300; // the test player must survive boss hits
   advance(s, 0, [{ type: 'travel', zone: bossZone, tier }]);
   advance(s, 0.5);
   expect(s.encounter.enemy?.isBoss).toBe(true);
@@ -36,7 +36,7 @@ describe('boss mechanics', () => {
     expect(s.player.hp).toBe(hp1);
   });
   it('blind phases hide the telegraph flag and disable auto-dodge', () => {
-    const s = arena('deep', -1);
+    const s = arena('undercroft', -1);
     const e = s.encounter.enemy!;
     e.hp = e.hpMax.mul(0.6); // into phase 2: Lights Out
     e.statuses.poison.active = 0.2; e.statuses.poison.dps = D(1); // a tick of damage triggers the phase check
@@ -64,23 +64,23 @@ describe('boss mechanics', () => {
     for (let i = 0; i < 300; i++) { const ev = advance(s, 0.1); if (ev.some((x) => x.type === 'enemyAttack')) timesLate.push(s.t); s.player.hp = s.player.hpMax; }
     expect(timesLate.length).toBeGreaterThan(timesEarly.length);
   });
-  it('cycle bosses appear only in their cycle after the lord, drop dark embers, and yield no soul', () => {
-    const s0 = arena('approach', -1, 0);
-    const ev0 = advance(s0, 0, [{ type: 'travel', zone: 'approach', tier: -3 }]);
+  it('cycle bosses appear only in their cycle after the lord, drop dark motes, and yield no wisp', () => {
+    const s0 = arena('tollroad', -1, 0);
+    const ev0 = advance(s0, 0, [{ type: 'travel', zone: 'tollroad', tier: -3 }]);
     expect(ev0.some((e) => e.type === 'error')).toBe(true);
-    const s = arena('approach', -3, 1);
+    const s = arena('tollroad', -3, 1);
     expect(s.encounter.enemy!.id).toBe('deserterCaptain');
-    const h0 = s.prestige.humanity;
+    const h0 = s.prestige.vestige;
     s.encounter.enemy!.hp = D(1);
     advance(s, 0, [{ type: 'click' }]);
-    expect(s.prestige.humanity.gt(h0)).toBe(true);
-    expect(s.bossSouls.deserterCaptain ?? 0).toBe(0);
-    expect(s.zones.approach.cycleKills).toBe(1);
-    const ev = advance(s, 0, [{ type: 'travel', zone: 'approach', tier: -3 }]);
+    expect(s.prestige.vestige.gt(h0)).toBe(true);
+    expect(s.keepsakes.deserterCaptain ?? 0).toBe(0);
+    expect(s.zones.tollroad.cycleKills).toBe(1);
+    const ev = advance(s, 0, [{ type: 'travel', zone: 'tollroad', tier: -3 }]);
     expect(ev.some((e) => e.type === 'error')).toBe(true);
   });
   it('an open wound stops a regenerating boss from mending', () => {
-    const s = arena('approach', -2);
+    const s = arena('tollroad', -2);
     const e = s.encounter.enemy!;
     expect(e.id).toBe('hangedPilgrim');
     e.hp = e.hpMax.mul(0.5);
@@ -98,7 +98,7 @@ describe('boss mechanics', () => {
     expect(cycles).toEqual([1, 2, 3, 4, 5]);
     for (let i = 1; i < ZONE_ORDER.length; i++) expect(ZONES[ZONE_ORDER[i]].requires).toBe(ZONES[ZONE_ORDER[i - 1]].boss);
   });
-  it('all boss soul weapons are reachable: every bossSoul weapon belongs to a boss', () => {
+  it('all keepsake weapons are reachable: every bossSoul weapon belongs to a boss', () => {
     for (const b of Object.values(BOSSES)) expect(b.phases.every((p) => p.text.length > 20)).toBe(true);
   });
 });

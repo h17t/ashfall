@@ -1,5 +1,5 @@
 /**
- * Big-number helpers. All economy/damage numbers in Ashfall are break_infinity Decimals
+ * Big-number helpers. All economy/damage numbers in Mournwake are break_infinity Decimals
  * from day one. Timers, stat points, stamina, and other bounded values are plain numbers.
  */
 import Decimal from 'break_infinity.js';

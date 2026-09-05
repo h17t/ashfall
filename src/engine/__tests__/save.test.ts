@@ -4,7 +4,7 @@ import { BALANCE } from '@/content/balance';
 
 function playedState(seed = 3): GameState {
   const s = newGame(seed);
-  s.souls = D('12345678901234567890');
+  s.marrow = D('12345678901234567890');
   for (let i = 0; i < 300; i++) advance(s, 0.1, i % 2 ? [{ type: 'click' }] : []);
   s.materials.shard = 4;
   return s;
@@ -15,8 +15,8 @@ describe('save round trip', () => {
     const s = playedState();
     const json = serialize(s, 1000);
     const back = parseSave(json);
-    expect(back.souls.eq(s.souls)).toBe(true);
-    expect(back.souls.toNumber()).toBeCloseTo(1.2345678901234568e19, -5);
+    expect(back.marrow.eq(s.marrow)).toBe(true);
+    expect(back.marrow.toNumber()).toBeCloseTo(1.2345678901234568e19, -5);
     expect(back.player.level).toBe(s.player.level);
     expect(back.stats.kills.eq(s.stats.kills)).toBe(true);
     expect(back.encounter.enemy?.hp.eq(s.encounter.enemy!.hp) ?? true).toBe(true);
@@ -26,14 +26,16 @@ describe('save round trip', () => {
     const a = JSON.stringify(advance(s, 2).length);
     const b = JSON.stringify(advance(back, 2).length);
     expect(a).toBe(b);
-    expect(back.souls.eq(s.souls)).toBe(true);
+    expect(back.marrow.eq(s.marrow)).toBe(true);
   });
   it('export/import is unicode-safe and detects corruption', () => {
     const s = playedState();
     const text = exportSave(s, 5);
-    expect(text.startsWith('ASHFALL1.')).toBe(true);
+    expect(text.startsWith('MOURNWAKE1.')).toBe(true);
+    // exports made before the rename carry the old prefix and must still import
+    expect(importSave('ASHFALL1.' + text.slice('MOURNWAKE1.'.length)).marrow.eq(s.marrow)).toBe(true); // banned-terms: allow
     const back = importSave(text);
-    expect(back.souls.eq(s.souls)).toBe(true);
+    expect(back.marrow.eq(s.marrow)).toBe(true);
     expect(() => importSave('hello')).toThrow(SaveError);
     expect(() => importSave(text.slice(0, text.length - 40))).toThrow(SaveError);
     try { importSave(text.slice(0, -40)); } catch (e) { expect((e as SaveError).kind).toMatch(/corrupt|checksum/); }
@@ -61,7 +63,7 @@ describe('save round trip', () => {
     blob.checksum = checksum(inner);
     const back = parseSave(JSON.stringify(blob));
     expect(back.automation.autoLevelStat).toBe('balanced');
-    expect(back.prestige.humanity.toNumber()).toBe(0);
+    expect(back.prestige.vestige.toNumber()).toBe(0);
     expect(back.player.buffs).toEqual([]);
   });
   it('runs the migration chain from every historical version', () => {
@@ -70,7 +72,7 @@ describe('save round trip', () => {
     for (const fixture of FIXTURES) {
       const back = parseSave(fixture.json);
       expect(back.version).toBe(SAVE_VERSION);
-      expect(back.souls.gte(0)).toBe(true);
+      expect(back.marrow.gte(0)).toBe(true);
       fixture.check(back);
     }
   });
@@ -80,8 +82,8 @@ describe('save round trip', () => {
 const FIXTURES: { version: number; json: string; check: (s: GameState) => void }[] = [
   {
     version: 1,
-    json: (() => { const s = newGame(9); s.souls = D(777); return serialize(s, 42); })(),
-    check: (s) => expect(s.souls.toNumber()).toBe(777),
+    json: (() => { const s = newGame(9); s.marrow = D(777); return serialize(s, 42); })(),
+    check: (s) => expect(s.marrow.toNumber()).toBe(777),
   },
 ];
 
@@ -92,19 +94,19 @@ describe('offline progress', () => {
     const sum = applyOffline(s, 100 * 3600);
     expect(sum).not.toBeNull();
     expect(sum!.cappedSeconds).toBe(BALANCE.offline.capHours * 3600);
-    expect(sum!.souls.toNumber()).toBe(0); // no phantoms yet
+    expect(sum!.marrow.toNumber()).toBe(0); // no shades yet
     expect(s.offline).toBe(sum);
   });
-  it('never drops souls and restores the player', () => {
+  it('never drops marrow and restores the player', () => {
     const s = newGame(1);
-    s.souls = D(500);
+    s.marrow = D(500);
     s.player.hp = 1;
-    s.player.estus = 0;
+    s.player.draughts = 0;
     applyOffline(s, 3600);
-    expect(s.souls.toNumber()).toBe(500);
+    expect(s.marrow.toNumber()).toBe(500);
     expect(s.player.hp).toBe(s.player.hpMax);
-    expect(s.player.estus).toBe(s.player.estusMax);
-    expect(s.bloodstain).toBeNull();
+    expect(s.player.draughts).toBe(s.player.draughtsMax);
+    expect(s.remains).toBeNull();
   });
   it('respects the offline cap modifier', () => {
     const s = newGame(1);

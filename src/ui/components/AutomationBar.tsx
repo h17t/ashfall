@@ -4,16 +4,16 @@ import { computeMods, STAT_NAMES, STAT_KEYS } from '@/engine';
 import { Tooltip } from './Tooltip';
 import { Slab } from '@/render/materials/Slab';
 
-const FEATURES: { key: 'autoAttack' | 'autoRiposte' | 'autoDodge' | 'autoEstus' | 'autoLevel' | 'autoAdvance' | 'autoKindle' | 'autoSpells' | 'autoSigil'; label: string; desc: string }[] = [
-  { key: 'autoAttack', label: 'Attack', desc: 'Hollow Instinct: swings once a second (scaled by weapon speed) whenever stamina allows. Clicking adds on top.' },
-  { key: 'autoRiposte', label: 'Riposte', desc: 'Strikes the Riposte window for you.' },
+const FEATURES: { key: 'autoAttack' | 'autoReprisal' | 'autoDodge' | 'autoDraught' | 'autoLevel' | 'autoAdvance' | 'autoSnuff' | 'autoSpells' | 'autoSever'; label: string; desc: string }[] = [
+  { key: 'autoAttack', label: 'Attack', desc: 'Revenant Instinct: swings once a second (scaled by weapon speed) whenever stamina allows. Clicking adds on top.' },
+  { key: 'autoReprisal', label: 'Reprisal', desc: 'Strikes the Reprisal window for you.' },
   { key: 'autoDodge', label: 'Dodge', desc: 'Perfect-dodges every telegraph the cooldown allows.' },
-  { key: 'autoEstus', label: 'Estus', desc: 'Drinks below 35% HP.' },
-  { key: 'autoLevel', label: 'Level', desc: 'Spends souls on levels as soon as you can afford one.' },
+  { key: 'autoDraught', label: 'Tallowdraught', desc: 'Drinks below 35% HP.' },
+  { key: 'autoLevel', label: 'Level', desc: 'Spends marrow on levels as soon as you can afford one.' },
   { key: 'autoAdvance', label: 'Advance', desc: 'Pushes into the next tier the moment one is cleared.' },
-  { key: 'autoSpells', label: 'Spells', desc: 'Casts attuned spells whenever they are ready.' },
-  { key: 'autoKindle', label: 'Kindle', desc: 'Kindles automatically when this cycle would gather at least double what the last Kindle gathered (and at least 10), after 20 minutes.' },
-  { key: 'autoSigil', label: 'Sigil', desc: 'Carves the Sigil automatically when it would gather at least 1.5× what the last Sigil gathered (and at least 5).' },
+  { key: 'autoSpells', label: 'Spells', desc: 'Casts recited spells whenever they are ready.' },
+  { key: 'autoSnuff', label: 'Snuff', desc: 'Wakings automatically when this cycle would gather at least double what the last Snuff gathered (and at least 10), after 20 minutes.' },
+  { key: 'autoSever', label: 'Severing', desc: 'Carves the Severing automatically when it would gather at least 1.5× what the last Severing gathered (and at least 5).' },
 ];
 
 /** Automation toggles. Only unlocked features are shown; each one was earned. */
@@ -28,7 +28,7 @@ export const AutomationBar = memo(function AutomationBar() {
   if (shown.length === 0) return null;
   return (
     <Slab material="iron" seed="auto" ornament="none" className="px-4 py-2 flex items-center gap-2 flex-wrap">
-      <span className="t-label mr-1">Hollow instinct</span>
+      <span className="t-label mr-1">Revenant instinct</span>
       {shown.map((f) => {
         const i = FEATURES.indexOf(f);
         return (

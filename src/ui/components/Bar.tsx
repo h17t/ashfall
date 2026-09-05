@@ -12,10 +12,10 @@ interface Props {
   text?: string;
 }
 
-const TONES: Tone[] = ['blood', 'ember', 'stamina', 'bone', 'soul', 'gold', 'verdigris'];
+const TONES: Tone[] = ['blood', 'ember', 'stamina', 'bone', 'wisp', 'gold', 'verdigris'];
 function toTone(c: string): Tone {
   if ((TONES as string[]).includes(c)) return c as Tone;
-  if (c.includes('soul')) return 'soul';
+  if (c.includes('wisp')) return 'wisp';
   if (c.includes('verdigris')) return 'stamina';
   if (c.includes('gold')) return 'gold';
   if (c.includes('ember')) return 'ember';

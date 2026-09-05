@@ -5,7 +5,7 @@ import { hashSeed } from '../seed';
 
 /**
  * A panel that is an object. Stone slab, scorched leather or nailed parchment: a chipped or torn
- * outline from a seeded polygon (never border-radius), a bevel lit from the bonfire at bottom-left
+ * outline from a seeded polygon (never border-radius), a bevel lit from the lantern at bottom-left
  * that breathes with `--fire`, grain, and a real shadow cast on whatever it overlaps.
  *
  * Nothing here uses an SVG filter at runtime; edges are clip-path polygons, grain is a cached tile,

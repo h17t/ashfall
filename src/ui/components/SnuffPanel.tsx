@@ -1,20 +1,21 @@
 import { memo, useState } from 'react';
 import { useGame, useSel } from '../store';
-import { fmt, D, humanityPreview, canKindle, kindleLedger, nodeCost, nodeBlocked, computeMods } from '@/engine';
+import { fmt, D, vestigePreview, canSnuff, snuffLedger, nodeCost, nodeBlocked, computeMods } from '@/engine';
+import { wakingName } from '@/engine/prestige';
 import { TREE, BRANCH_INFO } from '@/content';
 import { Tooltip } from './Tooltip';
 import { Slab } from '@/render/materials/Slab';
-import { setKindleLedger } from '@/render/cinematics/Cinema';
+import { setSnuffLedger } from '@/render/cinematics/Cinema';
 
-export const KindlePanel = memo(function KindlePanel() {
+export const SnuffPanel = memo(function SnuffPanel() {
   const dispatch = useGame((g) => g.dispatch);
-  const kindles = useSel((s) => s.prestige.kindles);
-  const humanity = useSel((s) => s.prestige.humanity.toString());
-  const total = useSel((s) => s.prestige.humanityTotal.toString());
-  const preview = useSel((s) => humanityPreview(s).toString());
-  const why = useSel((s) => canKindle(s));
-  const ledger = useSel((s) => JSON.stringify(kindleLedger(s)));
-  const cycleSouls = useSel((s) => s.stats.cycleSouls.toString());
+  const wakings = useSel((s) => s.prestige.wakings);
+  const vestige = useSel((s) => s.prestige.vestige.toString());
+  const total = useSel((s) => s.prestige.vestigeTotal.toString());
+  const preview = useSel((s) => vestigePreview(s).toString());
+  const why = useSel((s) => canSnuff(s));
+  const ledger = useSel((s) => JSON.stringify(snuffLedger(s)));
+  const cycleMarrow = useSel((s) => s.stats.cycleMarrow.toString());
   const cycleBosses = useSel((s) => s.stats.cycleBosses);
   const cycleTime = useSel((s) => Math.floor(s.stats.cycleTime / 60));
   const [confirm, setConfirm] = useState(false);
@@ -22,27 +23,27 @@ export const KindlePanel = memo(function KindlePanel() {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
-        <span className="t-display text-[20px] text-ember-hot">Kindle the Flame</span>
-        <span className="t-label">{kindles === 0 ? 'First cycle' : `New Game+${kindles}`}</span>
+        <span className="t-display text-[20px] text-ember-hot">Snuff the Flame</span>
+        <span className="t-label">{wakingName(wakings)}</span>
       </div>
       <div className="border border-ash/50 p-2 text-[14px] flex flex-col gap-1">
-        <div className="flex justify-between"><span className="text-bone/70">Humanity held</span><span className="font-num text-ember-hot">{fmt(D(humanity))}</span><span className="text-bone/70">of {fmt(D(total))} ever</span></div>
-        <div className="flex justify-between"><span className="text-bone/70">This cycle</span><span className="font-num text-parchment">{fmt(D(cycleSouls))} souls · {cycleBosses} lords · {cycleTime} min</span></div>
-        <Tooltip tip="Humanity = (cycle souls ÷ 5,000)^0.42 × 1.15 per lord felled × 1.06 per tier of depth reached × your Humanity bonuses. The curve is sub-linear: kindling twice as often gathers more than waiting twice as long.">
-          <div className="flex justify-between cursor-help"><span className="text-bone/70">Kindling now gathers</span><span className="font-num text-ember-hot text-[16px]">+{fmt(D(preview))} Humanity</span></div>
+        <div className="flex justify-between"><span className="text-bone/70">Vestige held</span><span className="font-num text-ember-hot">{fmt(D(vestige))}</span><span className="text-bone/70">of {fmt(D(total))} ever</span></div>
+        <div className="flex justify-between"><span className="text-bone/70">This cycle</span><span className="font-num text-parchment">{fmt(D(cycleMarrow))} marrow · {cycleBosses} lords · {cycleTime} min</span></div>
+        <Tooltip tip="Vestige = (cycle marrow ÷ 5,000)^0.42 × 1.15 per lord felled × 1.06 per tier of depth reached × your Vestige bonuses. The curve is sub-linear: rendering twice as often gathers more than waiting twice as long.">
+          <div className="flex justify-between cursor-help"><span className="text-bone/70">Snuffing now gathers</span><span className="font-num text-ember-hot text-[16px]">+{fmt(D(preview))} Vestige</span></div>
         </Tooltip>
       </div>
       {!confirm ? (
-        <button className={`btn ${why ? '' : 'btn-ember'}`} disabled={!!why} title={why ?? ''} onClick={() => setConfirm(true)}>{why ?? 'Kindle…'}</button>
+        <button className={`btn ${why ? '' : 'btn-ember'}`} disabled={!!why} title={why ?? ''} onClick={() => setConfirm(true)}>{why ?? 'Snuff…'}</button>
       ) : (
         <div className="border border-ember p-2 text-[14px] flex flex-col gap-2">
           <div className="grid grid-cols-2 gap-2">
             <div><div className="t-label mb-1" style={{ color: 'var(--parchment)' }}><span aria-hidden className="inline-block w-2 h-2 mr-2" style={{ background: 'var(--verdigris)' }} />Kept</div>{L.keep.map((k) => <div key={k} className="text-bone">· {k}</div>)}</div>
             <div><div className="t-label mb-1" style={{ color: 'var(--parchment)' }}><span aria-hidden className="inline-block w-2 h-2 mr-2" style={{ background: 'var(--blood-bright)' }} />Turned to ash</div>{L.lose.map((k) => <div key={k} className="text-bone">· {k}</div>)}</div>
           </div>
-          <div className="text-bone/70">Enemies of the next cycle carry ×1.6 HP and ×1.28 damage, but yield ×1.45 souls and ×1.3 drops, and new kinds of them walk the road.</div>
+          <div className="text-bone/70">Enemies of the next cycle carry ×1.6 HP and ×1.28 damage, but yield ×1.45 marrow and ×1.3 drops, and new kinds of them walk the road.</div>
           <div className="flex gap-2">
-            <button className="btn btn-ember" onClick={() => { setKindleLedger({ keep: L.keep, lose: L.lose, cycle: kindles + 1 }); dispatch({ type: 'kindle' }); setConfirm(false); }}>Kindle the flame</button>
+            <button className="btn btn-ember" onClick={() => { setSnuffLedger({ keep: L.keep, lose: L.lose, cycle: wakings + 1 }); dispatch({ type: 'snuff' }); setConfirm(false); }}>Snuff the flame</button>
             <button className="btn" onClick={() => setConfirm(false)}>Not yet</button>
           </div>
         </div>
@@ -53,25 +54,25 @@ export const KindlePanel = memo(function KindlePanel() {
 });
 
 /**
- * The Humanity tree as an illuminated page: four vines on parchment, medallions joined by drawn
- * stems, rank pips beneath each, ember where a node is complete, ash where it is not yet open.
+ * The Vestige tree as an illuminated page: four vines on parchment, medallions joined by drawn
+ * stems, rank pips beneath each, mote where a node is complete, ash where it is not yet open.
  */
 function Tree() {
   const dispatch = useGame((g) => g.dispatch);
   const ranks = useSel((s) => JSON.stringify(s.prestige.tree));
-  const humanity = useSel((s) => s.prestige.humanity.toString());
+  const vestige = useSel((s) => s.prestige.vestige.toString());
   const blocked = useSel((s) => JSON.stringify(Object.fromEntries(Object.keys(TREE).map((id) => [id, nodeBlocked(s, id)]))));
   const costs = useSel((s) => JSON.stringify(Object.fromEntries(Object.keys(TREE).map((id) => [id, nodeCost(s, id).toString()]))));
   const R = JSON.parse(ranks) as Record<string, number>;
   const B = JSON.parse(blocked) as Record<string, string | null>;
   const C = JSON.parse(costs) as Record<string, string>;
-  const branches = ['ember', 'bone', 'shadow', 'flame'] as const;
+  const branches = ['wick', 'bone', 'shadow', 'flame'] as const;
   const COL = 108, ROW = 96, PAD = 18;
   return (
     <Slab material="parchment" seed="tree" rough={8} ornament="fold" className="px-4 pt-3 pb-4 flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
-        <span className="t-display text-[18px]" style={{ color: 'var(--ink)' }}>The Humanity Tree</span>
-        <span className="t-label" style={{ color: 'var(--ash)' }}>permanent · <span className="font-num" style={{ color: 'var(--ember)' }}>{fmt(D(humanity))}</span> to spend</span>
+        <span className="t-display text-[18px]" style={{ color: 'var(--ink)' }}>The Vestige Tree</span>
+        <span className="t-label" style={{ color: 'var(--ash)' }}>permanent · <span className="font-num" style={{ color: 'var(--ember)' }}>{fmt(D(vestige))}</span> to spend</span>
       </div>
       {branches.map((b) => {
         const nodes = Object.values(TREE).filter((n) => n.branch === b);
@@ -102,7 +103,7 @@ function Tree() {
                 const shape = isAuto ? '15,1 29,15 15,29 1,15' : '15,1 27,8 27,22 15,29 3,22 3,8';
                 return (
                   <div key={n.id} className="absolute flex flex-col items-center" style={{ left: p.x - COL / 2, top: p.y - 15, width: COL }}>
-                    <Tooltip tip={<div><div className="font-display text-[16px]">{n.name}</div><div>{n.desc}</div><div className="font-num mt-1" style={{ color: 'var(--ash)' }}>rank {rank}/{n.maxRank} · next costs {C[n.id]} Humanity{n.requires.length ? ` · requires ${n.requires.map((r) => TREE[r].name).join(', ')}` : ''}</div>{why && !maxed && <div className="mt-1" style={{ color: 'var(--blood)' }}>{why}</div>}</div>}>
+                    <Tooltip tip={<div><div className="font-display text-[16px]">{n.name}</div><div>{n.desc}</div><div className="font-num mt-1" style={{ color: 'var(--ash)' }}>rank {rank}/{n.maxRank} · next costs {C[n.id]} Vestige{n.requires.length ? ` · requires ${n.requires.map((r) => TREE[r].name).join(', ')}` : ''}</div>{why && !maxed && <div className="mt-1" style={{ color: 'var(--blood)' }}>{why}</div>}</div>}>
                       <button
                         className="block relative"
                         disabled={!!why}

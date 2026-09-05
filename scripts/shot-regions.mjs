@@ -2,9 +2,9 @@
 import { createRequire } from 'node:module';
 const require = createRequire('/opt/node22/lib/node_modules/');
 const { chromium } = require('playwright');
-const sharp = require('/home/user/ashfall/node_modules/sharp');
+const sharp = require('/home/user/mournwake/node_modules/sharp');
 const out = process.argv[2] ?? 'art/review';
-const zones = ['approach', 'mire', 'archive', 'sanctum', 'deep', 'kiln', 'abyss'];
+const zones = ['tollroad', 'mire', 'archive', 'sanctum', 'undercroft', 'renderworks', 'nadir'];
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
 page.on('pageerror', (e) => console.log('PAGEERROR', e.message));
@@ -14,10 +14,10 @@ const tiles = [];
 for (const z of zones) {
   await page.evaluate((zone) => {
     const g = __ashfall.getState(); const s = g.state;
-    s.unlockedZones = ['approach', 'mire', 'archive', 'sanctum', 'deep', 'kiln', 'abyss'];
+    s.unlockedZones = ['tollroad', 'mire', 'archive', 'sanctum', 'undercroft', 'renderworks', 'nadir'];
     for (const id of s.unlockedZones) { s.zones[id] = s.zones[id] ?? { cleared: -1, kills: [0, 0, 0, 0], bossKills: 0, secretFound: false, secretKills: 0, cycleKills: 0 }; s.zones[id].cleared = 3; s.zones[id].bossKills = 1; }
-    s.player.level = 120; s.player.hpMax = 1e6; s.player.hp = 1e6; s.player.estus = 99;
-    localStorage.setItem('ashfall.seenBosses', '[]');
+    s.player.level = 120; s.player.hpMax = 1e6; s.player.hp = 1e6; s.player.draughts = 99;
+    localStorage.setItem('mournwake.seenBosses', '[]');
     g.dispatch({ type: 'travel', zone, tier: 1 }); g.stepBy(1);
     // skip the region card
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));

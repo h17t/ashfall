@@ -1,73 +1,73 @@
 import type { MaterialDef } from './types';
 
 export const MATERIALS: Record<string, MaterialDef> = {
-  shard: {
-    id: 'shard',
-    name: 'Titanite Shard',
+  coarseSlag: {
+    id: 'coarseSlag',
+    name: 'Coarse Slag',
     tier: 1,
-    lore: 'A fragment of the stone the old smiths called god-bone. Reinforces a weapon to +3. Nobody remembers which god, or what was done to it.',
+    lore: 'Grey slag from the Rendering Works, the crust the old smiths chipped from the crucible. Reinforces a weapon to +3.',
   },
-  largeShard: {
-    id: 'largeShard',
-    name: 'Large Titanite Shard',
+  fineSlag: {
+    id: 'fineSlag',
+    name: 'Fine Slag',
     tier: 2,
-    lore: 'A larger fragment, veined with something that glows only when no one is looking. Reinforces a weapon to +6.',
+    lore: 'Slag skimmed from a clean melt. Reinforces a weapon from +3 to +6.',
   },
-  chunk: {
-    id: 'chunk',
-    name: 'Titanite Chunk',
+  blackSlag: {
+    id: 'blackSlag',
+    name: 'Black Slag',
     tier: 3,
-    lore: 'Dense and cold. The weight of it is wrong for its size, as if part of it lies somewhere else. Reinforces a weapon to +9.',
+    lore: 'Slag from the deepest crucible, black all the way through. Reinforces a weapon from +6 to +9.',
   },
-  slab: {
-    id: 'slab',
-    name: 'Titanite Slab',
+  slagIngot: {
+    id: 'slagIngot',
+    name: 'Slag Ingot',
     tier: 4,
-    lore: 'A perfect slab, worked smooth by hands that ended their work before the first fire was lit. Reinforces a weapon to +10, its final form.',
+    lore: 'A whole ingot, poured once and never used. Takes a weapon to +10, its final shape.',
   },
-  estusShard: {
-    id: 'estusShard',
-    name: 'Estus Shard',
+  wickStub: {
+    id: 'wickStub',
+    name: 'Wick Stub',
     tier: 0,
-    lore: 'A shard of a broken flask. Fit it to your own and it holds one more draught of the flame. The fire remembers what it once filled.',
+    lore: 'The stub of a burnt wick. Set into your Lantern it holds one more Tallowdraught.',
   },
-  boneShard: {
-    id: 'boneShard',
-    name: 'Undead Bone Shard',
+  renderFat: {
+    id: 'renderFat',
+    name: 'Render Fat',
     tier: 0,
-    lore: 'A bone that would not stop burning. Cast into the bonfire, it deepens the flame and the Estus draws more from it.',
+    lore: 'Fat rendered from something that walked a long way. Cast into the Lantern it makes every draught heal more.',
   },
-  soulVessel: {
-    id: 'soulVessel',
-    name: 'Soul Vessel',
+  reliquaryBone: {
+    id: 'reliquaryBone',
+    name: 'Reliquary Bone',
     tier: 0,
-    lore: 'An empty vessel that hungers for a shape. Pour yourself out into it and choose again what you are. Few are made; fewer survive the pouring.',
+    lore: 'A bone kept in a reliquary long enough to forget whose it was. Held, it lets you forget what you were and choose again: your stats are poured out and re-poured.',
   },
-  coal: {
-    id: 'coal',
-    name: 'Cinder Coal',
+  pitchCoal: {
+    id: 'pitchCoal',
+    name: 'Pitch Coal',
     tier: 0,
-    lore: 'Coal that has been burnt once already and remembers how. Unlocks infusions at the bonfire, so a blade may learn a second nature.',
+    lore: 'Coal that has burnt once already and remembers how. Unlocks infusions at the Lantern, so a blade can be taught a second nature.',
   },
-  ember: {
-    id: 'ember',
-    name: 'Ember',
+  wickEnd: {
+    id: 'lit',
+    name: 'Wick',
     tier: 0,
-    lore: 'A warmth clenched in the palm. Carried by those who mean to kindle something.',
+    lore: 'A hearth clenched in the palm. Carried by those who mean to snuff something.',
   },
 };
 
 /** Materials required for reinforcement from level L to L+1. */
 export function reinforceMaterial(level: number): { id: string; count: number } {
-  if (level < 3) return { id: 'shard', count: level + 1 };
-  if (level < 6) return { id: 'largeShard', count: level - 2 };
-  if (level < 9) return { id: 'chunk', count: level - 5 };
-  return { id: 'slab', count: 1 };
+  if (level < 3) return { id: 'coarseSlag', count: level + 1 };
+  if (level < 6) return { id: 'fineSlag', count: level - 2 };
+  if (level < 9) return { id: 'blackSlag', count: level - 5 };
+  return { id: 'slagIngot', count: 1 };
 }
 
-MATERIALS.darkEmber = {
-  id: 'darkEmber',
-  name: 'Dark Ember',
+MATERIALS.dust = {
+  id: 'dust',
+  name: 'Dust of the Unmaking',
   tier: 0,
-  lore: 'An ember that gives no light and is warm anyway. Held, it becomes Humanity at once; no Kindling required. The things that carry them did not come by them honestly.',
+  lore: 'What is left of a world when the Unmaking has finished with it. Each grain buys a little more of it.',
 };

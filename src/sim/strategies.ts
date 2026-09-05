@@ -1,6 +1,6 @@
 /**
  * Scripted strategies. All are parameterizations of one policy so that later systems
- * (phantoms, spells, covenants, kindling) plug into every strategy through `extensions`.
+ * (shades, spells, creeds, rendering) plug into every strategy through `extensions`.
  */
 import type { Action, GameState, StatKey } from '@/engine';
 import { levelCost, reinforceCost, expectedLevel, weaponDamage, travelBlocked } from '@/engine';
@@ -18,14 +18,14 @@ export interface PolicyParams {
   dodgeSkill: number;
   /** if reacting, probability the dodge is inside the perfect window */
   perfectSkill: number;
-  /** clicks faster during riposte windows */
+  /** clicks faster during reprisal windows */
   riposteAware: boolean;
-  /** drink estus below this hp fraction */
+  /** drink draughts below this hp fraction */
   estusAt: number;
-  /** retreat to bonfire below this hp fraction when out of estus (0 = never) */
+  /** retreat to lantern below this hp fraction when out of draughts (0 = never) */
   retreatAt: number;
   /** stat allocation plan */
-  levelPlan: 'balanced' | 'weaponBest' | 'vigor' | 'none';
+  levelPlan: 'balanced' | 'weaponBest' | 'vitality' | 'none';
   /** keep this many level-costs in reserve before spending on anything */
   soulsReserve: number;
   /** push into the next tier when level >= expected - pushLead */
@@ -59,13 +59,13 @@ export function bestStatFor(state: GameState): StatKey {
   const def = getWeapon(state.player.weapon);
   const inst = state.player.weapons[state.player.weapon];
   const order: string[] = ['-', 'E', 'D', 'C', 'B', 'A', 'S'];
-  let best: StatKey = 'str';
+  let best: StatKey = 'mig';
   let bestG = -1;
   const scaling: Partial<Record<StatKey, string>> = { ...def.scaling };
-  if (inst?.infusion === 'heavy') scaling.str = 'A';
-  if (inst?.infusion === 'keen') scaling.dex = 'A';
-  if (inst?.infusion === 'magic') scaling.int = 'A';
-  if (inst?.infusion === 'blessed') scaling.fth = 'A';
+  if (inst?.infusion === 'heavy') scaling.mig = 'A';
+  if (inst?.infusion === 'keen') scaling.fin = 'A';
+  if (inst?.infusion === 'magic') scaling.ins = 'A';
+  if (inst?.infusion === 'blessed') scaling.dev = 'A';
   for (const [k, g] of Object.entries(scaling)) {
     const i = order.indexOf(g as string);
     if (i > bestG) { bestG = i; best = k as StatKey; }
@@ -76,17 +76,17 @@ export function bestStatFor(state: GameState): StatKey {
 function chooseStat(state: GameState, plan: PolicyParams['levelPlan']): StatKey | null {
   const p = state.player;
   if (plan === 'none') return null;
-  if (plan === 'vigor') return p.stats.vig < 60 ? 'vig' : 'end';
+  if (plan === 'vitality') return p.stats.vit < 60 ? 'vit' : 'bre';
   const best = bestStatFor(state);
-  // Everyone keeps a floor of survivability: vigor/endurance every third level.
+  // Everyone keeps a floor of survivability: vitality/breath every third level.
   const cycle = p.level % 3;
   if (plan === 'balanced') {
-    if (cycle === 0) return 'vig';
-    if (cycle === 1) return 'end';
+    if (cycle === 0) return 'vit';
+    if (cycle === 1) return 'bre';
     return best;
   }
   // weaponBest: two damage points per survivability point
-  if (cycle === 0) return p.stats.vig <= p.stats.end ? 'vig' : 'end';
+  if (cycle === 0) return p.stats.vit <= p.stats.bre ? 'vit' : 'bre';
   return best;
 }
 
@@ -114,7 +114,7 @@ function bestOwnedWeapon(view: SimView): string {
     const br = weaponDamage(s, view.mods, id);
     const def = getWeapon(id);
     // damage per stamina point, weighted towards raw hit for boss-killing
-    const score = br.total.toNumber() * (0.6 + 0.4 * (10 / def.stamina)) * (1 + def.stagger / 40);
+    const score = br.total.toNumber() * (0.6 + 0.4 * (10 / def.stamina)) * (1 + def.strain / 40);
     if (score > bestScore) { bestScore = score; best = id; }
   }
   return best;
@@ -124,7 +124,7 @@ function bestOwnedWeapon(view: SimView): string {
 function infuseForBoss(view: SimView, out: Action[]) {
   const s = view.state;
   const enemy = s.encounter.enemy;
-  if (!enemy?.isBoss || (s.materials.coal ?? 0) < 1 || !s.flags.infusionUnlocked) return;
+  if (!enemy?.isBoss || (s.materials.pitchCoal ?? 0) < 1 || !s.flags.infusionUnlocked) return;
   const ph = BOSSES[enemy.id]?.phases[enemy.phase];
   if (ph?.mechanic !== 'regen') return;
   const resists = (st: string) => (ph.statusResist?.[st as 'bleed'] ?? 1) <= 0;
@@ -177,9 +177,9 @@ export function makePolicy(params: PolicyParams): Strategy {
             if (enemy.windup <= threshold) { out.push({ type: 'dodge' }); mem.dodgeDecided = false; }
           }
         }
-        // estus
-        if (p.hp < p.hpMax * params.estusAt && p.estus > 0) out.push({ type: 'estus' });
-        else if (params.retreatAt > 0 && p.estus === 0 && p.hp < p.hpMax * params.retreatAt && !s.corpseRun) {
+        // draughts
+        if (p.hp < p.hpMax * params.estusAt && p.draughts > 0) out.push({ type: 'draughts' });
+        else if (params.retreatAt > 0 && p.draughts === 0 && p.hp < p.hpMax * params.retreatAt && !s.remainsRun) {
           out.push({ type: 'retreat' });
           // retreating from a boss resets it: count it as a failed attempt and go level up
           if (s.encounter.tier < 0) { mem.bossDeathBoss = s.encounter.tier === -1 ? getZone(s.encounter.zone).boss : getZone(s.encounter.zone).secretBoss ?? null; mem.bossDeathLevel = p.level; }
@@ -188,19 +188,19 @@ export function makePolicy(params: PolicyParams): Strategy {
         const clicking = params.clickRate > 0 && (params.clickUntil === undefined || view.t < params.clickUntil);
         if (clicking) {
           let rate = params.clickRate;
-          if (params.riposteAware && enemy.riposte > 0) rate = Math.max(rate, 6);
+          if (params.riposteAware && enemy.reprisal > 0) rate = Math.max(rate, 6);
           // learned players ease off during Backdraft
           if (params.respectsMechanics && enemy.isBoss) {
             const ph = BOSSES[enemy.id]?.phases[enemy.phase];
-            if (ph?.mechanic === 'backdraft' && enemy.riposte <= 0) rate = Math.min(rate, (ph.mechParam ?? 7) / 2.2);
-            if (ph?.mechanic === 'hymn' && enemy.mech.hymn === 1 && enemy.riposte <= 0) rate = 0;
+            if (ph?.mechanic === 'backdraft' && enemy.reprisal <= 0) rate = Math.min(rate, (ph.mechParam ?? 7) / 2.2);
+            if (ph?.mechanic === 'hymn' && enemy.mech.hymn === 1 && enemy.reprisal <= 0) rate = 0;
           }
           mem.clickAcc += rate * dt;
           const w = getWeapon(p.weapon);
           while (mem.clickAcc >= 1) {
             mem.clickAcc -= 1;
             // rhythmic players wait for stamina; spammers don't
-            if (params.respectsMechanics && p.stamina < w.stamina && enemy.riposte <= 0) break;
+            if (params.respectsMechanics && p.stamina < w.stamina && enemy.reprisal <= 0) break;
             out.push({ type: 'click' });
           }
         }
@@ -211,12 +211,12 @@ export function makePolicy(params: PolicyParams): Strategy {
         mem.lastEcon = view.t;
         const cost = levelCost(p.level);
         const reserve = cost.mul(params.soulsReserve);
-        // boss souls: default to the weapon
-        for (const [boss, n] of Object.entries(s.bossSouls)) if (n > 0) out.push({ type: 'chooseBossSoul', boss, choice: 'weapon' });
+        // boss marrow: default to the weapon
+        for (const [boss, n] of Object.entries(s.keepsakes)) if (n > 0) out.push({ type: 'chooseKeepsake', boss, choice: 'weapon' });
         // shop weapons: buy anything affordable we don't own from unlocked regions
         const maxRegion = Math.max(...s.unlockedZones.map((z) => getZone(z).region));
         for (const w of Object.values(WEAPONS)) {
-          if (w.source.kind === 'shop' && w.source.region <= maxRegion && !p.weapons[w.id] && s.souls.gte(w.source.cost + reserve.toNumber())) {
+          if (w.source.kind === 'shop' && w.source.region <= maxRegion && !p.weapons[w.id] && s.marrow.gte(w.source.cost + reserve.toNumber())) {
             out.push({ type: 'buyWeapon', weapon: w.id });
             break;
           }
@@ -230,18 +230,18 @@ export function makePolicy(params: PolicyParams): Strategy {
         if (inst && inst.level < 10) {
           const mat = reinforceMaterial(inst.level);
           const rc = reinforceCost(getWeapon(inst.id).region, inst.level);
-          if ((s.materials[mat.id] ?? 0) >= mat.count && s.souls.gte(rc.add(reserve))) out.push({ type: 'reinforce', weapon: p.weapon });
+          if ((s.materials[mat.id] ?? 0) >= mat.count && s.marrow.gte(rc.add(reserve))) out.push({ type: 'reinforce', weapon: p.weapon });
         }
-        // estus upgrades
-        if ((s.materials.estusShard ?? 0) > 0) out.push({ type: 'upgradeEstus', kind: 'count' });
-        if ((s.materials.boneShard ?? 0) > 0) out.push({ type: 'upgradeEstus', kind: 'potency' });
+        // draughts upgrades
+        if ((s.materials.wickStub ?? 0) > 0) out.push({ type: 'upgradeDraught', kind: 'count' });
+        if ((s.materials.renderFat ?? 0) > 0) out.push({ type: 'upgradeDraught', kind: 'potency' });
         // level up
         const stat = chooseStat(s, params.levelPlan);
-        if (stat && s.souls.gte(cost)) out.push({ type: 'levelUp', stat });
+        if (stat && s.marrow.gte(cost)) out.push({ type: 'levelUp', stat });
       }
 
       // ---- navigation (every 2s) ----
-      if (view.t - mem.lastNav >= 2 && !s.corpseRun && s.deathScreen <= 0) {
+      if (view.t - mem.lastNav >= 2 && !s.remainsRun && s.deathScreen <= 0) {
         mem.lastNav = view.t;
         const zoneId = s.encounter.zone;
         const zone = getZone(zoneId);
@@ -256,8 +256,8 @@ export function makePolicy(params: PolicyParams): Strategy {
             if (!travelBlocked(s, nz, 0)) out.push({ type: 'travel', zone: nz, tier: 0 });
           } else if (tier >= 0 && zp.cleared >= tier && tier < lastTier) {
             // push when strong enough
-            const g = globalTier(zoneId, tier + 1, s.prestige.abyssDepth);
-            if (p.level >= expectedLevel(g, s.prestige.kindles) - params.pushLead && !travelBlocked(s, zoneId, tier + 1)) out.push({ type: 'travel', zone: zoneId, tier: tier + 1 });
+            const g = globalTier(zoneId, tier + 1, s.prestige.nadirDepth);
+            if (p.level >= expectedLevel(g, s.prestige.wakings) - params.pushLead && !travelBlocked(s, zoneId, tier + 1)) out.push({ type: 'travel', zone: zoneId, tier: tier + 1 });
           } else if (tier >= 0 && zp.cleared >= lastTier && !bossDone) {
             // boss attempt gating
             const canRetry = mem.bossDeathBoss !== zone.boss || p.level >= mem.bossDeathLevel + params.bossRetryLevels;
@@ -265,9 +265,9 @@ export function makePolicy(params: PolicyParams): Strategy {
           }
         }
       }
-      // remember boss deaths (bloodstain in the arena)
-      if (s.bloodstain && s.bloodstain.tier === -1 && mem.bossDeathBoss !== getZone(s.bloodstain.zone).boss) {
-        mem.bossDeathBoss = getZone(s.bloodstain.zone).boss;
+      // remember boss deaths (remains in the arena)
+      if (s.remains && s.remains.tier === -1 && mem.bossDeathBoss !== getZone(s.remains.zone).boss) {
+        mem.bossDeathBoss = getZone(s.remains.zone).boss;
         mem.bossDeathLevel = p.level;
       }
       for (const ext of extensions) ext(view, params, mem, out);
@@ -293,12 +293,12 @@ export const STRATEGIES: Record<string, () => Strategy> = {
     levelPlan: 'balanced', soulsReserve: 0, pushLead: 2, bossRetryLevels: 3, respectsMechanics: false,
   }),
   idle: () => makePolicy({
-    id: 'idle', description: 'Clicks for the first 8 minutes to bootstrap, then relies on auto-attack and the squad; only pushes when safely over-levelled.',
+    id: 'idle', description: 'Clicks for the first 8 minutes to bootstrap, then relies on auto-attack and the cortege; only pushes when safely over-levelled.',
     clickRate: 2.5, clickUntil: 8 * 60, dodgeSkill: 0.3, perfectSkill: 0.1, riposteAware: false, estusAt: 0.4, retreatAt: 0.3,
     levelPlan: 'balanced', soulsReserve: 0, pushLead: -6, bossRetryLevels: 4, respectsMechanics: false,
   }),
   noclick: () => makePolicy({
-    id: 'noclick', description: 'Never clicks. Measures the pure idle floor: auto-attack (from 6 min) and phantoms.',
+    id: 'noclick', description: 'Never clicks. Measures the pure idle floor: auto-attack (from 6 min) and shades.',
     clickRate: 0, dodgeSkill: 0.4, perfectSkill: 0.1, riposteAware: false, estusAt: 0.4, retreatAt: 0.3,
     levelPlan: 'balanced', soulsReserve: 0, pushLead: -8, bossRetryLevels: 4, respectsMechanics: false,
   }),

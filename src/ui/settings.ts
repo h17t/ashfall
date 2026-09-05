@@ -12,7 +12,7 @@ export interface Settings {
   set: (patch: Partial<Omit<Settings, 'set'>>) => void;
 }
 
-const KEY = 'ashfall.settings';
+const KEY = 'mournwake.settings';
 
 function load(): Partial<Settings> {
   try {

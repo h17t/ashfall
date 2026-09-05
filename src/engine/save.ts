@@ -1,12 +1,13 @@
 /**
  * Save serialization, versioning, migrations, checksums, export/import.
- * Decimals serialize as strings prefixed with a sigil so no field list is needed.
+ * Decimals serialize as strings prefixed with a severing so no field list is needed.
  */
 import { Decimal, decFromJSON, isFiniteDec } from './num';
 import { newGame, SAVE_VERSION } from './state';
 import type { GameState } from './types';
+import { migrateV1toV2 } from './migrations/v1-to-v2';
 
-const SIGIL = '§D§';
+const DEC_MARK = '§D§';
 
 export interface SaveBlob {
   v: number;
@@ -18,11 +19,11 @@ export interface SaveBlob {
 function replacer(this: any, k: string, v: unknown) {
   // Decimal defines toJSON, so `v` is already a string here; read the original from the holder.
   const orig = this?.[k];
-  if (orig instanceof Decimal) return SIGIL + orig.toString();
+  if (orig instanceof Decimal) return DEC_MARK + orig.toString();
   return v;
 }
 function reviver(_k: string, v: unknown) {
-  if (typeof v === 'string' && v.startsWith(SIGIL)) return decFromJSON(v.slice(SIGIL.length));
+  if (typeof v === 'string' && v.startsWith(DEC_MARK)) return decFromJSON(v.slice(DEC_MARK.length));
   return v;
 }
 
@@ -53,7 +54,7 @@ export class SaveError extends Error {
  * Migration chain: migrations[n] upgrades a raw (revived) state from version n to n+1.
  * Write one whenever the schema changes; never edit an old one.
  */
-export const migrations: Record<number, (raw: any) => any> = {};
+export const migrations: Record<number, (raw: any) => any> = { 1: migrateV1toV2 };
 
 export function parseSave(json: string): GameState {
   if (!json || json.trim() === '') throw new SaveError('The save is empty.', 'empty');
@@ -86,7 +87,7 @@ export function normalize(raw: any): GameState {
   const merged = merge(fresh, raw);
   merged.version = SAVE_VERSION;
   // sanity on decimals
-  for (const k of ['souls'] as const) if (!isFiniteDec(merged[k])) merged[k] = new Decimal(0);
+  for (const k of ['marrow'] as const) if (!isFiniteDec(merged[k])) merged[k] = new Decimal(0);
   return merged as GameState;
 }
 
@@ -104,7 +105,8 @@ function merge(defaults: any, value: any): any {
 
 // ---- export / import (base64, unicode-safe) ----
 
-const EXPORT_PREFIX = 'ASHFALL1.';
+const EXPORT_PREFIX = 'MOURNWAKE1.';
+const LEGACY_PREFIX = 'ASHFALL1.'; // banned-terms: allow (exports made before the rename still import)
 
 export function exportSave(state: GameState, savedAt: number): string {
   const json = serialize(state, savedAt);
@@ -116,10 +118,11 @@ export function exportSave(state: GameState, savedAt: number): string {
 
 export function importSave(text: string): GameState {
   const t = text.trim();
-  if (!t.startsWith(EXPORT_PREFIX)) throw new SaveError('Not an Ashfall export: the text should begin with ASHFALL1.', 'corrupt');
+  const prefix = t.startsWith(EXPORT_PREFIX) ? EXPORT_PREFIX : t.startsWith(LEGACY_PREFIX) ? LEGACY_PREFIX : null;
+  if (!prefix) throw new SaveError('Not a Mournwake export: the text should begin with MOURNWAKE1.', 'corrupt');
   let bin: string;
   try {
-    bin = b64decode(t.slice(EXPORT_PREFIX.length));
+    bin = b64decode(t.slice(prefix.length));
   } catch {
     throw new SaveError('The export is not valid base64. Copy the whole string.', 'corrupt');
   }

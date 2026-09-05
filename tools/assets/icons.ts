@@ -1,9 +1,9 @@
-/** Spell icons (96), covenant seals (128), item icons (96), UI plates. */
+/** Spell icons (96), creed seals (128), item icons (96), UI plates. */
 import type { Plate, Layer } from './compose';
 import { rng, blob, taper, jitter, flame, type Pt } from './svg-parts';
 import { humanoid } from './parts';
 import type { PaletteKey } from './palette';
-import { SPELLS, COVENANTS, MATERIALS } from '../../src/content';
+import { SPELLS, CREEDS, MATERIALS } from '../../src/content';
 
 const ring = (c: number, rad: number, r: ReturnType<typeof rng>, tone = 0.3): Layer[] => [
   { kind: 'mass', pts: blob(c, c, rad, rad, r, 0.06, 24), z: 1, tone },
@@ -38,22 +38,22 @@ function motif(kind: string, c: number, r: ReturnType<typeof rng>, color: Palett
 }
 
 const SPELL_MOTIF: Record<string, [string, PaletteKey]> = {
-  soulArrow: ['arrow', 'soul'], greatSoulArrow: ['arrows', 'soul'], soulSpear: ['spear', 'soul'], crystalSoulSpear: ['crystal', 'parchment'], magicWeapon: ['sword', 'soul'], frostLance: ['spear', 'parchment'], hiddenBody: ['veil', 'soul'], soulGreatsword: ['oath', 'soul'], unwriting: ['ring', 'soul'], wanderersStep: ['step', 'soul'],
-  heal: ['hand', 'gold'], force: ['ring', 'gold'], lightningSpear: ['bolt', 'gold'], greatLightningSpear: ['storm', 'gold'], replenishment: ['drop', 'gold'], sacredOath: ['oath', 'gold'], bountifulSunlight: ['sun', 'gold'], sunlightSpear: ['spear', 'gold'], lastRites: ['skull', 'gold'], drowningHymn: ['mist', 'soul'], lanternLight: ['lantern', 'gold'], stormCall: ['storm', 'gold'],
-  pyreBloom: ['flame', 'ember'], combustion: ['flame', 'ember'], fireball: ['orb', 'ember'], poisonMist: ['mist', 'verdigris'], powerWithin: ['flame', 'bloodBright'], greatChaosFireball: ['orb', 'ember'], warmth: ['hand', 'ember'], blackFlame: ['flame', 'soul'], rotBloom: ['drop', 'verdigris'], firstFlame: ['sun', 'emberHot'],
-  darkOrb: ['orb', 'soul'], deadAgain: ['skull', 'soul'], numbness: ['veil', 'ash'],
+  marrowDart: ['arrow', 'wisp'], greatMarrowDart: ['arrows', 'wisp'], marrowSpike: ['spear', 'wisp'], glassSpike: ['crystal', 'parchment'], wovenEdge: ['sword', 'wisp'], frostLance: ['spear', 'parchment'], hush: ['veil', 'wisp'], marrowCleaver: ['oath', 'wisp'], unwriting: ['ring', 'wisp'], namelessStep: ['step', 'wisp'],
+  heal: ['hand', 'gold'], shove: ['ring', 'gold'], stormJavelin: ['bolt', 'gold'], greatStormJavelin: ['storm', 'gold'], knitting: ['drop', 'gold'], swornLitany: ['oath', 'gold'], bountifulLight: ['sun', 'gold'], daybreakJavelin: ['spear', 'gold'], lastRites: ['skull', 'gold'], drowningHymn: ['mist', 'wisp'], lanternLight: ['lantern', 'gold'], stormCall: ['storm', 'gold'],
+  pyreBloom: ['flame', 'ember'], flare: ['flame', 'ember'], gout: ['orb', 'ember'], rotBreath: ['mist', 'verdigris'], marrowBurn: ['flame', 'bloodBright'], ruinousGout: ['orb', 'ember'], hearth: ['hand', 'ember'], blackTallow: ['flame', 'wisp'], rotBloom: ['drop', 'verdigris'], firstWickSpell: ['sun', 'emberHot'],
+  nadirOrb: ['orb', 'wisp'], deadAgain: ['skull', 'wisp'], numbness: ['veil', 'ash'],
 };
 
 export function spellPlate(id: string, seed: number): Plate {
   const r = rng(seed);
   const c = 48;
-  const [m, color] = SPELL_MOTIF[id] ?? ['orb', 'soul'];
+  const [m, color] = SPELL_MOTIF[id] ?? ['orb', 'wisp'];
   const sp = SPELLS[id];
-  const tint: PaletteKey = sp?.school === 'sorcery' ? 'soul' : sp?.school === 'miracle' ? 'gold' : sp?.school === 'pyromancy' ? 'ember' : 'soul';
+  const tint: PaletteKey = sp?.school === 'weaving' ? 'wisp' : sp?.school === 'litany' ? 'gold' : sp?.school === 'ruin' ? 'ember' : 'wisp';
   return { id, w: 96, h: 96, seed, tint, fire: [0.2, 1.0], layers: [...ring(c, 44, r), ...motif(m, c, r, color)], bleed: 1.6 };
 }
 
-const SEAL_MOTIF: Record<string, [string, PaletteKey]> = { embers: ['flame', 'ember'], legion: ['oath', 'bone'], rot: ['drop', 'verdigris'], vigil: ['lantern', 'gold'], abyss: ['ring', 'soul'] };
+const SEAL_MOTIF: Record<string, [string, PaletteKey]> = { wick: ['flame', 'ember'], legion: ['oath', 'bone'], rot: ['drop', 'verdigris'], vigil: ['lantern', 'gold'], nadir: ['ring', 'wisp'] };
 
 export function covenantPlate(id: string, seed: number): Plate {
   const r = rng(seed);
@@ -69,7 +69,7 @@ export function covenantPlate(id: string, seed: number): Plate {
     { kind: 'line', pts: blob(c, c, 39, 37, r, 0.03, 26), width: 1.2, z: 5 },
     ...motif(m, c, r, color),
   ];
-  void COVENANTS[id];
+  void CREEDS[id];
   return { id, w: 128, h: 128, seed, tint: 'blood', fire: [0.2, 1.0], layers: L, bleed: 2.2 };
 }
 
@@ -77,27 +77,27 @@ export function itemPlate(id: string, seed: number): Plate {
   const r = rng(seed);
   const c = 48;
   const L: Layer[] = [];
-  const shardish = ['shard', 'largeShard', 'chunk', 'slab'];
+  const shardish = ['coarseSlag', 'fineSlag', 'blackSlag', 'slagIngot'];
   if (shardish.includes(id)) {
-    const n = id === 'shard' ? 1 : id === 'largeShard' ? 2 : id === 'chunk' ? 1 : 1;
-    const size = id === 'slab' ? 40 : id === 'chunk' ? 36 : id === 'largeShard' ? 30 : 26;
-    for (let i = 0; i < n; i++) L.push({ kind: 'mass', pts: jitter(id === 'slab' ? [[c - 40, c - 14], [c + 38, c - 22], [c + 40, c + 18], [c - 36, c + 24]] : [[c - size * 0.5 + i * 18, c + size * 0.6], [c - size * 0.2 + i * 18, c - size * 0.9], [c + size * 0.5 + i * 18, c - size * 0.2], [c + size * 0.3 + i * 18, c + size * 0.7]], r, 2), z: 2, tone: id === 'chunk' ? 0.1 : 0.45 });
-    L.push({ kind: 'glow', cx: c + 6, cy: c - 4, r: 10, color: 'soul', z: 9 });
-  } else if (id === 'estusShard' || id === 'boneShard') {
+    const n = id === 'coarseSlag' ? 1 : id === 'fineSlag' ? 2 : id === 'blackSlag' ? 1 : 1;
+    const size = id === 'slagIngot' ? 40 : id === 'blackSlag' ? 36 : id === 'fineSlag' ? 30 : 26;
+    for (let i = 0; i < n; i++) L.push({ kind: 'mass', pts: jitter(id === 'slagIngot' ? [[c - 40, c - 14], [c + 38, c - 22], [c + 40, c + 18], [c - 36, c + 24]] : [[c - size * 0.5 + i * 18, c + size * 0.6], [c - size * 0.2 + i * 18, c - size * 0.9], [c + size * 0.5 + i * 18, c - size * 0.2], [c + size * 0.3 + i * 18, c + size * 0.7]], r, 2), z: 2, tone: id === 'blackSlag' ? 0.1 : 0.45 });
+    L.push({ kind: 'glow', cx: c + 6, cy: c - 4, r: 10, color: 'wisp', z: 9 });
+  } else if (id === 'wickStub' || id === 'renderFat') {
     L.push({ kind: 'mass', pts: jitter([[c - 20, c + 30], [c - 12, c - 30], [c + 12, c - 30], [c + 20, c + 30]], r, 2), z: 2, tone: 0.5 });
-    L.push({ kind: 'glow', cx: c, cy: c + 4, r: 22, color: id === 'estusShard' ? 'emberHot' : 'bone', z: 9 });
-  } else if (id === 'soulVessel') {
+    L.push({ kind: 'glow', cx: c, cy: c + 4, r: 22, color: id === 'wickStub' ? 'emberHot' : 'bone', z: 9 });
+  } else if (id === 'reliquaryBone') {
     L.push({ kind: 'mass', pts: jitter([[c - 24, c + 34], [c - 16, c - 6], [c - 6, c - 32], [c + 6, c - 32], [c + 16, c - 6], [c + 24, c + 34]], r, 2), z: 2, tone: 0.35 });
-    L.push({ kind: 'glow', cx: c, cy: c + 8, r: 18, color: 'soul', z: 9 });
-  } else if (id === 'coal') {
+    L.push({ kind: 'glow', cx: c, cy: c + 8, r: 18, color: 'wisp', z: 9 });
+  } else if (id === 'pitchCoal') {
     L.push({ kind: 'mass', pts: blob(c, c + 6, 30, 24, r, 0.3, 14), z: 2, tone: 0 });
     L.push({ kind: 'glow', cx: c - 8, cy: c + 2, r: 10, color: 'ember', z: 9 }); L.push({ kind: 'glow', cx: c + 10, cy: c + 10, r: 8, color: 'ember', z: 9 });
   } else if (id === 'ember') {
     L.push({ kind: 'mass', pts: blob(c, c + 10, 22, 16, r, 0.3, 12), z: 2 });
     L.push({ kind: 'detail', pts: flame(c, c + 12, r, 52, 30), color: 'ember', alpha: 0.95, z: 5 }); L.push({ kind: 'glow', cx: c, cy: c, r: 24, color: 'emberHot', z: 9 });
-  } else if (id === 'darkEmber') {
+  } else if (id === 'dust') {
     L.push({ kind: 'mass', pts: blob(c, c + 10, 22, 16, r, 0.3, 12), z: 2 });
-    L.push({ kind: 'detail', pts: flame(c, c + 12, r, 52, 30), color: 'ink', alpha: 0.95, z: 5 }); L.push({ kind: 'glow', cx: c, cy: c, r: 22, color: 'soul', z: 9 });
+    L.push({ kind: 'detail', pts: flame(c, c + 12, r, 52, 30), color: 'ink', alpha: 0.95, z: 5 }); L.push({ kind: 'glow', cx: c, cy: c, r: 22, color: 'wisp', z: 9 });
   } else {
     L.push({ kind: 'mass', pts: blob(c, c, 28, 28, r, 0.2, 12), z: 2, tone: 0.3 });
   }
@@ -107,7 +107,7 @@ export function itemPlate(id: string, seed: number): Plate {
 
 export function uiPlate(id: string, seed: number): Plate {
   const r = rng(seed);
-  if (id === 'bonfire') {
+  if (id === 'lantern') {
     const cx = 160, gy = 210;
     const L: Layer[] = [];
     // coiled sword in a mound of ash and bones
@@ -120,11 +120,11 @@ export function uiPlate(id: string, seed: number): Plate {
     L.push({ kind: 'glow', cx, cy: gy - 40, r: 110, color: 'ember', z: 9 });
     return { id, w: 320, h: 240, seed, tint: 'ember', fire: [0.5, 0.85], layers: L, bleed: 2.5 };
   }
-  if (id === 'bloodstain') {
+  if (id === 'remains') {
     const L: Layer[] = [{ kind: 'mass', pts: blob(64, 34, 52, 16, r, 0.35, 22), z: 1, tone: 0 }, { kind: 'detail', pts: blob(64, 34, 40, 12, r, 0.3, 18), color: 'blood', alpha: 0.8, z: 2 }, { kind: 'glow', cx: 64, cy: 32, r: 28, color: 'bloodBright', z: 9 }];
     return { id, w: 128, h: 64, seed, tint: 'blood', layers: L, bleed: 2 };
   }
-  // emberTender: the player, seen from behind-ish, holding an ember
+  // revenant: the player, seen from behind-ish, holding an mote
   const L = humanoid(r, { head: 'hood', cloak: 0.9, weapon: { kind: 'sword', raised: false }, height: 1.05, bulk: 0.9, eyes: 'none', fx: [{ kind: 'glow', cx: 128 - 40, cy: 200, r: 26, color: 'emberHot', z: 9 }] });
   return { id, w: 256, h: 320, seed, tint: 'ember', layers: L };
 }

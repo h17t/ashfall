@@ -12,14 +12,14 @@ await page.getByRole('tab', { name: /^Settings/ }).click();
 await page.getByText('Sound (synthesized').locator('..').getByRole('button').click();
 await page.waitForTimeout(200);
 const arena = page.locator('.cursor-pointer').first();
-for (let i = 0; i < 30; i++) { await arena.click({ force: true }); await page.waitForTimeout(60); }
+for (let i = 0; i < 30; i++) { await arena.click({ shove: true }); await page.waitForTimeout(60); }
 await page.waitForTimeout(800);
 console.log('bed after clicks:', await page.evaluate(() => JSON.stringify({ active: __ashfallAudio.bedActive(), region: __ashfallAudio.region() })));
-await page.evaluate(() => { const g = __ashfall.getState(); const s = g.state; s.unlockedZones = ['approach', 'mire']; s.zones.approach.cleared = 3; s.zones.approach.bossKills = 1; g.dispatch({ type: 'travel', zone: 'mire', tier: 0 }); });
+await page.evaluate(() => { const g = __ashfall.getState(); const s = g.state; s.unlockedZones = ['tollroad', 'mire']; s.zones.tollroad.cleared = 3; s.zones.tollroad.bossKills = 1; g.dispatch({ type: 'travel', zone: 'mire', tier: 0 }); });
 await page.waitForTimeout(600);
 console.log('bed after travel:', await page.evaluate(() => JSON.stringify({ active: __ashfallAudio.bedActive(), region: __ashfallAudio.region() })));
 // boss: drive HP to just above the second phase threshold → hush; then across it → toll and release
-await page.evaluate(() => { const g = __ashfall.getState(); g.dispatch({ type: 'travel', zone: 'approach', tier: -1 }); g.stepBy(2); });
+await page.evaluate(() => { const g = __ashfall.getState(); g.dispatch({ type: 'travel', zone: 'tollroad', tier: -1 }); g.stepBy(2); });
 await page.waitForTimeout(300);
 await page.evaluate(() => { const g = __ashfall.getState(); const e = g.state.encounter.enemy; e.hp = e.hpMax.mul(0.62); g.replace(g.state); });
 await page.waitForTimeout(600);

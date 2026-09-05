@@ -3,7 +3,7 @@
 @import "./tokens.css";
 
 /*
- * Ashfall presentation layer. Palette is the thirteen tokens in tokens.css and nothing else
+ * Mournwake presentation layer. Palette is the thirteen tokens in tokens.css and nothing else
  * (ART.md §2); type is IM Fell / EB Garamond / Barlow Condensed, self-hosted (ART.md §3).
  * The names below keep older utility classes compiling while mapping them onto the palette.
  */
@@ -19,7 +19,7 @@
   --color-blood: #6E1212;
   --color-blood-bright: #A81C1C;
   --color-verdigris: #3D5A4C;
-  --color-soul: #5C7A99;
+  --color-wisp: #5C7A99;
   --color-gold: #B8912F;
 
   --color-ash-950: #0A0908;
@@ -49,7 +49,7 @@ html, body, #root { height: 100%; }
 html { background: var(--void); }
 body {
   margin: 0;
-  /* the bonfire sits low-left of the arena; the whole page is lit from there */
+  /* the lantern sits low-left of the arena; the whole page is lit from there */
   background:
     radial-gradient(ellipse 60% 45% at 26% 100%, color-mix(in srgb, var(--ember) 22%, transparent) 0%, transparent 70%),
     radial-gradient(ellipse 90% 70% at 40% 60%, var(--ink) 0%, var(--void) 75%);
@@ -125,13 +125,13 @@ select, input[type="text"], input[type="number"] {
 @keyframes shake { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-4px,2px); } 50% { transform: translate(3px,-3px); } 75% { transform: translate(-2px,-2px); } }
 @keyframes flash { from { opacity: 0.8; } to { opacity: 0; } }
 @keyframes ember-rise { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(-110vh) translateX(var(--drift)); opacity: 0; } }
-@keyframes you-died { 0% { opacity: 0; letter-spacing: 0.3em; } 30% { opacity: 1; } 100% { opacity: 1; letter-spacing: 0.5em; } }
-@keyframes riposte-pulse { 0%,100% { opacity: 0.15; } 50% { opacity: 1; } }
+@keyframes unmade { 0% { opacity: 0; letter-spacing: 0.3em; } 30% { opacity: 1; } 100% { opacity: 1; letter-spacing: 0.5em; } }
+@keyframes reprisal-pulse { 0%,100% { opacity: 0.15; } 50% { opacity: 1; } }
 @keyframes backdrop-drift { 0% { transform: translateX(-0.6%) scale(1.09); } 100% { transform: translateX(0.6%) scale(1.09); } }
 
 .float-num { position: absolute; animation: float-up 0.9s ease-out forwards; pointer-events: none; font-family: var(--font-num); font-weight: 600; letter-spacing: 0.02em; text-shadow: 0 2px 4px var(--void), 0 0 12px var(--void); }
 .shake { animation: shake 0.18s linear; }
-.riposte-glow::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 5; box-shadow: inset 0 0 60px 8px color-mix(in srgb, var(--ember-hot) 35%, transparent); animation: riposte-pulse 0.6s ease-in-out infinite; will-change: opacity; }
+.reprisal-glow::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 5; box-shadow: inset 0 0 60px 8px color-mix(in srgb, var(--ember-hot) 35%, transparent); animation: reprisal-pulse 0.6s ease-in-out infinite; will-change: opacity; }
 .backdrop-drift { animation: backdrop-drift 22s ease-in-out infinite alternate; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -140,19 +140,19 @@ select, input[type="text"], input[type="number"] {
 }
 .reduce-fx .float-num { animation-duration: 0.5s; }
 .reduce-fx .shake, .reduce-fx .backdrop-drift { animation: none; }
-.reduce-fx .ember { display: none; }
+.reduce-fx .mote { display: none; }
 
 /* ---- juice ---- */
 @keyframes ash-fall { from { transform: translate(0, 0); opacity: 0.7; } to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
 @keyframes flame-flicker { 0%,100% { transform: scaleY(1) scaleX(1); } 30% { transform: scaleY(1.06) scaleX(0.97); } 60% { transform: scaleY(0.95) scaleX(1.03); } }
 @keyframes root-shake { 0%,100% { transform: translate(0,0); } 20% { transform: translate(calc(var(--shake) * -1), calc(var(--shake) * 0.5)); } 40% { transform: translate(calc(var(--shake) * 0.8), calc(var(--shake) * -0.6)); } 60% { transform: translate(calc(var(--shake) * -0.5), calc(var(--shake) * -0.3)); } 80% { transform: translate(calc(var(--shake) * 0.3), calc(var(--shake) * 0.4)); } }
-@keyframes chromatic { 0% { box-shadow: inset 0 0 0 0 color-mix(in srgb, var(--ember) 0%, transparent), inset 0 0 0 0 color-mix(in srgb, var(--soul) 0%, transparent); } 20% { box-shadow: inset 6px 0 40px 4px color-mix(in srgb, var(--ember) 35%, transparent), inset -6px 0 40px 4px color-mix(in srgb, var(--soul) 35%, transparent); } 100% { box-shadow: inset 0 0 0 0 color-mix(in srgb, var(--ember) 0%, transparent), inset 0 0 0 0 color-mix(in srgb, var(--soul) 0%, transparent); } }
+@keyframes chromatic { 0% { box-shadow: inset 0 0 0 0 color-mix(in srgb, var(--ember) 0%, transparent), inset 0 0 0 0 color-mix(in srgb, var(--wisp) 0%, transparent); } 20% { box-shadow: inset 6px 0 40px 4px color-mix(in srgb, var(--ember) 35%, transparent), inset -6px 0 40px 4px color-mix(in srgb, var(--wisp) 35%, transparent); } 100% { box-shadow: inset 0 0 0 0 color-mix(in srgb, var(--ember) 0%, transparent), inset 0 0 0 0 color-mix(in srgb, var(--wisp) 0%, transparent); } }
 #root.shaking, .arena.shaking { animation: root-shake 0.22s linear; }
 .arena > .relative:last-child { will-change: transform; }
 .flame { animation: flame-flicker 1.6s ease-in-out infinite; }
 .chromatic-edge { animation: chromatic 0.65s ease-out forwards; }
-html.riposte-time .arena * { animation-duration: 1.8s; transition-duration: 0.5s; }
-html.riposte-time .float-num { animation-duration: 1.6s; }
+html.reprisal-time .arena * { animation-duration: 1.8s; transition-duration: 0.5s; }
+html.reprisal-time .float-num { animation-duration: 1.6s; }
 .reduce-fx .flame { animation: none; }
 .reduce-fx #root.shaking, .reduce-fx .arena.shaking { animation: none; }
 @media (prefers-reduced-motion: reduce) {
@@ -160,7 +160,7 @@ html.riposte-time .float-num { animation-duration: 1.6s; }
 }
 :focus-visible { outline: 2px solid var(--ember-hot); outline-offset: 2px; }
 
-/* the bonfire's flicker: an 8Hz stepped opacity loop on every lit layer, compositor only */
+/* the lantern's flicker: an 8Hz stepped opacity loop on every lit layer, compositor only */
 @keyframes fire-flicker {
   0% { opacity: 0.22; } 4% { opacity: 0.25; } 8% { opacity: 0.2; } 12% { opacity: 0.24; } 16% { opacity: 0.21; } 20% { opacity: 0.26; }
   24% { opacity: 0.23; } 28% { opacity: 0.19; } 32% { opacity: 0.24; } 36% { opacity: 0.22; } 40% { opacity: 0.27; } 44% { opacity: 0.21; }
@@ -171,7 +171,7 @@ html.riposte-time .float-num { animation-duration: 1.6s; }
 html.fire-still .fire-lit, .reduce-fx .fire-lit { animation: none; }
 /* perf-lite: set by the VFX stage when even its degraded tier cannot hold the frame; ambient motion stops, the picture stays */
 html.perf-lite .backdrop-drift, html.perf-lite .flame, html.perf-lite .fire-lit { animation: none !important; }
-html.perf-lite .ember { display: none; }
+html.perf-lite .mote { display: none; }
 @media (prefers-reduced-motion: reduce) { .fire-lit { animation: none; } }
 
 /* while a cinematic plays, everything that is not the frame steps back */
@@ -186,8 +186,8 @@ html.cine .hub-column, html.cine .under-frame { opacity: 0.3; filter: saturate(0
 .icon-well::before { content: ""; position: absolute; inset: 2px; background: radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--bone) 28%, transparent) 0%, transparent 70%); pointer-events: none; }
 .icon-well > * { position: relative; }
 
-/* the riposte figure: four times the display face, hot, with a dark plate behind it */
-.num-riposte { font-family: var(--font-display); font-weight: 400; font-size: 84px; letter-spacing: 0.06em; color: var(--ember-hot); text-shadow: 0 0 30px color-mix(in srgb, var(--ember-hot) 70%, transparent), 0 3px 0 var(--void), 0 0 2px var(--void); animation-duration: 1.4s !important; }
+/* the reprisal figure: four times the display face, hot, with a dark plate behind it */
+.num-reprisal { font-family: var(--font-display); font-weight: 400; font-size: 84px; letter-spacing: 0.06em; color: var(--ember-hot); text-shadow: 0 0 30px color-mix(in srgb, var(--ember-hot) 70%, transparent), 0 3px 0 var(--void), 0 0 2px var(--void); animation-duration: 1.4s !important; }
 
 /* while a cinematic plays, the frame's own name card yields to the card the cinema draws */
 .arena-namecard { transition: opacity 300ms; }

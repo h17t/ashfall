@@ -21,8 +21,8 @@ async function sheet(kinds: string[], out: string, cellW: number, cellH: number,
   console.log('wrote', out);
 }
 fs.mkdirSync('art', { recursive: true });
-await sheet(['enemy', 'phantom'], 'art/sheet-enemies.png', 200, 270, 9, '#241E1A');
-await sheet(['enemy', 'phantom'], 'art/sheet-enemies-parchment.png', 200, 270, 9, '#E8DCC4');
+await sheet(['enemy', 'shade'], 'art/sheet-enemies.png', 200, 270, 9, '#241E1A');
+await sheet(['enemy', 'shade'], 'art/sheet-enemies-parchment.png', 200, 270, 9, '#E8DCC4');
 await sheet(['boss'], 'art/sheet-bosses.png', 260, 330, 6, '#241E1A');
 await sheet(['weapon'], 'art/sheet-weapons.png', 180, 200, 8, '#241E1A');
-await sheet(['spell', 'covenant', 'item', 'ui'], 'art/sheet-icons.png', 140, 160, 10, '#241E1A');
+await sheet(['spell', 'creed', 'item', 'ui'], 'art/sheet-icons.png', 140, 160, 10, '#241E1A');

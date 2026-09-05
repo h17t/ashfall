@@ -11,7 +11,7 @@ export type TickHook = (state: GameState, mods: Mods, events: GameEvent[], dt: n
 export const actionHandlers: ActionHandler[] = [];
 export const tickHooks: TickHook[] = [];
 
-/** Later modules (phantoms, covenants, prestige) register action handlers here. */
+/** Later modules (shades, creeds, prestige) register action handlers here. */
 export function registerActionHandler(h: ActionHandler) {
   actionHandlers.push(h);
 }

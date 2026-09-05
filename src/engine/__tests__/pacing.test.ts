@@ -27,8 +27,8 @@ describe('pacing targets', () => {
     expect(r.invariantErrors).toEqual([]);
     expect(r.finalLevel).toBeGreaterThan(5);
   });
-  it('greedy: first Kindle lands inside the target window and the cycle after it is faster, not slower', () => {
-    const r = runSim({ strategy: STRATEGIES.greedy(), hours: 7, seed: 7, until: (s) => s.prestige.kindles >= 1 && s.stats.cycleTime > 20 * 60 });
+  it('greedy: first Snuff lands inside the target window and the cycle after it is faster, not slower', () => {
+    const r = runSim({ strategy: STRATEGIES.greedy(), hours: 7, seed: 7, until: (s) => s.prestige.wakings >= 1 && s.stats.cycleTime > 20 * 60 });
     expect(r.invariantErrors).toEqual([]);
     expect(r.milestones.firstKindle).not.toBeNull();
     const h = r.milestones.firstKindle! / 3600;

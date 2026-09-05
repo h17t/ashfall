@@ -186,7 +186,7 @@ export interface HumanoidSpec {
   weapon?: { kind: 'sword' | 'great' | 'dagger' | 'mace' | 'spear' | 'halberd' | 'staff' | 'club' | 'crossbow' | 'cleaver' | 'rapier' | 'twin' | 'katana' | 'hammer' | 'bell' | 'axe' | 'none'; raised?: boolean };
   shield?: 'kite' | 'round' | 'none';
   horns?: boolean;
-  eyes?: 'ember' | 'soul' | 'gold' | 'none';
+  eyes?: 'ember' | 'wisp' | 'gold' | 'none';
   rope?: boolean;       // hanged
   wings?: boolean;
   chains?: boolean;
@@ -259,7 +259,7 @@ export function humanoid(r: Rng, spec: HumanoidSpec = {}): Layer[] {
   if (wk === 'mace' || wk === 'club' || wk === 'hammer') { const end: Pt = [handR[0] + tipDir[0] * wl, handR[1] + tipDir[1] * wl]; L.push({ kind: 'mass', pts: haft(grip, end, r, wk === 'club' ? 9 : 6), z: 5 }); L.push({ kind: 'mass', pts: wk === 'hammer' ? jitter([[end[0] - 22, end[1] - 10], [end[0] + 22, end[1] - 10], [end[0] + 22, end[1] + 12], [end[0] - 22, end[1] + 12]], r, 1) : wk === 'club' ? blob(end[0], end[1] - 8, 13, 22, r, 0.2, 12) : maceHead(end, r, 15), z: 5, tone: 0.3 }); }
   if (wk === 'spear' || wk === 'halberd') { const g2: Pt = [handR[0] - tipDir[0] * wl * 0.9, handR[1] - tipDir[1] * wl * 0.9]; const end: Pt = [handR[0] + tipDir[0] * wl * 1.5, handR[1] + tipDir[1] * wl * 1.5]; L.push({ kind: 'mass', pts: haft(g2, end, r, 5), z: 5 }); L.push({ kind: 'mass', pts: spearHead(end, [end[0] + tipDir[0] * 34, end[1] + tipDir[1] * 34], r, 10), z: 5, tone: 0.4 }); if (wk === 'halberd') L.push({ kind: 'mass', pts: axeHead([end[0], end[1] + 6], r, 14, 1), z: 5, tone: 0.3 }); }
   if (wk === 'axe') { const end: Pt = [handR[0] + tipDir[0] * wl, handR[1] + tipDir[1] * wl]; L.push({ kind: 'mass', pts: haft(grip, end, r, 6), z: 5 }); L.push({ kind: 'mass', pts: axeHead(end, r, 20, 1), z: 5, tone: 0.3 }); }
-  if (wk === 'staff') { const g2: Pt = [handR[0] - tipDir[0] * wl * 0.8, handR[1] - tipDir[1] * wl * 0.8]; const end: Pt = [handR[0] + tipDir[0] * wl * 1.3, handR[1] + tipDir[1] * wl * 1.3]; L.push({ kind: 'mass', pts: haft(g2, end, r, 5), z: 5 }); L.push({ kind: 'glow', cx: end[0], cy: end[1] - 6, r: 18, color: 'soul', z: 9 }); }
+  if (wk === 'staff') { const g2: Pt = [handR[0] - tipDir[0] * wl * 0.8, handR[1] - tipDir[1] * wl * 0.8]; const end: Pt = [handR[0] + tipDir[0] * wl * 1.3, handR[1] + tipDir[1] * wl * 1.3]; L.push({ kind: 'mass', pts: haft(g2, end, r, 5), z: 5 }); L.push({ kind: 'glow', cx: end[0], cy: end[1] - 6, r: 18, color: 'wisp', z: 9 }); }
   if (wk === 'crossbow') {
     // stock along the forearm, a bow arc across the muzzle, a string, the wound bolt
     const muzzle: Pt = [handR[0] + 34, handR[1] - 18];
@@ -287,7 +287,7 @@ export function humanoid(r: Rng, spec: HumanoidSpec = {}): Layer[] {
   L.push({ kind: 'line', pts: [[cx - w * 0.2, shoulderY + 30], [cx - w * 0.05, hipY - 10]], width: 1.4, closed: false, z: 7 });
   L.push({ kind: 'line', pts: [[cx + w * 0.15, shoulderY + 24], [cx + w * 0.25, hipY - 16]], width: 1.1, closed: false, z: 7 });
   // rim light region: fire-side flank
-  L.push({ kind: 'light', pts: taper([cx - w * 0.45, shoulderY + 10], [cx - w * 0.3, ground], 22 * B, 14 * B, r, 1), strength: 0.42, z: 8 });
+  L.push({ kind: 'light', pts: taper([cx - w * 0.45, shoulderY + 10], [cx - w * 0.3, ground], 22 * B, 14 * B, r, 1), power: 0.42, z: 8 });
   if (spec.fx) L.push(...spec.fx);
   return L;
 }
@@ -298,7 +298,7 @@ export interface BeastSpec {
   tail?: 'long' | 'short' | 'none';
   headLow?: boolean;
   legs?: 2 | 4 | 6;
-  eyes?: 'ember' | 'soul' | 'gold' | 'none';
+  eyes?: 'ember' | 'wisp' | 'gold' | 'none';
   wings?: boolean;
   segmented?: boolean; // leech / crawler
   maw?: boolean;
@@ -326,7 +326,7 @@ export function beast(r: Rng, spec: BeastSpec = {}): Layer[] {
   if (spec.wings) L.push({ kind: 'mass', pts: jitter([[cx - 10, by - bodyH * 0.3], [cx - bodyW * 0.7, by - bodyH * 2.2], [cx - bodyW * 0.2, by - bodyH * 1.2], [cx + bodyW * 0.3, by - bodyH * 2.0], [cx + bodyW * 0.2, by - bodyH * 0.4]], r, 3), z: 0 });
   if (spec.eyes && spec.eyes !== 'none') L.push({ kind: 'glow', cx: hx + 8 * S, cy: hy - 4 * S, r: 8 * S, color: spec.eyes === 'ember' ? 'emberHot' : spec.eyes, z: 9 });
   L.push({ kind: 'line', pts: [[cx - bodyW * 0.3, by - 4], [cx + bodyW * 0.2, by + 6]], width: 1.3, closed: false, z: 7 });
-  L.push({ kind: 'light', pts: taper([cx - bodyW * 0.4, by + bodyH * 0.3], [cx + bodyW * 0.3, by + bodyH * 0.45], 18 * S, 12 * S, r, 1), strength: 0.5, z: 8 });
+  L.push({ kind: 'light', pts: taper([cx - bodyW * 0.4, by + bodyH * 0.3], [cx + bodyW * 0.3, by + bodyH * 0.45], 18 * S, 12 * S, r, 1), power: 0.5, z: 8 });
   return L;
 }
 
@@ -344,7 +344,7 @@ function segmentedBody(cx: number, cy: number, w: number, h: number, r: Rng): Pt
 }
 
 export type WraithForm = 'shroud' | 'column' | 'flayed' | 'spire' | 'wide';
-export interface WraithSpec { height?: number; tatter?: number; eyes?: 'soul' | 'ember' | 'gold' | 'none'; arms?: boolean; crown?: boolean; sun?: boolean; form?: WraithForm; hands?: boolean }
+export interface WraithSpec { height?: number; tatter?: number; eyes?: 'wisp' | 'ember' | 'gold' | 'none'; arms?: boolean; crown?: boolean; sun?: boolean; form?: WraithForm; hands?: boolean }
 
 export function wraith(r: Rng, spec: WraithSpec = {}): Layer[] {
   const H = spec.height ?? 1;
@@ -367,7 +367,7 @@ export function wraith(r: Rng, spec: WraithSpec = {}): Layer[] {
   if (spec.eyes && spec.eyes !== 'none') { L.push({ kind: 'glow', cx: cx - 8, cy: top + 32 * H, r: 8, color: spec.eyes === 'ember' ? 'emberHot' : spec.eyes, z: 9 }); L.push({ kind: 'glow', cx: cx + 9, cy: top + 32 * H, r: 8, color: spec.eyes === 'ember' ? 'emberHot' : spec.eyes, z: 9 }); }
   L.push({ kind: 'line', pts: [[cx - 10, top + 90], [cx - 24, bot - 70]], width: 1.2, closed: false, z: 7 });
   L.push({ kind: 'line', pts: [[cx + 14, top + 100], [cx + 20, bot - 60]], width: 1.0, closed: false, z: 7 });
-  L.push({ kind: 'light', pts: taper([cx - w * 0.45, top + 80], [cx - w * 0.35, bot - 40], 16, 10, r, 1), strength: 0.4, z: 8 });
+  L.push({ kind: 'light', pts: taper([cx - w * 0.45, top + 80], [cx - w * 0.35, bot - 40], 16, 10, r, 1), power: 0.4, z: 8 });
   return L;
 }
 
@@ -399,18 +399,18 @@ export function robed(r: Rng, spec: HumanoidSpec & { staff?: boolean; lantern?: 
   const handR: Pt = [cx + 44 * H, top + 110 * H];
   L.push({ kind: 'mass', pts: limb([cx + 22 * H, top + 60 * H], handR, r, 14, 9), z: 3 });
   L.push({ kind: 'mass', pts: limb([cx - 22 * H, top + 60 * H], [cx - 40 * H, top + 120 * H], r, 14, 9), z: 3 });
-  if (spec.staff !== false) { L.push({ kind: 'mass', pts: haft([handR[0] + 6, ground], [handR[0] + 14, top - 10 * H], r, 5), z: 5 }); L.push({ kind: 'glow', cx: handR[0] + 15, cy: top - 6 * H, r: 16, color: spec.eyes === 'gold' ? 'gold' : 'soul', z: 9 }); }
+  if (spec.staff !== false) { L.push({ kind: 'mass', pts: haft([handR[0] + 6, ground], [handR[0] + 14, top - 10 * H], r, 5), z: 5 }); L.push({ kind: 'glow', cx: handR[0] + 15, cy: top - 6 * H, r: 16, color: spec.eyes === 'gold' ? 'gold' : 'wisp', z: 9 }); }
   if (spec.lantern) L.push({ kind: 'glow', cx: cx - 48 * H, cy: top + 126 * H, r: 24, color: 'gold', z: 9 });
   if (spec.eyes && spec.eyes !== 'none') { L.push({ kind: 'glow', cx: cx - 6, cy: top + 26 * H, r: 6, color: spec.eyes === 'ember' ? 'emberHot' : spec.eyes, z: 9 }); L.push({ kind: 'glow', cx: cx + 7, cy: top + 26 * H, r: 6, color: spec.eyes === 'ember' ? 'emberHot' : spec.eyes, z: 9 }); }
   L.push({ kind: 'line', pts: [[cx - 8, top + 70 * H], [cx - 18, ground - 10]], width: 1.3, closed: false, z: 7 });
   L.push({ kind: 'line', pts: [[cx + 10, top + 80 * H], [cx + 22, ground - 20]], width: 1.1, closed: false, z: 7 });
-  L.push({ kind: 'light', pts: taper([cx - 34 * H, top + 90 * H], [cx - 48 * H, ground], 16, 12, r, 1), strength: 0.5, z: 8 });
+  L.push({ kind: 'light', pts: taper([cx - 34 * H, top + 90 * H], [cx - 48 * H, ground], 16, 12, r, 1), power: 0.5, z: 8 });
   if (spec.fx) L.push(...spec.fx);
   return L;
 }
 
 /** Big blocky constructs: golems, sentinels, custodians. */
-export function golem(r: Rng, spec: { size?: number; eyes?: 'ember' | 'soul' | 'gold'; cracks?: boolean; halberd?: boolean; twin?: boolean } = {}): Layer[] {
+export function golem(r: Rng, spec: { size?: number; eyes?: 'ember' | 'wisp' | 'gold'; cracks?: boolean; halberd?: boolean; twin?: boolean } = {}): Layer[] {
   const S = spec.size ?? 1;
   const cx = PW * 0.5, ground = PH * 0.94;
   const L: Layer[] = [];
@@ -424,11 +424,11 @@ export function golem(r: Rng, spec: { size?: number; eyes?: 'ember' | 'soul' | '
   L.push({ kind: 'mass', pts: limb([cx + bodyW * 0.5, by - bodyH * 0.3], [cx + bodyW * 0.72, by + bodyH * 0.4], r, 30 * S, 22 * S), z: 3 });
   if (spec.halberd) { const g: Pt = [cx + bodyW * 0.72, by + bodyH * 0.55]; const e: Pt = [cx + bodyW * 0.85, by - bodyH * 0.95]; L.push({ kind: 'mass', pts: haft(g, e, r, 6), z: 5 }); L.push({ kind: 'mass', pts: spearHead(e, [e[0] + 4, e[1] - 40], r, 12), z: 5, tone: 0.4 }); L.push({ kind: 'mass', pts: axeHead([e[0], e[1] + 10], r, 18, 1), z: 5, tone: 0.3 }); }
   if (spec.cracks) for (let i = 0; i < 4; i++) L.push({ kind: 'glow', cx: cx + r.range(-bodyW * 0.3, bodyW * 0.3), cy: by + r.range(-bodyH * 0.3, bodyH * 0.3), r: 10, color: 'ember', z: 9 });
-  L.push({ kind: 'glow', cx: cx - 8 * S, cy: by - bodyH * 0.5 - 12 * S, r: 7 * S, color: spec.eyes === 'soul' ? 'soul' : spec.eyes === 'gold' ? 'gold' : 'emberHot', z: 9 });
-  L.push({ kind: 'glow', cx: cx + 8 * S, cy: by - bodyH * 0.5 - 12 * S, r: 7 * S, color: spec.eyes === 'soul' ? 'soul' : spec.eyes === 'gold' ? 'gold' : 'emberHot', z: 9 });
+  L.push({ kind: 'glow', cx: cx - 8 * S, cy: by - bodyH * 0.5 - 12 * S, r: 7 * S, color: spec.eyes === 'wisp' ? 'wisp' : spec.eyes === 'gold' ? 'gold' : 'emberHot', z: 9 });
+  L.push({ kind: 'glow', cx: cx + 8 * S, cy: by - bodyH * 0.5 - 12 * S, r: 7 * S, color: spec.eyes === 'wisp' ? 'wisp' : spec.eyes === 'gold' ? 'gold' : 'emberHot', z: 9 });
   L.push({ kind: 'line', pts: [[cx - bodyW * 0.2, by - bodyH * 0.2], [cx - bodyW * 0.1, by + bodyH * 0.3]], width: 1.6, closed: false, z: 7 });
   L.push({ kind: 'line', pts: [[cx + bodyW * 0.1, by - bodyH * 0.35], [cx + bodyW * 0.25, by + bodyH * 0.1]], width: 1.2, closed: false, z: 7 });
-  L.push({ kind: 'light', pts: taper([cx - bodyW * 0.45, by - bodyH * 0.2], [cx - bodyW * 0.3, ground], 26 * S, 16 * S, r, 1), strength: 0.55, z: 8 });
+  L.push({ kind: 'light', pts: taper([cx - bodyW * 0.45, by - bodyH * 0.2], [cx - bodyW * 0.3, ground], 26 * S, 16 * S, r, 1), power: 0.55, z: 8 });
   return L;
 }
 
@@ -439,9 +439,9 @@ export function tome(r: Rng): Layer[] {
   L.push({ kind: 'mass', pts: jitter([[cx - 70, cy - 40], [cx + 70, cy - 50], [cx + 76, cy + 50], [cx - 66, cy + 60]], r, 3), z: 2 });
   for (let i = 0; i < 7; i++) L.push({ kind: 'mass', pts: taper([cx - 60 + i * 20, cy - 44], [cx - 80 + i * 24, cy - 100 - (i % 3) * 20], 10, 2, r, 1, 4), z: 1, tone: 0.5 });
   for (const c of chain([cx - 70, cy + 10], [cx + 74, cy + 6], r, 8, 5)) L.push({ kind: 'mass', pts: c, z: 5, tone: 0.3 });
-  L.push({ kind: 'glow', cx, cy: cy + 4, r: 28, color: 'soul', z: 9 });
+  L.push({ kind: 'glow', cx, cy: cy + 4, r: 28, color: 'wisp', z: 9 });
   L.push({ kind: 'line', pts: [[cx - 60, cy - 30], [cx + 62, cy - 38]], width: 1.4, closed: false, z: 7 });
-  L.push({ kind: 'light', pts: taper([cx - 66, cy - 30], [cx - 60, cy + 56], 18, 12, r, 1), strength: 0.5, z: 8 });
+  L.push({ kind: 'light', pts: taper([cx - 66, cy - 30], [cx - 60, cy + 56], 18, 12, r, 1), power: 0.5, z: 8 });
   return L;
 }
 
@@ -468,7 +468,7 @@ export function treant(r: Rng): Layer[] {
   L.push({ kind: 'glow', cx: cx + 12, cy: ground - 212, r: 8, color: 'verdigris', z: 9 });
   L.push({ kind: 'line', pts: [[cx - 10, ground - 190], [cx - 4, ground - 40]], width: 1.6, closed: false, z: 7 });
   L.push({ kind: 'line', pts: [[cx + 18, ground - 170], [cx + 26, ground - 60]], width: 1.2, closed: false, z: 7 });
-  L.push({ kind: 'light', pts: taper([cx - 40, ground - 160], [cx - 44, ground], 18, 14, r, 1), strength: 0.5, z: 8 });
+  L.push({ kind: 'light', pts: taper([cx - 40, ground - 160], [cx - 44, ground], 18, 14, r, 1), power: 0.5, z: 8 });
   return L;
 }
 

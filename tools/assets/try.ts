@@ -10,7 +10,7 @@ import { treat } from './treat';
 const subjects: Record<string, (seed: number) => Plate> = {
   knight: (seed) => ({ id: 'knight', w: PW, h: PH, seed, layers: humanoid(rng(seed), { head: 'helm', armour: 1, weapon: { kind: 'great', raised: true }, cloak: 0.6, eyes: 'ember', bulk: 1.15 }) }),
   hound: (seed) => ({ id: 'hound', w: PW, h: PH, seed, layers: beast(rng(seed), { size: 1, spines: true, tail: 'long', eyes: 'ember', maw: true }) }),
-  wraith: (seed) => ({ id: 'wraith', w: PW, h: PH, seed, tint: 'soul', layers: wraith(rng(seed), { eyes: 'soul', arms: true }) }),
+  wraith: (seed) => ({ id: 'wraith', w: PW, h: PH, seed, tint: 'wisp', layers: wraith(rng(seed), { eyes: 'wisp', arms: true }) }),
   acolyte: (seed) => ({ id: 'acolyte', w: PW, h: PH, seed, layers: robed(rng(seed), { eyes: 'ember', staff: true }) }),
   golem: (seed) => ({ id: 'golem', w: PW, h: PH, seed, tint: 'ember', layers: golem(rng(seed), { size: 1, cracks: true, eyes: 'ember' }) }),
 };

@@ -11,7 +11,7 @@ export const PALETTE = {
   blood: '#6E1212',
   bloodBright: '#A81C1C',
   verdigris: '#3D5A4C',
-  soul: '#5C7A99',
+  wisp: '#5C7A99',
   gold: '#B8912F',
 } as const;
 export type PaletteKey = keyof typeof PALETTE;
@@ -26,8 +26,8 @@ export function lerpRgb(a: [number, number, number], b: [number, number, number]
 
 /**
  * The house tone ramp: luminance 0..1 → colour. Darks pool toward ink, mids sit in ash/stone,
- * lights warm toward bone and, at the very top, the ember highlight. A `tint` key bends the mids
- * (verdigris for the Mire, soul for the Archive, gold for the Sanctum, blood for the Deep).
+ * lights warm toward bone and, at the very top, the mote highlight. A `tint` key bends the mids
+ * (verdigris for the Mire, wisp for the Archive, gold for the Sanctum, blood for the Deep).
  */
 export function toneRamp(l: number, tint: PaletteKey | null = null, tintStrength = 0.35): [number, number, number] {
   const stops: [number, [number, number, number]][] = [

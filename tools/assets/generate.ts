@@ -1,7 +1,7 @@
 /**
  * Manifest-driven asset build. For each procedural entry: build the plate, rasterise at 2x,
  * run the treatment chain, write @2x/@1x/mask. Cached by a hash of the recipe source and seed,
- * so unchanged assets are never regenerated. Usage: npm run art [-- --only enemy:ashRat --force]
+ * so unchanged assets are never regenerated. Usage: npm run art [-- --only enemy:ashRat --shove]
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,7 +20,7 @@ const OUT = 'assets/generated';
 const CACHE = path.join(OUT, '.cache.json');
 const args = process.argv.slice(2);
 const only = args.includes('--only') ? args[args.indexOf('--only') + 1] : null;
-const force = args.includes('--force');
+const shove = args.includes('--shove');
 
 // recipe hash: every source file in tools/assets participates, so a tweak to a rig rebuilds
 const recipeHash = crypto.createHash('sha1');
@@ -31,10 +31,10 @@ const cache: Record<string, string> = fs.existsSync(CACHE) ? JSON.parse(fs.readF
 
 function plateFor(e: AssetEntry): Plate | null {
   switch (e.kind) {
-    case 'enemy': case 'boss': case 'phantom': return findSubject(e.id)?.build(e.seed) ?? null;
+    case 'enemy': case 'boss': case 'shade': return findSubject(e.id)?.build(e.seed) ?? null;
     case 'weapon': return weaponPlate(e.id, e.seed);
     case 'spell': return spellPlate(e.id, e.seed);
-    case 'covenant': return covenantPlate(e.id, e.seed);
+    case 'creed': return covenantPlate(e.id, e.seed);
     case 'item': return itemPlate(e.id, e.seed);
     case 'ui': return uiPlate(e.id, e.seed);
     default: return null;
@@ -48,7 +48,7 @@ async function buildOne(e: AssetEntry): Promise<'built' | 'cached' | 'skipped'> 
   const dir = path.join(OUT, 'art', e.kind);
   fs.mkdirSync(dir, { recursive: true });
   const target = path.join(OUT, e.files.x2);
-  if (!force && cache[key] === stamp && fs.existsSync(target)) return 'cached';
+  if (!shove && cache[key] === stamp && fs.existsSync(target)) return 'cached';
   if (e.kind === 'region') {
     const svgs = regionLayers(e.id, e.seed);
     for (let i = 0; i < svgs.length; i++) {

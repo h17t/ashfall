@@ -6,7 +6,16 @@
 import { serialize, parseSave, applyOffline, newGame, SaveError, type GameState } from '@/engine';
 import { useGame } from './store';
 
-export const KEYS = { main: 'ashfall.save', backup: 'ashfall.backup', corrupt: 'ashfall.corrupt' } as const;
+export const KEYS = { main: 'mournwake.save', backup: 'mournwake.backup', corrupt: 'mournwake.corrupt' } as const;
+/** the keys the game wrote before the rename; read once and carried over */
+const LEGACY_KEYS = { main: 'ashfall.save', backup: 'ashfall.backup' } as const; // banned-terms: allow
+export function adoptLegacyKeys(): void {
+  try {
+    for (const k of ['main', 'backup'] as const) {
+      if (localStorage.getItem(KEYS[k]) === null) { const old = localStorage.getItem(LEGACY_KEYS[k]); if (old !== null) localStorage.setItem(KEYS[k], old); }
+    }
+  } catch { /* storage unavailable */ }
+}
 const AUTOSAVE_MS = 10_000;
 
 export interface LoadReport {
@@ -17,6 +26,7 @@ export interface LoadReport {
 
 export function loadFromStorage(now = Date.now()): LoadReport {
   let error: string | null = null;
+  adoptLegacyKeys();
   for (const source of ['main', 'backup'] as const) {
     const raw = safeGet(KEYS[source]);
     if (!raw) continue;

@@ -25,9 +25,9 @@ export interface Milestones {
   bosses: Record<string, number>;
   regions: Record<number, number>;
   firstKindle: number | null;
-  kindles: number[];
+  wakings: number[];
   firstSigil: number | null;
-  ageOfDark: number | null;
+  unmake: number | null;
   level10: number | null;
   level25: number | null;
   level50: number | null;
@@ -47,8 +47,8 @@ export interface SimResult {
   hours: number;
   wallMs: number;
   milestones: Milestones;
-  /** souls earned per hour bucket */
-  soulsPerHour: string[];
+  /** marrow earned per hour bucket */
+  marrowPerHour: string[];
   levelsPerHour: number[];
   deepestPerHour: number[];
   deaths: number;

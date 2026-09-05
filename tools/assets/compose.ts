@@ -8,7 +8,7 @@ import { inkFilter, washFilter, paperFilter, hatchPattern, fireGradient, smoothC
 export type Layer =
   | { kind: 'mass'; pts: Pt[]; smooth?: boolean; tone?: number; z?: number }          // tone 0 = ink, 1 = ash (interior value)
   | { kind: 'line'; pts: Pt[]; width: number; closed?: boolean; smooth?: boolean; z?: number }
-  | { kind: 'light'; pts: Pt[]; smooth?: boolean; strength?: number; z?: number }     // rim light region (fire side)
+  | { kind: 'light'; pts: Pt[]; smooth?: boolean; power?: number; z?: number }     // rim light region (fire side)
   | { kind: 'detail'; pts: Pt[]; color: PaletteKey; alpha?: number; smooth?: boolean; z?: number }
   | { kind: 'glow'; cx: number; cy: number; r: number; color: PaletteKey; z?: number } // a light source in the world
   | { kind: 'hatch'; pts: Pt[]; smooth?: boolean; spacing?: number; angle?: number; z?: number }
@@ -76,7 +76,7 @@ export function composePlate(p: Plate): string {
     if (l.kind === 'hatch') {
       body += `<g filter="url(#inkFine)"><path d="${pathOf(l.pts, l.smooth ?? true)}" fill="url(#hatch)" opacity="0.9"/></g>`;
     } else if (l.kind === 'light') {
-      body += `<g clip-path="url(#body)" filter="url(#inkFine)"><path d="${pathOf(l.pts, l.smooth ?? true)}" fill="${PALETTE.ember}" opacity="${(l.strength ?? 0.7).toFixed(2)}" mask="url(#lightMask)"/></g>`;
+      body += `<g clip-path="url(#body)" filter="url(#inkFine)"><path d="${pathOf(l.pts, l.smooth ?? true)}" fill="${PALETTE.ember}" opacity="${(l.power ?? 0.7).toFixed(2)}" mask="url(#lightMask)"/></g>`;
     } else if (l.kind === 'detail') {
       body += `<g filter="url(#inkFine)"><path d="${pathOf(l.pts, l.smooth ?? true)}" fill="${PALETTE[l.color]}" opacity="${(l.alpha ?? 1).toFixed(2)}"/></g>`;
     } else if (l.kind === 'line') {
@@ -93,7 +93,7 @@ export function composePlate(p: Plate): string {
   const off = Math.max(2, p.w / 90);
   defs.push(`<mask id="rimSliver"><g fill="#fff">${massPaths}</g><g fill="#000" transform="translate(${(-fx * off).toFixed(1)} ${(-fy * off).toFixed(1)})">${massPaths}</g></mask>`);
   body += `<g mask="url(#rimSliver)" filter="url(#inkFine)"><rect width="${p.w}" height="${p.h}" fill="url(#rim)" opacity="0.9"/></g>`;
-  // 6. Glows: actual light sources (eyes, flame, soul).
+  // 6. Glows: actual light sources (eyes, flame, wisp).
   for (const l of layers) {
     if (l.kind !== 'glow') continue;
     const gid = `g${Math.round(l.cx)}_${Math.round(l.cy)}`;

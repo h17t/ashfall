@@ -69,8 +69,8 @@ export const sfx = {
     env(f, now, 0.002, 0.06, crit ? 0.5 : 0.25);
     n.start(now);
   },
-  /** the riposte: a hard, bright chime with a rising fifth */
-  riposte() {
+  /** the reprisal: a hard, bright chime with a rising fifth */
+  reprisal() {
     const c = ensure(); if (!c) return;
     const now = c.currentTime;
     for (const [f, delay, len] of [[880, 0, 0.5], [1318, 0.05, 0.6], [1760, 0.1, 0.9]] as const) {
@@ -81,8 +81,8 @@ export const sfx = {
     const n = noise(0.05); const f = c.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 4000; n.connect(f);
     env(f, now, 0.001, 0.05, 0.4); n.start(now);
   },
-  /** the stagger: a crack */
-  stagger() {
+  /** the strain: a crack */
+  strain() {
     const c = ensure(); if (!c) return;
     const now = c.currentTime;
     const n = noise(0.15); const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 900; f.Q.value = 2; n.connect(f);
@@ -114,7 +114,7 @@ export const sfx = {
       env(o, now, 0.01, len, amp); o.start(now); o.stop(now + len + 0.2);
     }
   },
-  /** YOU DIED: a slow, heavy descending sting */
+  /** UNMADE.: a slow, heavy descending sting */
   died() {
     const c = ensure(); if (!c) return;
     const now = c.currentTime;
@@ -133,7 +133,7 @@ export const sfx = {
       env(o, now + delay, 0.02, 0.6, 0.18); o.start(now + delay); o.stop(now + delay + 0.8);
     }
   },
-  /** bloodstain recovered: a warm chord */
+  /** remains recovered: a warm chord */
   recover() {
     const c = ensure(); if (!c) return;
     const now = c.currentTime;
@@ -159,16 +159,16 @@ export function startAudio(): () => void {
       switch (e.type) {
         case 'hit':
           if (e.source === 'dot') break;
-          if (e.riposte) { sfx.riposte(); break; }
+          if (e.reprisal) { sfx.reprisal(); break; }
           hitWeight = Math.max(hitWeight, e.source === 'player' ? 0.6 : 0.3); hitCrit = hitCrit || e.crit; break;
-        case 'stagger': sfx.stagger(); break;
+        case 'strain': sfx.strain(); break;
         case 'enemyAttack': if (e.dodged) sfx.dodge(e.perfect); else sfx.hurt(); break;
         case 'death': sfx.died(); break;
         case 'bossKilled': sfx.toll(); break;
         case 'bossPhase': if (e.phase === 0) toll('arrival'); else window.setTimeout(() => toll('phase'), 600); break;
-        case 'kindled': swell(5); break;
+        case 'snuffed': swell(5); break;
         case 'levelUp': case 'unlock': sfx.unlock(); break;
-        case 'bloodstainRecovered': sfx.recover(); break;
+        case 'remainsRecovered': sfx.recover(); break;
         case 'cast': sfx.cast(); break;
       }
     }

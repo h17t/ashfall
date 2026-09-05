@@ -1,4 +1,4 @@
-// Frame-time probe. Usage: node scripts/perf.mjs [url]. Loads a heavy state (boss, full squad, DoTs, spam clicks)
+// Frame-time probe. Usage: node scripts/perf.mjs [url]. Loads a heavy state (boss, full cortege, DoTs, spam clicks)
 // and reports rAF intervals over 4 seconds. Not a benchmark of the engine (see scripts/bench.ts): a check that
 // the presentation layer leaves 60fps on the table.
 import { createRequire } from 'node:module';
@@ -8,14 +8,14 @@ const url = process.argv[2] ?? 'http://localhost:4173/';
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--disable-frame-rate-limit'] });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
 if (process.env.PERF_LITE) await page.addInitScript(() => { document.addEventListener('DOMContentLoaded', () => document.documentElement.classList.add('perf-lite')); });
-if (process.env.PERF_REDUCE) await page.addInitScript(() => localStorage.setItem('ashfall.settings', JSON.stringify({ reduceFx: true })));
+if (process.env.PERF_REDUCE) await page.addInitScript(() => localStorage.setItem('mournwake.settings', JSON.stringify({ reduceFx: true })));
 await page.goto(url, { waitUntil: 'networkidle' });
 await page.waitForTimeout(600);
 await page.evaluate(() => {
   const g = __ashfall.getState(); const s = g.state;
-  s.zones.approach.cleared = 3; s.souls = s.souls.add(50000); s.player.level = 31;
-  s.squad.recruited = ['aldric']; s.squad.phantoms = [{ id: 'aldric', level: 5, xp: s.souls.mul(0), assignment: 'beside', weapon: null, retreat: 0 }];
-  g.dispatch({ type: 'travel', zone: 'approach', tier: -1 }); g.stepBy(2);
+  s.zones.tollroad.cleared = 3; s.marrow = s.marrow.add(50000); s.player.level = 31;
+  s.cortege.recruited = ['aldric']; s.cortege.shades = [{ id: 'aldric', level: 5, xp: s.marrow.mul(0), assignment: 'beside', weapon: null, retreat: 0 }];
+  g.dispatch({ type: 'travel', zone: 'tollroad', tier: -1 }); g.stepBy(2);
   const e = s.encounter.enemy; if (e) { e.statuses.poison.active = 30; e.statuses.frost.active = 30; e.statuses.bleed.buildup = 70; }
 });
 // let the stage settle (and, on a machine without a GPU, hand the frame back to the DOM stage) before sampling

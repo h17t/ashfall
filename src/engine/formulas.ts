@@ -39,7 +39,7 @@ export function gradeCoef(g: Grade | undefined): number {
   return BALANCE.weapon.grade[g] ?? 0;
 }
 
-/** Soul cost of going from `level` to `level + 1`. */
+/** Marrow cost of going from `level` to `level + 1`. */
 export function levelCost(level: number): Decimal {
   const b = BALANCE.level;
   return D(b.costBase).mul(Decimal.pow(b.costGrowth, level)).add(b.costLinear * level).floor();
@@ -55,7 +55,7 @@ export function reinforceMult(level: number): number {
   return Math.pow(BALANCE.weapon.reinforceGrowth, level);
 }
 
-/** Enemy baselines by global tier g (0-based) and NG+ cycle. */
+/** Enemy baselines by global tier g (0-based) and Waking cycle. */
 export function tierHp(g: number, ng: number): Decimal {
   const e = BALANCE.enemy;
   return D(e.hpBase).mul(Decimal.pow(e.hpGrowth, g)).mul(Decimal.pow(BALANCE.ng.hpGrowth, ng));
@@ -68,60 +68,60 @@ export function tierPoise(g: number): number {
   const e = BALANCE.enemy;
   return e.poiseBase * Math.pow(e.poiseGrowth, g);
 }
-export function tierSouls(g: number, ng: number): Decimal {
+export function tierMarrow(g: number, ng: number): Decimal {
   const e = BALANCE.enemy;
   return D(e.soulBase).mul(Decimal.pow(e.soulGrowth, g)).mul(Decimal.pow(BALANCE.ng.soulGrowth, ng));
 }
 
-export function playerHpMax(vig: number, level: number, hpMult: number): number {
+export function playerHpMax(vit: number, level: number, hpMult: number): number {
   const p = BALANCE.player;
-  const base = p.hpBase + statCurve(vig) * 40 * p.hpPerVig;
+  const base = p.hpBase + statCurve(vit) * 40 * p.hpPerVig;
   return Math.floor(base * Math.pow(p.hpPerLevel, Math.max(0, level - 1)) * hpMult);
 }
 
-/** Ember hardening for damage: every soul level multiplies damage. Stats and grades decide *which* damage. */
+/** Wick hardening for damage: every level multiplies damage. Stats and grades decide *which* damage. */
 export function levelDamageMult(level: number): number {
   return Math.pow(BALANCE.player.dmgPerLevel, Math.max(0, level - 1));
 }
 
-export function playerStaminaMax(end: number): number {
+export function playerStaminaMax(bre: number): number {
   const p = BALANCE.player;
-  return Math.floor(p.staminaBase + statCurve(end) * 40 * p.staminaPerEnd);
+  return Math.floor(p.staminaBase + statCurve(bre) * 40 * p.staminaPerEnd);
 }
 
-export function playerStaminaRegen(end: number, mult: number): number {
+export function playerStaminaRegen(bre: number, mult: number): number {
   const p = BALANCE.player;
-  return (p.staminaRegenBase + statCurve(end) * 40 * p.staminaRegenPerEnd) * mult;
+  return (p.staminaRegenBase + statCurve(bre) * 40 * p.staminaRegenPerEnd) * mult;
 }
 
-export function playerFpMax(int: number, fth: number, mult: number): number {
+export function playerFpMax(ins: number, dev: number, mult: number): number {
   const p = BALANCE.player;
-  return Math.floor((p.fpBase + (statCurve(int) + statCurve(fth)) * 40 * p.fpPerIntFth) * mult);
+  return Math.floor((p.fpBase + (statCurve(ins) + statCurve(dev)) * 40 * p.fpPerIntFth) * mult);
 }
 
-export function critChance(dex: number, bonus: number): number {
-  return BALANCE.player.baseCrit + Math.min(dex, 40) * BALANCE.player.critPerDex + bonus;
+export function critChance(fin: number, bonus: number): number {
+  return BALANCE.player.baseCrit + Math.min(fin, 40) * BALANCE.player.critPerDex + bonus;
 }
 
-/** Expected soul level for a global tier; used by phantom hunting difficulty and tooltips. */
+/** Expected level for a global tier; used by shade hunting difficulty and tooltips. */
 export function expectedLevel(g: number, ng = 0): number {
   return 10 + 4 * g + 5 * ng;
 }
 
 export const STAT_NAMES: Record<StatKey, string> = {
-  vig: 'Vigor',
-  end: 'Endurance',
-  str: 'Strength',
-  dex: 'Dexterity',
-  int: 'Intelligence',
-  fth: 'Faith',
+  vit: 'Vitality',
+  bre: 'Breath',
+  mig: 'Might',
+  fin: 'Finesse',
+  ins: 'Insight',
+  dev: 'Devotion',
 };
 
 export const STAT_DESC: Record<StatKey, string> = {
-  vig: 'Max HP. The ember burns longer.',
-  end: 'Max stamina and stamina regen. Every swing and roll is paid from here.',
-  str: 'Scales heavy weapons. Slightly raises stagger power.',
-  dex: 'Scales fast weapons. Raises crit chance.',
-  int: 'Scales sorcery and magic infusions. Raises FP.',
-  fth: 'Scales miracles and blessed infusions. Raises FP.',
+  vit: 'Max HP. The mote burns longer.',
+  bre: 'Max stamina and stamina regen. Every swing and roll is paid from here.',
+  mig: 'Scales heavy weapons. Slightly raises strain power.',
+  fin: 'Scales fast weapons. Raises crit chance.',
+  ins: 'Scales weaving and magic infusions. Raises FP.',
+  dev: 'Scales litanies and blessed infusions. Raises FP.',
 };

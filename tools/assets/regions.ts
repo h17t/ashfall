@@ -102,7 +102,7 @@ function stair(r: Rng, x: number, y: number, steps: number, w: number, dir = 1):
 }
 
 const STYLES: Record<string, RegionStyle> = {
-  approach: {
+  tollroad: {
     tint: 'ember', sky: 'ash',
     mid: (r) => [path(ground(r, 560, 40)), path(spire(r, 1180, 140, 420)), path(ruin(r, 1080, 260, 180)), path(spire(r, 300, 90, 260)), path(ruin(r, 60, 300, 120))],
     near: (r) => [path(ground(r, 700, 24)), ...[220, 520, 900, 1300].flatMap((x) => tree(r, x, r.range(220, 360), 720)), path(ruin(r, 1350, 220, 260, 740))],
@@ -117,11 +117,11 @@ const STYLES: Record<string, RegionStyle> = {
     glow: [{ x: 500, y: 620, r: 120, color: 'verdigris' }, { x: 1150, y: 700, r: 80, color: 'verdigris' }],
   },
   archive: {
-    tint: 'soul', sky: 'ink',
+    tint: 'wisp', sky: 'ink',
     mid: (r) => [path(ground(r, 640, 6)), ...shelf(r, 80, 100, 220, 540), ...shelf(r, 380, 60, 200, 580), ...shelf(r, 1000, 120, 240, 520), ...shelf(r, 1300, 40, 260, 600), arch(640, 300, 480, 640)],
     near: (r) => [path(ground(r, 760, 4)), ...shelf(r, -40, 200, 300, 560), ...shelf(r, 1250, 260, 400, 500), ...stair(r, 560, 620, 6, 120, 1), ...ladder(r, 900, 760, 520, 1.15)],
     fore: (r) => [path(ground(r, 860, 3)), ...shelf(r, -80, 300, 380, 600), path(blob(700, 880, 200, 30, r, 0.2, 14)), path(blob(1450, 860, 120, 40, r, 0.3, 12)), ...Array.from({ length: 14 }, () => path(jitter([[r.range(200, 1500), r.range(820, 900)], [r.range(200, 1500), r.range(820, 900)], [r.range(200, 1500), r.range(820, 900)]], r, 2)))],
-    glow: [{ x: 790, y: 360, r: 160, color: 'soul' }],
+    glow: [{ x: 790, y: 360, r: 160, color: 'wisp' }],
     shafts: [{ x: 760, w: 70, lean: 60 }],
   },
   sanctum: {
@@ -132,26 +132,26 @@ const STYLES: Record<string, RegionStyle> = {
     glow: [{ x: 800, y: 260, r: 220, color: 'gold' }],
     shafts: [{ x: 700, w: 140, lean: 120 }, { x: 900, w: 90, lean: 160 }],
   },
-  deep: {
-    tint: 'soul', sky: 'void',
+  undercroft: {
+    tint: 'wisp', sky: 'void',
     mid: (r) => [path(ground(r, 520, 60, 40)), ...stair(r, 700, 300, 14, 90, 1), path(blob(300, 520, 260, 90, r, 0.35, 20)), path(blob(1300, 500, 300, 110, r, 0.35, 20))],
     near: (r) => [path(ground(r, 700, 40, 40)), path(blob(200, 700, 220, 120, r, 0.4, 20)), path(blob(1400, 720, 260, 140, r, 0.4, 20)), ...[500, 1000].map((x) => path(spire(r, x, 60, 300, 720)))],
     fore: (r) => [path(ground(r, 840, 30, 40)), path(blob(-20, 860, 300, 160, r, 0.4, 20)), path(blob(1600, 880, 320, 180, r, 0.4, 20))],
-    glow: [{ x: 950, y: 620, r: 140, color: 'soul' }],
+    glow: [{ x: 950, y: 620, r: 140, color: 'wisp' }],
   },
-  kiln: {
+  renderworks: {
     tint: 'ember', sky: 'ink',
     mid: (r) => [path(ground(r, 580, 30)), path(spire(r, 800, 260, 520)), path(ruin(r, 300, 340, 300)), path(ruin(r, 1100, 380, 320)), arch(720, 160, 260, 580)],
     near: (r) => [path(ground(r, 720, 20)), path(ruin(r, 60, 260, 380, 740)), path(ruin(r, 1250, 300, 400, 740)), path(blob(700, 740, 200, 60, r, 0.4, 16))],
     fore: (r) => [path(ground(r, 850, 14)), path(blob(200, 880, 260, 80, r, 0.4, 16)), path(blob(1300, 890, 300, 90, r, 0.4, 16))],
     glow: [{ x: 800, y: 420, r: 260, color: 'ember' }, { x: 300, y: 820, r: 120, color: 'ember' }, { x: 1300, y: 830, r: 120, color: 'ember' }],
   },
-  abyss: {
-    tint: 'soul', sky: 'void',
+  nadir: {
+    tint: 'wisp', sky: 'void',
     mid: (r) => [path(ground(r, 500, 80, 40)), ...stair(r, 750, 200, 24, 80, -1)],
     near: (r) => [path(ground(r, 680, 60, 40)), ...stair(r, 300, 500, 10, 120, 1), path(blob(1300, 700, 300, 160, r, 0.45, 22))],
     fore: (r) => [path(ground(r, 830, 40, 40)), path(blob(100, 880, 340, 200, r, 0.45, 22)), path(blob(1500, 900, 360, 220, r, 0.45, 22))],
-    glow: [{ x: 780, y: 200, r: 90, color: 'soul' }],
+    glow: [{ x: 780, y: 200, r: 90, color: 'wisp' }],
   },
 };
 
@@ -195,7 +195,7 @@ export function regionLayers(id: string, seed: number): string[] {
     const fill = depth === 1 ? mix(PALETTE.ink, tint, 0.35) : depth === 2 ? mix(PALETTE.ink, tint, 0.14) : PALETTE.void;
     const lit = depth === 1 ? mix(fill, mix(PALETTE.ash, tint, 0.5), 0.8) : depth === 2 ? mix(fill, mix(PALETTE.ash, tint, 0.4), 0.85) : mix(fill, mix(PALETTE.ash, tint, 0.3), 0.8);
     const rimOp = depth === 1 ? 0.5 : depth === 2 ? 0.45 : 0.4;
-    // the near layers stand in the bonfire's light: an ember underlight climbs from their feet
+    // the near layers stand in the lantern's light: an mote underlight climbs from their feet
     const underOp = depth === 1 ? 0.12 : depth === 2 ? 0.3 : 0.42;
     const under = mix(tint, PALETTE.ember, 0.5);
     const mask = `<mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="${RW}" height="${RH}"><g fill="#fff">${shapes.map((d) => `<path d="${d}"/>`).join('')}</g></mask>`;

@@ -50,7 +50,7 @@ void main() {
   // screen the tint through the silhouette
   vec3 t = 1.0 - (1.0 - c.rgb) * (1.0 - u_tint);
   c.rgb = mix(c.rgb, t, u_tintAmt * m);
-  // rim toward the bonfire (lower left): the silhouette edge that faces the light
+  // rim toward the lantern (lower left): the silhouette edge that faces the light
   float inner = texture(u_mask, v_uv + u_texel * vec2(4.0, 4.0)).a;
   float inner2 = texture(u_mask, v_uv + u_texel * vec2(9.0, 9.0)).a;
   float edge = m * (1.0 - inner) + 0.5 * m * (1.0 - inner2);
@@ -162,7 +162,7 @@ void main() {
   vec3 col = vec3(r, g, b);
   col += texture(u_bloom, uv).rgb * u_bloomAmt;
   float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
-  // desaturate the world but keep what burns: saturated, bright pixels (embers, the rim, glows) stay hot
+  // desaturate the world but keep what burns: saturated, bright pixels (motes, the rim, glows) stay hot
   float sat = max(col.r, max(col.g, col.b)) - min(col.r, min(col.g, col.b));
   float keep = smoothstep(0.12, 0.4, sat) * smoothstep(0.25, 0.5, l);
   col = mix(col, vec3(l), u_desat * (1.0 - keep));

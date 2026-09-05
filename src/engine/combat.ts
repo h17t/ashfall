@@ -1,6 +1,6 @@
 /**
- * Combat: encounter spawning, player attacks, stagger/riposte, enemy telegraphs,
- * dodges, statuses, boss phases and mechanics, kills, death and the bloodstain.
+ * Combat: encounter spawning, player attacks, strain/reprisal, enemy telegraphs,
+ * dodges, statuses, boss phases and mechanics, kills, death and the remains.
  */
 import { D, Decimal, ZERO, safe, decMin } from './num';
 import { rand, chance, pick } from './rng';
@@ -9,9 +9,9 @@ import { getEnemy, getZone, getBoss, getWeapon, getSpell, globalTier, nextZone, 
 const getSpellSchool = (id: string) => getSpell(id).school;
 import type { AttackPattern, BossPhase, EnemyDef } from '@/content/types';
 import type { GameState, GameEvent, EnemyInstance, StatusKey, DamageType, Buff, StatKey } from './types';
-import { tierHp, tierDmg, tierPoise, tierSouls, reinforceMult, gradeCoef, statCurve, critChance, playerHpMax, playerStaminaMax, playerStaminaRegen, playerFpMax, levelDamageMult } from './formulas';
+import { tierHp, tierDmg, tierPoise, tierMarrow, reinforceMult, gradeCoef, statCurve, critChance, playerHpMax, playerStaminaMax, playerStaminaRegen, playerFpMax, levelDamageMult } from './formulas';
 import type { Mods } from './mods';
-import { addRep } from './covenants';
+import { addRep } from './creeds';
 
 // ---------------------------------------------------------------------------
 // Derived player numbers
@@ -19,9 +19,9 @@ import { addRep } from './covenants';
 
 export function refreshPlayerMaxes(state: GameState, mods: Mods) {
   const p = state.player;
-  const hpMax = playerHpMax(p.stats.vig, p.level, mods.hpMult);
-  const stamMax = playerStaminaMax(p.stats.end);
-  const fpMax = playerFpMax(p.stats.int, p.stats.fth, mods.fpMult);
+  const hpMax = playerHpMax(p.stats.vit, p.level, mods.hpMult);
+  const stamMax = playerStaminaMax(p.stats.bre);
+  const fpMax = playerFpMax(p.stats.ins, p.stats.dev, mods.fpMult);
   if (hpMax !== p.hpMax) {
     // keep the same fraction when max changes
     const frac = p.hpMax > 0 ? p.hp / p.hpMax : 1;
@@ -32,11 +32,11 @@ export function refreshPlayerMaxes(state: GameState, mods: Mods) {
   p.stamina = Math.min(p.stamina, stamMax);
   p.fpMax = fpMax;
   p.fp = Math.min(p.fp, fpMax);
-  p.estusMax = BALANCE.player.estusStart + mods.estusCount + (state.flags.estusShards ? 0 : 0) + (state.materials.__estusUpgrades ?? 0);
-  p.estus = Math.min(p.estus, p.estusMax);
-  p.attunementSlots = (state.flags.hasCatalyst ? 1 : 0) + (state.materials.__attuneUpgrades ?? 0) + mods.attunementSlots;
-  while (p.attuned.length < p.attunementSlots) p.attuned.push(null);
-  if (p.attuned.length > p.attunementSlots) p.attuned.length = Math.max(0, p.attunementSlots);
+  p.draughtsMax = BALANCE.player.draughtsStart + mods.draughtCount + (state.flags.estusShards ? 0 : 0) + (state.materials.__estusUpgrades ?? 0);
+  p.draughts = Math.min(p.draughts, p.draughtsMax);
+  p.recitationSlots = (state.flags.hasCatalyst ? 1 : 0) + (state.materials.__reciteUpgrades ?? 0) + mods.recitationSlots;
+  while (p.recited.length < p.recitationSlots) p.recited.push(null);
+  if (p.recited.length > p.recitationSlots) p.recited.length = Math.max(0, p.recitationSlots);
 }
 
 export interface DamageBreakdown {
@@ -52,10 +52,10 @@ export interface DamageBreakdown {
   total: Decimal;
   type: DamageType;
   crit: number;
-  riposte: number;
+  reprisal: number;
 }
 
-export function buffMult(buffs: Buff[], key: 'dmg' | 'souls' | 'stagger' | 'taken' | 'stamRegen'): number {
+export function buffMult(buffs: Buff[], key: 'dmg' | 'marrow' | 'strain' | 'taken' | 'stamRegen'): number {
   let m = 1;
   for (const b of buffs) {
     const v = b[key];
@@ -115,8 +115,8 @@ export function weaponDamage(state: GameState, mods: Mods, weaponId = state.play
     level: levelMult,
     total: safe(total),
     type,
-    crit: critChance(p.stats.dex, mods.critBonus + def.crit),
-    riposte: def.riposteMult * mods.riposteMult,
+    crit: critChance(p.stats.fin, mods.critBonus + def.crit),
+    reprisal: def.reprisalMult * mods.reprisalMult,
   };
 }
 
@@ -138,20 +138,20 @@ function emptyStatuses(): Record<StatusKey, { buildup: number; active: number; d
   };
 }
 
-/** Global tier of the current encounter, depth-aware for the Abyss. */
+/** Global tier of the current encounter, depth-aware for the Nadir. */
 export function gTier(state: GameState, zone: string, tier: number): number {
-  return globalTier(zone, tier, state.prestige.abyssDepth);
+  return globalTier(zone, tier, state.prestige.nadirDepth);
 }
 
-export function ngLevel(state: GameState, mods: Mods): number {
-  return state.prestige.kindles * mods.ngScaling;
+export function wakingLevel(state: GameState, mods: Mods): number {
+  return state.prestige.wakings * mods.ngScaling;
 }
 
 export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
   const enc = state.encounter;
   const zone = getZone(enc.zone);
   const g = gTier(state, enc.zone, enc.tier);
-  const ng = ngLevel(state, mods);
+  const ng = wakingLevel(state, mods);
   enc.t = 0;
   if (enc.tier < 0) {
     const bossId = enc.tier === -1 ? zone.boss : enc.tier === -2 ? zone.secretBoss! : cycleBossFor(enc.zone)!.id;
@@ -160,7 +160,7 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
     const hp = tierHp(g, ng).mul(secret ? BALANCE.enemy.secretBossHpMult : BALANCE.enemy.bossHpMult).mul(boss.hpMult).floor();
     const killsThisCycle = enc.tier === -1 ? state.zones[enc.zone]?.bossKills : enc.tier === -2 ? state.zones[enc.zone]?.secretKills : state.zones[enc.zone]?.cycleKills;
     const alreadyKilled = state.prestige.bossesEverKilled.includes(bossId) && (killsThisCycle ?? 0) > 0;
-    const souls = tierSouls(g, ng).mul(secret ? BALANCE.enemy.secretBossSoulMult : BALANCE.enemy.bossSoulMult).mul(boss.soulMult).mul(alreadyKilled ? 0.25 : 1).floor();
+    const marrow = tierMarrow(g, ng).mul(secret ? BALANCE.enemy.secretBossSoulMult : BALANCE.enemy.bossSoulMult).mul(boss.marrowMult).mul(alreadyKilled ? 0.25 : 1).floor();
     enc.enemy = {
       id: bossId,
       name: `${boss.name}, ${boss.title}`,
@@ -168,9 +168,9 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
       phase: 0,
       hp,
       hpMax: hp,
-      stagger: 0,
-      poise: tierPoise(g) * BALANCE.enemy.bossPoiseMult * boss.poiseMult,
-      riposte: 0,
+      strain: 0,
+      composure: tierPoise(g) * BALANCE.enemy.bossPoiseMult * boss.composureMult,
+      reprisal: 0,
       attackIn: boss.phases[0].attackInterval * 0.8,
       windup: 0,
       windupTotal: 0,
@@ -179,7 +179,7 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
       statuses: emptyStatuses(),
       mech: { phaseStart: 0 },
       variants: [],
-      souls,
+      marrow,
     };
     applyPhaseMech(enc.enemy);
     events.push({ type: 'bossPhase', phase: 0, name: boss.phases[0].name });
@@ -188,10 +188,10 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
   const tier = zone.tiers[enc.tier];
   const defId = pick(state.rng, tier.enemies);
   const def = getEnemy(defId);
-  const variants = pickVariants(state, state.prestige.kindles);
+  const variants = pickVariants(state, state.prestige.wakings);
   const vMult = variantMults(variants);
   const hp = tierHp(g, ng).mul(def.hpMult).mul(vMult.hp).floor();
-  const souls = tierSouls(g, ng).mul(def.soulMult).mul(vMult.souls).floor();
+  const marrow = tierMarrow(g, ng).mul(def.marrowMult).mul(vMult.marrow).floor();
   enc.enemy = {
     id: defId,
     name: (variants.length ? variants.map((v) => VARIANTS[v].name).join(' ') + ' ' : '') + def.name,
@@ -199,9 +199,9 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
     phase: 0,
     hp,
     hpMax: hp,
-    stagger: 0,
-    poise: tierPoise(g) * def.poiseMult * vMult.poise,
-    riposte: 0,
+    strain: 0,
+    composure: tierPoise(g) * def.composureMult * vMult.composure,
+    reprisal: 0,
     attackIn: def.attackInterval * (0.5 + rand(state.rng) * 0.5),
     windup: 0,
     windupTotal: 0,
@@ -210,17 +210,17 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
     statuses: emptyStatuses(),
     mech: {},
     variants,
-    souls,
+    marrow,
   };
 }
 
-/** NG+ enemy variants: each kindle adds a chance for modifiers that change how the fight plays. */
-export const VARIANTS: Record<string, { name: string; hp: number; dmg: number; poise: number; souls: number; desc: string; minNg: number }> = {
-  ashen: { name: 'Ashen', hp: 1.3, dmg: 1.0, poise: 1.4, souls: 1.35, desc: 'Hardened by the second burning. More HP and poise, worth more souls.', minNg: 1 },
-  hollowed: { name: 'Hollowed', hp: 0.8, dmg: 1.5, poise: 0.7, souls: 1.25, desc: 'Nothing left but the urge to strike. Hits hard, breaks easily.', minNg: 1 },
-  abyssal: { name: 'Abyssal', hp: 1.2, dmg: 1.2, poise: 1.0, souls: 1.8, desc: 'Touched by the dark. Attacks faster; drops far more souls.', minNg: 2 },
-  ancient: { name: 'Ancient', hp: 2.0, dmg: 1.1, poise: 2.0, souls: 2.4, desc: 'Was old before the first fire. A wall of a creature.', minNg: 3 },
-  ember: { name: 'Ember-touched', hp: 1.0, dmg: 1.3, poise: 1.0, souls: 1.6, desc: 'Burns from within. Its attacks come with almost no warning.', minNg: 4 },
+/** Waking enemy variants: each snuff adds a chance for modifiers that change how the fight plays. */
+export const VARIANTS: Record<string, { name: string; hp: number; dmg: number; composure: number; marrow: number; desc: string; minNg: number }> = {
+  ashen: { name: 'Ashen', hp: 1.3, dmg: 1.0, composure: 1.4, marrow: 1.35, desc: 'Hardened by the second burning. More HP and composure, worth more marrow.', minNg: 1 },
+  waned: { name: 'Waned', hp: 0.8, dmg: 1.5, composure: 0.7, marrow: 1.25, desc: 'Nothing left but the urge to strike. Hits hard, breaks easily.', minNg: 1 },
+  nadiral: { name: 'Nadiral', hp: 1.2, dmg: 1.2, composure: 1.0, marrow: 1.8, desc: 'Touched by the dark. Attacks faster; drops far more marrow.', minNg: 2 },
+  ancient: { name: 'Ancient', hp: 2.0, dmg: 1.1, composure: 2.0, marrow: 2.4, desc: 'Was old before the first fire. A wall of a creature.', minNg: 3 },
+  ember: { name: 'Lit', hp: 1.0, dmg: 1.3, composure: 1.0, marrow: 1.6, desc: 'Burns from within. Its attacks come with almost no warning.', minNg: 4 },
 };
 
 function pickVariants(state: GameState, ng: number): string[] {
@@ -235,12 +235,12 @@ function pickVariants(state: GameState, ng: number): string[] {
 }
 
 export function variantMults(variants: string[]) {
-  let hp = 1, dmg = 1, poise = 1, souls = 1;
+  let hp = 1, dmg = 1, composure = 1, marrow = 1;
   for (const v of variants) {
     const d = VARIANTS[v];
-    hp *= d.hp; dmg *= d.dmg; poise *= d.poise; souls *= d.souls;
+    hp *= d.hp; dmg *= d.dmg; composure *= d.composure; marrow *= d.marrow;
   }
-  return { hp, dmg, poise, souls };
+  return { hp, dmg, composure, marrow };
 }
 
 function currentPhase(enemy: EnemyInstance): BossPhase | null {
@@ -274,18 +274,18 @@ export function damageEnemy(
   events: GameEvent[],
   dmg: Decimal,
   type: DamageType,
-  source: 'player' | 'phantom' | 'dot' | 'spell',
-  opts: { crit?: boolean; riposte?: boolean; kind?: string } = {},
+  source: 'player' | 'shade' | 'dot' | 'spell',
+  opts: { crit?: boolean; reprisal?: boolean; kind?: string } = {},
 ): Decimal {
   const enemy = state.encounter.enemy;
   if (!enemy || enemy.hp.lte(0)) return ZERO;
   let d = dmg.mul(resistFor(enemy, type));
   // Boss mechanics that modify incoming damage
   const ph = currentPhase(enemy);
-  if (ph?.mechanic === 'staggerOnly' && enemy.riposte <= 0 && source !== 'dot') {
+  if (ph?.mechanic === 'breakOnly' && enemy.reprisal <= 0 && source !== 'dot') {
     d = d.mul(ph.mechParam ?? 0.15);
   }
-  if (ph?.mechanic === 'hymn' && (source === 'player' || source === 'spell') && enemy.mech.hymn === 1 && enemy.riposte <= 0) {
+  if (ph?.mechanic === 'hymn' && (source === 'player' || source === 'spell') && enemy.mech.hymn === 1 && enemy.reprisal <= 0) {
     hurtPlayer(state, mods, events, Math.round(state.player.hpMax * (ph.mechParam ?? 0.04)), 'hymn');
     if (state.encounter.enemy !== enemy) return ZERO; // the reflection killed the player
   }
@@ -306,7 +306,7 @@ export function damageEnemy(
   d = safe(d.floor());
   if (d.lt(1) && dmg.gt(0)) d = D(1);
   enemy.hp = enemy.hp.sub(d);
-  events.push({ type: 'hit', dmg: d, crit: !!opts.crit, riposte: !!opts.riposte, source, kind: opts.kind });
+  events.push({ type: 'hit', dmg: d, crit: !!opts.crit, reprisal: !!opts.reprisal, source, kind: opts.kind });
   if (enemy.hp.lte(0)) {
     enemy.hp = ZERO;
     onKill(state, mods, events);
@@ -327,8 +327,8 @@ function checkPhase(state: GameState, enemy: EnemyInstance, events: GameEvent[])
     enemy.phase = target;
     enemy.windup = 0;
     enemy.attackIn = boss.phases[target].attackInterval * 0.6;
-    enemy.stagger = 0;
-    enemy.riposte = 0;
+    enemy.strain = 0;
+    enemy.reprisal = 0;
     enemy.mech.phaseStart = state.encounter.t;
     applyPhaseMech(enemy);
     events.push({ type: 'bossPhase', phase: target, name: boss.phases[target].name });
@@ -345,19 +345,19 @@ function applyPhaseMech(enemy: EnemyInstance) {
 
 export function addStagger(state: GameState, mods: Mods, events: GameEvent[], amount: number) {
   const enemy = state.encounter.enemy;
-  if (!enemy || enemy.riposte > 0 || enemy.hp.lte(0)) return;
-  let a = amount * mods.stagger * buffMult(state.player.buffs, 'stagger');
+  if (!enemy || enemy.reprisal > 0 || enemy.hp.lte(0)) return;
+  let a = amount * mods.strain * buffMult(state.player.buffs, 'strain');
   if (enemy.statuses.frost.active > 0) a *= BALANCE.status.frost.staggerBonus;
-  enemy.stagger += a;
-  if (enemy.stagger >= enemy.poise) {
-    enemy.stagger = 0;
-    enemy.riposte = BALANCE.player.riposteWindow;
+  enemy.strain += a;
+  if (enemy.strain >= enemy.composure) {
+    enemy.strain = 0;
+    enemy.reprisal = BALANCE.player.riposteWindow;
     enemy.mech.riposteHit = 0;
     if (BALANCE.player.staggerResetsAttack) {
       enemy.windup = 0;
       enemy.attackIn = Math.max(enemy.attackIn, 1.0);
     }
-    events.push({ type: 'stagger' });
+    events.push({ type: 'strain' });
   }
 }
 
@@ -412,19 +412,19 @@ export function playerAttack(state: GameState, mods: Mods, events: GameEvent[], 
   if (fromClick) state.stats.clicks++;
   const crit = chance(state.rng, br.crit);
   if (crit) dmg = dmg.mul(BALANCE.player.critMult);
-  const riposte = enemy.riposte > 0;
-  if (riposte) {
-    dmg = dmg.mul(br.riposte);
+  const reprisal = enemy.reprisal > 0;
+  if (reprisal) {
+    dmg = dmg.mul(br.reprisal);
     enemy.mech.riposteHit = (enemy.mech.riposteHit ?? 0) + 1;
-    state.stats.ripostes++;
+    state.stats.reprisals++;
   }
   // roll variance ±8% so numbers feel alive
   dmg = dmg.mul(0.92 + rand(state.rng) * 0.16);
-  damageEnemy(state, mods, events, dmg, br.type, 'player', { crit, riposte });
+  damageEnemy(state, mods, events, dmg, br.type, 'player', { crit, reprisal });
   if (state.encounter.enemy && state.encounter.enemy.hp.gt(0)) {
     if (!exhausted) {
-      const strBonus = 1 + statCurve(p.stats.str) * 0.25;
-      addStagger(state, mods, events, def.stagger * strBonus * (riposte ? 0 : 1));
+      const strBonus = 1 + statCurve(p.stats.mig) * 0.25;
+      addStagger(state, mods, events, def.strain * strBonus * (reprisal ? 0 : 1));
     }
     // status from weapon + infusion
     const inst = p.weapons[p.weapon];
@@ -472,9 +472,9 @@ export function playerDodge(state: GameState, mods: Mods, events: GameEvent[]) {
 
 export function playerEstus(state: GameState, mods: Mods, events: GameEvent[]) {
   const p = state.player;
-  if (p.estus <= 0 || state.deathScreen > 0 || p.hp >= p.hpMax) return;
-  p.estus--;
-  const amt = Math.round(p.hpMax * p.estusPotency * mods.estusPotency);
+  if (p.draughts <= 0 || state.deathScreen > 0 || p.hp >= p.hpMax) return;
+  p.draughts--;
+  const amt = Math.round(p.hpMax * p.draughtPotency * mods.draughtPotency);
   p.hp = Math.min(p.hpMax, p.hp + amt);
   events.push({ type: 'heal', amount: amt });
 }
@@ -483,30 +483,30 @@ export function playerDie(state: GameState, mods: Mods, events: GameEvent[]) {
   const p = state.player;
   const enc = state.encounter;
   state.stats.deaths++;
-  const lost = state.souls;
+  const lost = state.marrow;
   // Losing a stain you hadn't reclaimed
-  if (state.bloodstain && state.bloodstain.souls.gt(0)) {
-    events.push({ type: 'bloodstainLost', souls: state.bloodstain.souls });
-    state.stats.soulsLost = state.stats.soulsLost.add(state.bloodstain.souls);
+  if (state.remains && state.remains.marrow.gt(0)) {
+    events.push({ type: 'remainsLost', marrow: state.remains.marrow });
+    state.stats.marrowLost = state.stats.marrowLost.add(state.remains.marrow);
   }
   if (mods.noBloodstain) {
-    state.bloodstain = null;
-    state.stats.soulsLost = state.stats.soulsLost.add(lost);
+    state.remains = null;
+    state.stats.marrowLost = state.stats.marrowLost.add(lost);
   } else if (lost.gt(0)) {
-    state.bloodstain = { souls: lost, zone: enc.zone, tier: enc.tier };
+    state.remains = { marrow: lost, zone: enc.zone, tier: enc.tier };
   } else {
-    state.bloodstain = null;
+    state.remains = null;
   }
-  state.souls = ZERO;
-  events.push({ type: 'death', soulsLost: lost });
+  state.marrow = ZERO;
+  events.push({ type: 'death', marrowLost: lost });
   state.deathScreen = BALANCE.player.deathScreen;
-  // Respawn at bonfire
-  const bonfireZone = state.bonfiresLit.includes(enc.zone) ? enc.zone : state.bonfire;
-  state.bonfire = bonfireZone;
+  // Respawn at lantern
+  const bonfireZone = state.lanternsLit.includes(enc.zone) ? enc.zone : state.lantern;
+  state.lantern = bonfireZone;
   p.hp = Math.round(p.hpMax * BALANCE.player.respawnHeal);
   p.stamina = p.staminaMax;
   p.fp = p.fpMax;
-  p.estus = p.estusMax;
+  p.draughts = p.draughtsMax;
   p.buffs = [];
   p.poisoned = 0;
   p.dodgeCd = 0;
@@ -516,10 +516,10 @@ export function playerDie(state: GameState, mods: Mods, events: GameEvent[]) {
   enc.enemy = null;
   enc.respawnIn = 0.5;
   enc.streak = 0;
-  if (state.bloodstain && state.bloodstain.zone === bonfireZone) {
-    state.corpseRun = { zone: bonfireZone, targetTier: state.bloodstain.tier, atTier: 0, killsAtTier: 0 };
+  if (state.remains && state.remains.zone === bonfireZone) {
+    state.remainsRun = { zone: bonfireZone, targetTier: state.remains.tier, atTier: 0, killsAtTier: 0 };
   } else {
-    state.corpseRun = null;
+    state.remainsRun = null;
   }
 }
 
@@ -533,11 +533,11 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
   const zone = getZone(enc.zone);
   const g = gTier(state, enc.zone, enc.tier);
   const zp = state.zones[enc.zone];
-  const soulMult = mods.souls * buffMult(state.player.buffs, 'souls');
-  const souls = safe(enemy.souls.mul(soulMult).floor());
-  state.souls = state.souls.add(souls);
-  state.stats.soulsEarned = state.stats.soulsEarned.add(souls);
-  state.stats.cycleSouls = state.stats.cycleSouls.add(souls);
+  const marrowMult = mods.marrow * buffMult(state.player.buffs, 'marrow');
+  const marrow = safe(enemy.marrow.mul(marrowMult).floor());
+  state.marrow = state.marrow.add(marrow);
+  state.stats.marrowEarned = state.stats.marrowEarned.add(marrow);
+  state.stats.cycleMarrow = state.stats.cycleMarrow.add(marrow);
   state.stats.kills = state.stats.kills.add(1);
   state.stats.cycleKills = state.stats.cycleKills.add(1);
   state.stats.deepestTier = Math.max(state.stats.deepestTier, g);
@@ -546,12 +546,12 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
   // drops
   const drops: Record<string, number> = {};
   const dropTable = enemy.isBoss ? getBoss(enemy.id).drops : getEnemy(enemy.id).drops;
-  const dropMult = mods.materialMult * Math.pow(BALANCE.ng.dropGrowth, state.prestige.kindles);
+  const dropMult = mods.materialMult * Math.pow(BALANCE.ng.dropGrowth, state.prestige.wakings);
   for (const [mat, ch] of Object.entries(dropTable)) {
     if (enemy.isBoss) {
       const already = enc.tier === -1 ? zp.bossKills > 0 : enc.tier === -2 ? zp.secretKills > 0 : zp.cycleKills > 0;
-      if (already && ch >= 1 && (mat === 'estusShard' || mat === 'soulVessel' || mat === 'slab' || mat === 'coal')) continue;
-      const n = Math.max(1, Math.floor(ch * (mat === 'estusShard' || mat === 'soulVessel' || mat === 'coal' ? 1 : dropMult)));
+      if (already && ch >= 1 && (mat === 'wickStub' || mat === 'reliquaryBone' || mat === 'slagIngot' || mat === 'pitchCoal')) continue;
+      const n = Math.max(1, Math.floor(ch * (mat === 'wickStub' || mat === 'reliquaryBone' || mat === 'pitchCoal' ? 1 : dropMult)));
       drops[mat] = n;
     } else {
       const expected = ch * dropMult;
@@ -561,10 +561,10 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
     }
   }
   for (const [mat, n] of Object.entries(drops)) {
-    if (mat === 'darkEmber') {
-      state.prestige.humanity = state.prestige.humanity.add(n);
-      state.prestige.humanityTotal = state.prestige.humanityTotal.add(n);
-      events.push({ type: 'notice', text: `${n} Dark Ember${n > 1 ? 's' : ''} crumble into Humanity in your palm.` });
+    if (mat === 'dust') {
+      state.prestige.vestige = state.prestige.vestige.add(n);
+      state.prestige.vestigeTotal = state.prestige.vestigeTotal.add(n);
+      events.push({ type: 'notice', text: `${n} Dark Wick${n > 1 ? 's' : ''} crumble into Vestige in your palm.` });
       continue;
     }
     state.materials[mat] = (state.materials[mat] ?? 0) + n;
@@ -578,7 +578,7 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
       }
     }
   }
-  events.push({ type: 'kill', enemy: enemy.name, souls, isBoss: enemy.isBoss, drops });
+  events.push({ type: 'kill', enemy: enemy.name, marrow, isBoss: enemy.isBoss, drops });
   addRep(state, enemy.isBoss ? 25 : 1);
 
   if (enemy.isBoss) {
@@ -589,17 +589,17 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
     const first = !state.prestige.bossesEverKilled.includes(bossId);
     if (first) state.prestige.bossesEverKilled.push(bossId);
     const firstThisCycle = (enc.tier === -1 ? zp.bossKills : enc.tier === -2 ? zp.secretKills : zp.cycleKills) === 1;
-    if (firstThisCycle && !getBoss(bossId).noSoul) {
-      const remembered = state.bossSoulChoices[bossId];
+    if (firstThisCycle && !getBoss(bossId).noKeepsake) {
+      const remembered = state.keepsakeChoices[bossId];
       const bossDef = getBoss(bossId);
-      if (remembered === 'weapon' && !state.player.weapons[bossDef.soulWeapon]) {
-        state.player.weapons[bossDef.soulWeapon] = { id: bossDef.soulWeapon, level: mods.startWeaponLevel, infusion: 'none' };
-        events.push({ type: 'unlock', what: 'weapon:' + bossDef.soulWeapon, text: `${getWeapon(bossDef.soulWeapon).name} returns to your hand, as it was shaped before.` });
+      if (remembered === 'weapon' && !state.player.weapons[bossDef.keepsakeWeapon]) {
+        state.player.weapons[bossDef.keepsakeWeapon] = { id: bossDef.keepsakeWeapon, level: mods.startWeaponLevel, infusion: 'none' };
+        events.push({ type: 'unlock', what: 'weapon:' + bossDef.keepsakeWeapon, text: `${getWeapon(bossDef.keepsakeWeapon).name} returns to your hand, as it was shaped before.` });
       } else if (remembered === 'spell') {
-        if (!state.spellsKnown.includes(bossDef.soulSpell)) state.spellsKnown.push(bossDef.soulSpell);
-        if (getSpellSchool(bossDef.soulSpell) === 'pyromancy') state.flags.hasFlame = true;
+        if (!state.spellsKnown.includes(bossDef.keepsakeSpell)) state.spellsKnown.push(bossDef.keepsakeSpell);
+        if (getSpellSchool(bossDef.keepsakeSpell) === 'ruin') state.flags.hasBrand = true;
       } else {
-        state.bossSouls[bossId] = (state.bossSouls[bossId] ?? 0) + 1;
+        state.keepsakes[bossId] = (state.keepsakes[bossId] ?? 0) + 1;
       }
     }
     events.push({ type: 'bossKilled', boss: bossId });
@@ -614,12 +614,12 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
       }
       if (zone.endless) {
         // The stair goes on: descend, and the road resets one landing deeper.
-        state.prestige.abyssDepth++;
-        state.prestige.abyssRecord = Math.max(state.prestige.abyssRecord, state.prestige.abyssDepth);
+        state.prestige.nadirDepth++;
+        state.prestige.nadirRecord = Math.max(state.prestige.nadirRecord, state.prestige.nadirDepth);
         zp.kills = zp.kills.map(() => 0);
         zp.cleared = -1;
         zp.bossKills = 0;
-        events.push({ type: 'unlock', what: 'abyss:' + state.prestige.abyssDepth, text: `You descend. Dark Depth ${state.prestige.abyssDepth}. The stair continues, and so does the Watcher.` });
+        events.push({ type: 'unlock', what: 'nadir:' + state.prestige.nadirDepth, text: `You descend. Dark Depth ${state.prestige.nadirDepth}. The stair continues, and so does the Watcher.` });
       }
     }
     // Boss arena: after the kill, the arena is empty; player returns to the last tier
@@ -644,7 +644,7 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
       }
     }
     // corpse run progress
-    const run = state.corpseRun;
+    const run = state.remainsRun;
     if (run && run.zone === enc.zone && run.atTier === enc.tier) {
       run.killsAtTier++;
       if (run.killsAtTier >= BALANCE.death.runKillsPerTier) {
@@ -670,13 +670,13 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
 }
 
 export function recoverBloodstain(state: GameState, mods: Mods, events: GameEvent[]) {
-  const bs = state.bloodstain;
-  if (!bs) { state.corpseRun = null; return; }
-  const kept = safe(bs.souls.mul(mods.bloodstainKeep).floor());
-  state.souls = state.souls.add(kept);
-  events.push({ type: 'bloodstainRecovered', souls: kept });
-  state.bloodstain = null;
-  state.corpseRun = null;
+  const bs = state.remains;
+  if (!bs) { state.remainsRun = null; return; }
+  const kept = safe(bs.marrow.mul(mods.remainsKeep).floor());
+  state.marrow = state.marrow.add(kept);
+  events.push({ type: 'remainsRecovered', marrow: kept });
+  state.remains = null;
+  state.remainsRun = null;
 }
 
 
@@ -695,8 +695,8 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
   }
 
   // ---- player regen & timers ----
-  p.stamina = Math.min(p.staminaMax, p.stamina + playerStaminaRegen(p.stats.end, mods.stamRegen * buffMult(p.buffs, 'stamRegen')) * dt);
-  p.fp = Math.min(p.fpMax, p.fp + BALANCE.player.fpRegen * (1 + statCurve(p.stats.int) + statCurve(p.stats.fth)) * dt);
+  p.stamina = Math.min(p.staminaMax, p.stamina + playerStaminaRegen(p.stats.bre, mods.stamRegen * buffMult(p.buffs, 'stamRegen')) * dt);
+  p.fp = Math.min(p.fpMax, p.fp + BALANCE.player.fpRegen * (1 + statCurve(p.stats.ins) + statCurve(p.stats.dev)) * dt);
   if (p.dodgeCd > 0) p.dodgeCd = Math.max(0, p.dodgeCd - dt);
   if (p.iframes > 0) p.iframes = Math.max(0, p.iframes - dt);
   for (const k of Object.keys(p.cooldowns)) {
@@ -742,17 +742,17 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
   const ph = currentPhase(enemy);
   if (ph?.mechanic === 'regen') {
     const suppressed = enemy.statuses.poison.active > 0 || enemy.statuses.frost.active > 0 || (enemy.mech.lastBleed !== undefined && enc.t - enemy.mech.lastBleed < 6);
-    if (!suppressed && enemy.hp.gt(0) && enemy.riposte <= 0) {
+    if (!suppressed && enemy.hp.gt(0) && enemy.reprisal <= 0) {
       enemy.hp = decMin(enemy.hpMax, enemy.hp.add(enemy.hpMax.mul((ph.mechParam ?? 0.02) * dt)));
     }
   }
 
-  // ---- riposte window ----
-  if (enemy.riposte > 0) {
-    enemy.riposte = Math.max(0, enemy.riposte - dt);
-    if (enemy.riposte <= 0 && !(enemy.mech.riposteHit > 0)) events.push({ type: 'riposteMissed' });
-    // auto-riposte
-    if (state.automation.autoRiposte && enemy.riposte > 0 && mods.unlocks.has('autoRiposte')) {
+  // ---- reprisal window ----
+  if (enemy.reprisal > 0) {
+    enemy.reprisal = Math.max(0, enemy.reprisal - dt);
+    if (enemy.reprisal <= 0 && !(enemy.mech.riposteHit > 0)) events.push({ type: 'riposteMissed' });
+    // auto-reprisal
+    if (state.automation.autoReprisal && enemy.reprisal > 0 && mods.unlocks.has('autoReprisal')) {
       enemy.mech.autoRip = (enemy.mech.autoRip ?? 0) - dt;
       if (enemy.mech.autoRip <= 0) { enemy.mech.autoRip = 0.35; playerAttack(state, mods, events, false); }
     }
@@ -788,8 +788,8 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
       if (p.stamina >= w.stamina) playerAttack(state, mods, events, false);
     }
   }
-  // ---- auto estus ----
-  if (state.automation.autoEstus && mods.unlocks.has('autoEstus') && p.hp < p.hpMax * 0.35 && p.estus > 0) {
+  // ---- auto draughts ----
+  if (state.automation.autoDraught && mods.unlocks.has('autoDraught') && p.hp < p.hpMax * 0.35 && p.draughts > 0) {
     playerEstus(state, mods, events);
   }
 }
@@ -801,7 +801,7 @@ function attackInterval(enemy: EnemyInstance, encT = 0): number {
     return ph.attackInterval;
   }
   const def = enemyDef(enemy)!;
-  const v = enemy.variants.includes('abyssal') ? 0.75 : 1;
+  const v = enemy.variants.includes('nadiral') ? 0.75 : 1;
   return def.attackInterval * v;
 }
 
@@ -814,13 +814,13 @@ function beginTelegraph(state: GameState, mods: Mods) {
   let atk = attacks[0];
   for (const a of attacks) { r -= a.weight; if (r <= 0) { atk = a; break; } }
   const g = gTier(state, state.encounter.zone, state.encounter.tier);
-  const ng = ngLevel(state, mods);
+  const ng = wakingLevel(state, mods);
   const base = tierDmg(g, ng);
   let mult = atk.mult;
   if (enemy.isBoss) mult *= BALANCE.enemy.bossDmgMult * getBoss(enemy.id).dmgMult;
   else mult *= enemyDef(enemy)!.dmgMult * variantMults(enemy.variants).dmg;
-  const emberTouched = enemy.variants.includes('ember');
-  enemy.windup = atk.windup * (emberTouched ? 0.55 : 1);
+  const litTouched = enemy.variants.includes('lit');
+  enemy.windup = atk.windup * (litTouched ? 0.55 : 1);
   enemy.windupTotal = enemy.windup;
   enemy.attackDamage = Math.round(base * mult);
   enemy.attackId = atk.id;
@@ -845,24 +845,24 @@ function resolveEnemyAttack(state: GameState, mods: Mods, events: GameEvent[]) {
   if (!died && enemy.mech.attackStatus === 1) p.poisoned = 8;
 }
 
-/** Player retreats to the bonfire: no death, no soul loss, encounter resets, Estus refilled. */
-export function restAtBonfire(state: GameState, mods: Mods, events: GameEvent[]) {
+/** Player retreats to the lantern: no death, no Marrow loss, encounter resets, Tallowdraught refilled. */
+export function restAtLantern(state: GameState, mods: Mods, events: GameEvent[]) {
   const p = state.player;
   const enc = state.encounter;
   p.hp = p.hpMax;
   p.stamina = p.staminaMax;
   p.fp = p.fpMax;
-  p.estus = p.estusMax;
+  p.draughts = p.draughtsMax;
   p.poisoned = 0;
   p.buffs = p.buffs.filter((b) => b.id.startsWith('spell:'));
-  // Resting leaves a boss arena: the fog gate must be crossed deliberately again.
+  // Resting leaves a boss arena: the threshold must be crossed deliberately again.
   if (enc.tier < 0) enc.tier = Math.max(0, Math.min(getZone(enc.zone).tiers.length - 1, state.zones[enc.zone]?.cleared ?? 0));
   enc.enemy = null;
   enc.respawnIn = 0.8;
   enc.streak = 0;
-  if (!state.bonfiresLit.includes(enc.zone)) {
-    state.bonfiresLit.push(enc.zone);
-    events.push({ type: 'unlock', what: 'bonfire:' + enc.zone, text: `Bonfire lit: ${getZone(enc.zone).name}. You will return here when you fall.` });
+  if (!state.lanternsLit.includes(enc.zone)) {
+    state.lanternsLit.push(enc.zone);
+    events.push({ type: 'unlock', what: 'lantern:' + enc.zone, text: `Lantern lit: ${getZone(enc.zone).name}. You will return here when you fall.` });
   }
-  state.bonfire = enc.zone;
+  state.lantern = enc.zone;
 }

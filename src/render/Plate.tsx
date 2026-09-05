@@ -11,7 +11,7 @@ interface Props {
   className?: string;
   style?: CSSProperties;
   alt?: string;
-  /** a colour laid over the figure through its silhouette mask (status effects, hurt, stagger) */
+  /** a colour laid over the figure through its silhouette mask (status effects, hurt, strain) */
   tint?: { color: string; opacity: number; blend?: CSSProperties['mixBlendMode'] };
   draggable?: boolean;
   /** styles for the image itself (filters that must not re-run when the tint changes) */

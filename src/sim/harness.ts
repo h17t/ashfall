@@ -1,7 +1,7 @@
 /**
  * Headless simulation harness. Drives the engine with a scripted strategy at 10Hz and
  * records pacing metrics. Hundreds of simulated hours run in seconds because the engine
- * has no rendering and phantoms/offline use closed-form rates.
+ * has no rendering and shades/offline use closed-form rates.
  */
 import { newGame, step, computeMods, isFiniteDec, type GameState, type GameEvent, type Action } from '@/engine';
 import { BALANCE } from '@/content/balance';
@@ -21,7 +21,7 @@ export interface SimOptions {
   stallSeconds?: number;
 }
 
-const PROGRESS_EVENTS = new Set(['tierCleared', 'bossKilled', 'levelUp', 'zoneUnlocked', 'kindled', 'unlock', 'bloodstainRecovered']);
+const PROGRESS_EVENTS = new Set(['tierCleared', 'bossKilled', 'levelUp', 'zoneUnlocked', 'snuffed', 'unlock', 'remainsRecovered']);
 
 export function runSim(opts: SimOptions): SimResult {
   const seed = opts.seed ?? 7;
@@ -29,8 +29,8 @@ export function runSim(opts: SimOptions): SimResult {
   const decisionRng = makeRng(seed ^ 0x9e3779b9);
   const dt = BALANCE.tick;
   const totalTicks = Math.round((opts.hours * 3600) / dt);
-  const ms: Milestones = { autoAttack: null, firstDeath: null, firstBoss: null, bosses: {}, regions: {}, firstKindle: null, kindles: [], firstSigil: null, ageOfDark: null, level10: null, level25: null, level50: null, level100: null };
-  const soulsPerHour: string[] = [];
+  const ms: Milestones = { autoAttack: null, firstDeath: null, firstBoss: null, bosses: {}, regions: {}, firstKindle: null, wakings: [], firstSigil: null, unmake: null, level10: null, level25: null, level50: null, level100: null };
+  const marrowPerHour: string[] = [];
   const levelsPerHour: number[] = [];
   const deepestPerHour: number[] = [];
   const stalls: Stall[] = [];
@@ -38,7 +38,7 @@ export function runSim(opts: SimOptions): SimResult {
   const notes: string[] = [];
   const stallThreshold = opts.stallSeconds ?? 20 * 60;
   let lastProgress = 0;
-  let hourSoulsStart = state.stats.soulsEarned;
+  let hourSoulsStart = state.stats.marrowEarned;
   let nextHour = 3600;
   const t0 = Date.now();
   let prevKindles = 0;
@@ -76,17 +76,17 @@ export function runSim(opts: SimOptions): SimResult {
           if (e.level >= 50 && ms.level50 === null) ms.level50 = t;
           if (e.level >= 100 && ms.level100 === null) ms.level100 = t;
           break;
-        case 'kindled':
+        case 'snuffed':
           if (ms.firstKindle === null) ms.firstKindle = t;
-          ms.kindles.push(t);
+          ms.wakings.push(t);
           break;
         case 'error':
           break;
       }
     }
-    if (state.prestige.kindles !== prevKindles) { prevKindles = state.prestige.kindles; lastProgress = t; }
-    if (state.prestige.sigils !== prevSigils) { prevSigils = state.prestige.sigils; if (ms.firstSigil === null) ms.firstSigil = t; lastProgress = t; }
-    if (state.prestige.darkLevel > 0 && ms.ageOfDark === null) ms.ageOfDark = t;
+    if (state.prestige.wakings !== prevKindles) { prevKindles = state.prestige.wakings; lastProgress = t; }
+    if (state.prestige.severings !== prevSigils) { prevSigils = state.prestige.severings; if (ms.firstSigil === null) ms.firstSigil = t; lastProgress = t; }
+    if (state.prestige.unmaking > 0 && ms.unmake === null) ms.unmake = t;
 
     // stall detection
     if (t - lastProgress > stallThreshold) {
@@ -98,21 +98,21 @@ export function runSim(opts: SimOptions): SimResult {
 
     // per-hour buckets & invariants
     if (t >= nextHour - 1e-6) {
-      soulsPerHour.push(state.stats.soulsEarned.sub(hourSoulsStart).toString());
-      hourSoulsStart = state.stats.soulsEarned;
+      marrowPerHour.push(state.stats.marrowEarned.sub(hourSoulsStart).toString());
+      hourSoulsStart = state.stats.marrowEarned;
       levelsPerHour.push(state.player.level);
       deepestPerHour.push(state.stats.deepestTier);
       nextHour += 3600;
       const inv = checkInvariants(state);
       if (inv.length) invariantErrors.push(`h${(t / 3600).toFixed(0)}: ${inv.join('; ')}`);
-      if (opts.verbose) console.log(`[${opts.strategy.id}] h${(t / 3600).toFixed(0)} L${state.player.level} souls=${state.souls.toString()} deepest=${state.stats.deepestTier} NG+${state.prestige.kindles} deaths=${state.stats.deaths}`);
+      if (opts.verbose) console.log(`[${opts.strategy.id}] h${(t / 3600).toFixed(0)} L${state.player.level} marrow=${state.marrow.toString()} deepest=${state.stats.deepestTier} Waking ${state.prestige.wakings} deaths=${state.stats.deaths}`);
     }
     if (opts.until && opts.until(state)) break;
   }
   const inv = checkInvariants(state);
   if (inv.length) invariantErrors.push(`final: ${inv.join('; ')}`);
-  if (state.t < nextHour - 1e-6 && state.stats.soulsEarned.gt(hourSoulsStart)) {
-    soulsPerHour.push(state.stats.soulsEarned.sub(hourSoulsStart).toString());
+  if (state.t < nextHour - 1e-6 && state.stats.marrowEarned.gt(hourSoulsStart)) {
+    marrowPerHour.push(state.stats.marrowEarned.sub(hourSoulsStart).toString());
     levelsPerHour.push(state.player.level);
     deepestPerHour.push(state.stats.deepestTier);
   }
@@ -122,14 +122,14 @@ export function runSim(opts: SimOptions): SimResult {
     hours: state.t / 3600,
     wallMs: Date.now() - t0,
     milestones: ms,
-    soulsPerHour,
+    marrowPerHour,
     levelsPerHour,
     deepestPerHour,
     deaths: state.stats.deaths,
     kills: state.stats.kills.toString(),
     finalLevel: state.player.level,
     finalDeepest: state.stats.deepestTier,
-    finalKindles: state.prestige.kindles,
+    finalKindles: state.prestige.wakings,
     stalls,
     invariantErrors,
     notes,
@@ -144,19 +144,19 @@ export function checkInvariants(state: GameState): string[] {
     if (!isFiniteDec(d)) errs.push(`${name} non-finite`);
     else if (d.lt(0)) errs.push(`${name} negative`);
   };
-  dec('souls', state.souls);
-  dec('humanity', state.prestige.humanity);
-  dec('sigilMarks', state.prestige.sigilMarks);
-  dec('soulsEarned', state.stats.soulsEarned);
-  if (state.bloodstain) dec('bloodstain', state.bloodstain.souls);
-  if (state.encounter.enemy) { dec('enemy.hp', state.encounter.enemy.hp); dec('enemy.souls', state.encounter.enemy.souls); }
+  dec('marrow', state.marrow);
+  dec('vestige', state.prestige.vestige);
+  dec('threads', state.prestige.threads);
+  dec('marrowEarned', state.stats.marrowEarned);
+  if (state.remains) dec('remains', state.remains.marrow);
+  if (state.encounter.enemy) { dec('enemy.hp', state.encounter.enemy.hp); dec('enemy.marrow', state.encounter.enemy.marrow); }
   for (const [k, v] of Object.entries(state.materials)) if (!Number.isFinite(v) || v < 0) errs.push(`material ${k} = ${v}`);
   const p = state.player;
-  for (const [k, v] of Object.entries({ hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, fp: p.fp, fpMax: p.fpMax, estus: p.estus })) {
+  for (const [k, v] of Object.entries({ hp: p.hp, hpMax: p.hpMax, stamina: p.stamina, staminaMax: p.staminaMax, fp: p.fp, fpMax: p.fpMax, draughts: p.draughts })) {
     if (!Number.isFinite(v) || v < 0) errs.push(`player.${k} = ${v}`);
   }
   if (p.hp > p.hpMax + 1) errs.push('hp > hpMax');
-  for (const ph of state.squad.phantoms) dec(`phantom ${ph.id} xp`, ph.xp);
+  for (const ph of state.cortege.shades) dec(`shade ${ph.id} xp`, ph.xp);
   return errs;
 }
 

@@ -4,19 +4,19 @@ import { memo } from 'react';
  * A chipped iron gauge. Never a rounded-cap bar: the trough is cut stone, the fill is a hot liquid
  * with a brighter leading edge, and the outline is nicked so no two gauges are the same rectangle.
  */
-export type Tone = 'blood' | 'ember' | 'stamina' | 'bone' | 'soul' | 'gold' | 'verdigris';
+export type Tone = 'blood' | 'ember' | 'stamina' | 'bone' | 'wisp' | 'gold' | 'verdigris';
 
 const FILL: Record<Tone, string> = {
   blood: 'linear-gradient(90deg, var(--blood) 0%, var(--blood-bright) 100%)',
   ember: 'linear-gradient(90deg, var(--ember) 0%, var(--ember-hot) 100%)',
   stamina: 'linear-gradient(90deg, var(--verdigris) 0%, color-mix(in srgb, var(--verdigris) 55%, var(--bone)) 100%)',
   bone: 'linear-gradient(90deg, var(--ash) 0%, var(--bone) 100%)',
-  soul: 'linear-gradient(90deg, color-mix(in srgb, var(--soul) 70%, var(--ink)) 0%, var(--soul) 100%)',
+  wisp: 'linear-gradient(90deg, color-mix(in srgb, var(--wisp) 70%, var(--ink)) 0%, var(--wisp) 100%)',
   gold: 'linear-gradient(90deg, color-mix(in srgb, var(--gold) 70%, var(--ink)) 0%, var(--gold) 100%)',
-  verdigris: 'linear-gradient(90deg, var(--verdigris) 0%, color-mix(in srgb, var(--verdigris) 60%, var(--soul)) 100%)',
+  verdigris: 'linear-gradient(90deg, var(--verdigris) 0%, color-mix(in srgb, var(--verdigris) 60%, var(--wisp)) 100%)',
 };
 const EDGE: Record<Tone, string> = {
-  blood: 'var(--blood-bright)', ember: 'var(--ember-hot)', stamina: 'var(--bone)', bone: 'var(--parchment)', soul: 'var(--parchment)', gold: 'var(--parchment)', verdigris: 'var(--bone)',
+  blood: 'var(--blood-bright)', ember: 'var(--ember-hot)', stamina: 'var(--bone)', bone: 'var(--parchment)', wisp: 'var(--parchment)', gold: 'var(--parchment)', verdigris: 'var(--bone)',
 };
 
 // two nicked outlines so adjacent gauges do not rhyme

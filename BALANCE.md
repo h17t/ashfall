@@ -1,4 +1,4 @@
-# Ashfall — Balance Log
+# Mournwake — Balance Log
 
 Simulator output per revision of `src/content/balance.ts`. The simulator lands in Milestone 2; this file starts life as the record of the initial curve choices.
 
@@ -8,46 +8,46 @@ Simulator output per revision of `src/content/balance.ts`. The simulator lands i
 |---|---|
 | Enemy HP | 60 × 1.55^g |
 | Enemy damage | 20 × 1.2^g (rev 1: was 9) |
-| Enemy poise | 26 × 1.12^g |
-| Souls per kill | 6 × 1.5^g |
+| Enemy composure | 26 × 1.12^g |
+| Marrow per kill | 6 × 1.5^g |
 | Level cost | 30 × 1.115^L + 6L |
 | Reinforce | ×1.15 per level, cost 40 × 1.9^L × 5^(region−1) |
-| Boss HP / souls / dmg | 30× / 40× / 2.4× the zone's last tier (rev 1: was 14× / 40× / 1.6×) |
+| Boss HP / marrow / dmg | 30× / 40× / 2.4× the zone's last tier (rev 1: was 14× / 40× / 1.6×) |
 
-Smoke run (2 min, click every 0.3s, tier 0): 68 kills, 309 souls, no deaths.
+Smoke run (2 min, click every 0.3s, tier 0): 68 kills, 309 marrow, no deaths.
 
 ## Rev 2 — Milestone 10 (full content)
 
 | Knob | Value | Why |
 |---|---|---|
-| NG+ scaling | HP ×1.45, dmg ×1.2, souls ×1.55, drops ×1.35 per cycle | a cycle must be net-positive (was 1.6 / 1.28 / 1.45) |
-| Damage per soul level | ×1.025 (HP ×1.035) | levels must always pay; stats decide what they buy |
-| Humanity | (souls/5000)^0.42 × 1.15^lords × 1.06^depth | depth compounds so pushing beats early kindling |
-| Poise | 26 × 1.12^g | staggers must happen on tier-0 enemies |
+| Waking  scaling | HP ×1.45, dmg ×1.2, marrow ×1.55, drops ×1.35 per cycle | a cycle must be net-positive (was 1.6 / 1.28 / 1.45) |
+| Damage per level | ×1.025 (HP ×1.035) | levels must always pay; stats decide what they buy |
+| Vestige | (marrow/5000)^0.42 × 1.15^lords × 1.06^depth | depth compounds so pushing beats early rendering |
+| Composure | 26 × 1.12^g | staggers must happen on tier-0 enemies |
 
-Region cadence (skilled / casual): Eskel 9m / 18m · Mother Nettle 35m / 45m · Archivist 1.1h / 1.9h · Orvane 3.5h / 4.7h · Keeper 4.5h / 6h · Lord of Cinders 7h / 9.8h. First Kindle 2.4h / 3.2h / 3.5h (idle).
+Region cadence (skilled / casual): the Pyre-Warden 9m / 18m · Mother Nettle 35m / 45m · Archivist 1.1h / 1.9h · Orvane 3.5h / 4.7h · Keeper 4.5h / 6h · the Renderer 7h / 9.8h. First Snuff 2.4h / 3.2h / 3.5h (idle).
 
 ## Rev 3 — Milestones 11–12 (deep meta, polish)
 
 | Knob | Value | Why |
 |---|---|---|
-| Sigil Marks | (lifetime Humanity ÷ 25)^0.6 × √(NG+ ÷ 5) × (1 + 0.1 × depth record) | opens at NG+5; depth record feeds it so the Abyss matters |
-| Dark Level | 8 × 1.7^n Marks → ×1.5 dmg/souls, ×1.25 Humanity each | the endless horizon |
-| Auto-Kindle | gain ≥ 2 × last Kindle's gain, ≥ 10, after 20 min | comparing with *held* Humanity kindled every minute (players spend it) |
+| Severing Marks | (lifetime Vestige ÷ 25)^0.6 × √(Waking  ÷ 5) × (1 + 0.1 × depth record) | opens at Waking 5; depth record feeds it so the Nadir matters |
+| Dark Level | 8 × 1.7^n Marks → ×1.5 dmg/marrow, ×1.25 Vestige each | the endless horizon |
+| Auto-Snuff | gain ≥ 2 × last Snuff's gain, ≥ 10, after 20 min | comparing with *held* Vestige snuffed every minute (players spend it) |
 | Bleed vs regen | open wound suppresses regen 6s (was 4s); Nettle mends 1.2%/2% (was 1.5%/2.5%) | the idle path could never sustain suppression at 1 hit/s |
-| Reflex nodes | auto-riposte / auto-dodge cost 4 (was 6) | they are what get an idle player past a lord |
+| Reflex nodes | auto-reprisal / auto-dodge cost 4 (was 6) | they are what get an idle player past a lord |
 
-Final 60h, seed 7 — every strategy fells all six lords. Lords (skilled / casual / idle): Eskel 9m / 18m / 2.3h · Nettle 17m / 35m / 3.1h · Archivist 35m / 1.0h / 5.3h · Orvane 1.8h / 2.2h / 10h · Keeper 3.1h / 4.1h / 13h · Lord of Cinders 4.2h / 5.4h / 22h · the Watcher 8.3h / 16h / —. First Kindle 1.8h / 2.2h / 10h; first Sigil (see table). Deaths in 60h: 20 / 19 / 0. Two stalls, both 22 minutes, both idle at Sanctum tier 4.
+Final 60h, seed 7 — every strategy fells all six lords. Lords (skilled / casual / idle): the Pyre-Warden 9m / 18m / 2.3h · Nettle 17m / 35m / 3.1h · Archivist 35m / 1.0h / 5.3h · Orvane 1.8h / 2.2h / 10h · Keeper 3.1h / 4.1h / 13h · the Renderer 4.2h / 5.4h / 22h · the Watcher 8.3h / 16h / —. First Snuff 1.8h / 2.2h / 10h; first Severing (see table). Deaths in 60h: 20 / 19 / 0. Two stalls, both 22 minutes, both idle at Sanctum tier 4.
 
-200h long-horizon run (greedy / idle, seed 7, ~5.5 min of wall time each): no stalls (one 22-minute idle stall at 7.7h), no invariant violations at septillion-scale souls. Skilled: Abyss depth 35 (global tier 205), NG+13 within the current Sigil, 20 deaths total, all in the first hours. Idle: the Watcher at 140h, Abyss depth 7, souls/hour rising monotonically for the whole run (11K → 18.8M by hour 12 and onward), zero deaths. The Age of Dark's multiplier and the Abyss keep both curves moving at hour 200.
+200h long-horizon run (greedy / idle, seed 7, ~5.5 min of wall time each): no stalls (one 22-minute idle stall at 7.7h), no invariant violations at septillion-scale marrow. Skilled: Nadir depth 35 (global tier 205), Waking 13 within the current Severing, 20 deaths total, all in the first hours. Idle: the Watcher at 140h, Nadir depth 7, marrow/hour rising monotonically for the whole run (11K → 18.8M by hour 12 and onward), zero deaths. The Unmaking's multiplier and the Nadir keep both curves moving at hour 200.
 
-Known gaps versus the spec targets: the skilled first Kindle (1.8h) is under the 3–7h window because the simulator kindles the moment it is stuck 90 minutes; a human who reads the depth multiplier will wait longer. The first Sigil for skilled play arrives well before the 30–60h target for the same reason (cycles are ~1–2h for a skilled player); both are cadence choices the player owns rather than walls. Region cadence from Orvane onward is 60–90 min per region for skilled play, as intended.
+Known gaps versus the spec targets: the skilled first Snuff (1.8h) is under the 3–7h window because the simulator wakings the moment it is stuck 90 minutes; a human who reads the depth multiplier will wait longer. The first Severing for skilled play arrives well before the 30–60h target for the same reason (cycles are ~1–2h for a skilled player); both are cadence choices the player owns rather than walls. Region cadence from Orvane onward is 60–90 min per region for skilled play, as intended.
 
 ## Latest simulator run
 
 ### Run — 2026-09-04 13:07 UTC · 60h · seed 7
 
-| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
+| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Snuff | Severing | Final L | Deepest | Waking  | Deaths | Stalls | Sim ms |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | greedy | 3.1m | 1.13h | 8.6m | 8.6m | 17.1m | 1.81h | 4.24h | 871 | 146 | 6 | 20 | 0 | 94327 |
 | optimal | 3.7m | 3.30h | 9.4m | 9.4m | 17.9m | 1.40h | 3.86h | 829 | 139 | 3 | 5 | 0 | 70274 |
@@ -55,7 +55,7 @@ Known gaps versus the spec targets: the skilled first Kindle (1.8h) is under the
 | idle | 6.0m | — | 2.34h | 2.34h | 3.10h | 10.07h | 15.63h | 773 | 33 | 7 | 0 | 1 | 63988 |
 | noclick | 6.0m | 14.98h | 2.43h | 2.43h | 3.54h | 10.24h | 15.07h | 708 | 35 | 7 | 2 | 1 | 64895 |
 
-Souls earned per hour (first 12 buckets):
+Marrow earned per hour (first 12 buckets):
 
 | Strategy | h1 | h2 | h3 | h4 | h5 | h6 | h7 | h8 | h9 | h10 | h11 | h12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -67,24 +67,24 @@ Souls earned per hour (first 12 buckets):
 
 Bosses (first kill):
 
-- **greedy**: Eskel 8.6m, Mother Nettle 17.1m, Archivist Null 34.9m, Saint Orvane 1.81h, The Keeper 3.13h, The Lord of Cinders 4.18h, The Watcher 8.27h
-- **optimal**: Eskel 9.4m, Mother Nettle 17.9m, Archivist Null 36.0m, Saint Orvane 1.39h, The Keeper 2.73h, The Lord of Cinders 3.77h, The Watcher 8.66h
-- **casual**: Eskel 17.7m, Mother Nettle 34.5m, Archivist Null 1.04h, Saint Orvane 2.15h, The Keeper 4.10h, The Lord of Cinders 5.44h, The Watcher 16.34h
-- **idle**: Eskel 2.34h, Mother Nettle 3.10h, Archivist Null 5.25h, Saint Orvane 10.07h, The Keeper 13.19h, The Lord of Cinders 21.97h
-- **noclick**: Eskel 2.43h, Mother Nettle 3.54h, Archivist Null 6.20h, Saint Orvane 10.24h, The Keeper 12.83h, The Lord of Cinders 22.36h
+- **greedy**: the Pyre-Warden 8.6m, Mother Nettle 17.1m, Archivist Null 34.9m, Saint Orvane 1.81h, The Keeper 3.13h, The Renderer 4.18h, The Watcher 8.27h
+- **optimal**: the Pyre-Warden 9.4m, Mother Nettle 17.9m, Archivist Null 36.0m, Saint Orvane 1.39h, The Keeper 2.73h, The Renderer 3.77h, The Watcher 8.66h
+- **casual**: the Pyre-Warden 17.7m, Mother Nettle 34.5m, Archivist Null 1.04h, Saint Orvane 2.15h, The Keeper 4.10h, The Renderer 5.44h, The Watcher 16.34h
+- **idle**: the Pyre-Warden 2.34h, Mother Nettle 3.10h, Archivist Null 5.25h, Saint Orvane 10.07h, The Keeper 13.19h, The Renderer 21.97h
+- **noclick**: the Pyre-Warden 2.43h, Mother Nettle 3.54h, Archivist Null 6.20h, Saint Orvane 10.24h, The Keeper 12.83h, The Renderer 22.36h
 
 Stalls (no progress event for 20+ min):
 
 - **idle** stalled 22.6m from 7.72h at The Sanctum of the Vigil tier 4 (cleared 4), level 89
 - **noclick** stalled 22.3m from 9.17h at The Sanctum of the Vigil tier 4 (cleared 4), level 92
 
-Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
+Targets: first boss 6–16 min · first Snuff 3–7 h · first Severing 30–60 h · auto-attack by 10 min
 
 <details><summary>Previous runs</summary>
 
 ### Run — 2026-09-04 12:55 UTC · 60h · seed 7
 
-| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
+| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Snuff | Severing | Final L | Deepest | Waking  | Deaths | Stalls | Sim ms |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | greedy | 3.1m | 1.13h | 8.6m | 8.6m | 22.7m | 1.51h | 4.10h | 900 | 151 | 7 | 22 | 0 | 97684 |
 | optimal | 3.7m | 1.08h | 9.4m | 9.4m | 19.1m | 1.35h | 3.78h | 875 | 151 | 6 | 3 | 0 | 72379 |
@@ -92,7 +92,7 @@ Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h 
 | idle | 6.0m | — | 2.34h | 2.34h | 41.50h | 4.58h | 38.71h | 506 | 32 | 3 | 0 | 9 | 31883 |
 | noclick | 6.0m | — | 2.43h | 2.43h | 40.17h | 5.02h | 47.71h | 138 | 30 | 4 | 0 | 11 | 27592 |
 
-Souls earned per hour (first 12 buckets):
+Marrow earned per hour (first 12 buckets):
 
 | Strategy | h1 | h2 | h3 | h4 | h5 | h6 | h7 | h8 | h9 | h10 | h11 | h12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -104,11 +104,11 @@ Souls earned per hour (first 12 buckets):
 
 Bosses (first kill):
 
-- **greedy**: Eskel 8.6m, Mother Nettle 22.7m, Archivist Null 45.1m, Saint Orvane 1.50h, The Keeper 2.84h, The Lord of Cinders 4.07h, The Watcher 8.18h
-- **optimal**: Eskel 9.4m, Mother Nettle 19.1m, Archivist Null 38.8m, Saint Orvane 1.34h, The Keeper 2.71h, The Lord of Cinders 3.74h, The Watcher 7.78h
-- **casual**: Eskel 17.7m, Mother Nettle 39.8m, Archivist Null 1.18h, Saint Orvane 2.44h, The Keeper 4.41h, The Lord of Cinders 5.86h, The Watcher 12.04h
-- **idle**: Eskel 2.34h, Mother Nettle 41.50h, Archivist Null 43.03h, Saint Orvane 45.98h, The Keeper 49.02h, The Lord of Cinders 57.93h
-- **noclick**: Eskel 2.43h, Mother Nettle 40.17h, Archivist Null 43.01h, Saint Orvane 53.49h, The Keeper 55.64h
+- **greedy**: the Pyre-Warden 8.6m, Mother Nettle 22.7m, Archivist Null 45.1m, Saint Orvane 1.50h, The Keeper 2.84h, The Renderer 4.07h, The Watcher 8.18h
+- **optimal**: the Pyre-Warden 9.4m, Mother Nettle 19.1m, Archivist Null 38.8m, Saint Orvane 1.34h, The Keeper 2.71h, The Renderer 3.74h, The Watcher 7.78h
+- **casual**: the Pyre-Warden 17.7m, Mother Nettle 39.8m, Archivist Null 1.18h, Saint Orvane 2.44h, The Keeper 4.41h, The Renderer 5.86h, The Watcher 12.04h
+- **idle**: the Pyre-Warden 2.34h, Mother Nettle 41.50h, Archivist Null 43.03h, Saint Orvane 45.98h, The Keeper 49.02h, The Renderer 57.93h
+- **noclick**: the Pyre-Warden 2.43h, Mother Nettle 40.17h, Archivist Null 43.01h, Saint Orvane 53.49h, The Keeper 55.64h
 
 Stalls (no progress event for 20+ min):
 
@@ -133,13 +133,13 @@ Stalls (no progress event for 20+ min):
 - **noclick** stalled 25.5m from 46.92h at The Sanctum of the Vigil tier 4 (cleared 4), level 127
 - **noclick** stalled 21.4m from 47.34h at The Sanctum of the Vigil tier 4 (cleared 4), level 128
 
-Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
+Targets: first boss 6–16 min · first Snuff 3–7 h · first Severing 30–60 h · auto-attack by 10 min
 
 ---
 
 ### Run — 2026-09-04 12:40 UTC · 60h · seed 7
 
-| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
+| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Snuff | Severing | Final L | Deepest | Waking  | Deaths | Stalls | Sim ms |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | greedy | 3.1m | 1.13h | 8.6m | 8.6m | 22.7m | 1.51h | 4.10h | 447 | 59 | 5 | 21 | 0 | 88743 |
 | optimal | 3.7m | 1.08h | 9.4m | 9.4m | 19.1m | 1.35h | 3.78h | 467 | 54 | 4 | 3 | 0 | 68108 |
@@ -147,7 +147,7 @@ Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h 
 | idle | 6.0m | — | 2.34h | 2.34h | 41.50h | 4.58h | 38.71h | 47 | 30 | 3 | 0 | 9 | 26600 |
 | noclick | 6.0m | — | 2.43h | 2.43h | 40.17h | 5.02h | 47.71h | 33 | 30 | 0 | 0 | 11 | 25809 |
 
-Souls earned per hour (first 12 buckets):
+Marrow earned per hour (first 12 buckets):
 
 | Strategy | h1 | h2 | h3 | h4 | h5 | h6 | h7 | h8 | h9 | h10 | h11 | h12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -159,11 +159,11 @@ Souls earned per hour (first 12 buckets):
 
 Bosses (first kill):
 
-- **greedy**: Eskel 8.6m, Mother Nettle 22.7m, Archivist Null 45.1m, Saint Orvane 1.50h, The Keeper 2.84h, The Lord of Cinders 4.07h, The Watcher 47.37h
-- **optimal**: Eskel 9.4m, Mother Nettle 19.1m, Archivist Null 38.8m, Saint Orvane 1.34h, The Keeper 2.71h, The Lord of Cinders 3.74h, The Watcher 41.93h
-- **casual**: Eskel 17.7m, Mother Nettle 39.8m, Archivist Null 1.18h, Saint Orvane 2.44h, The Keeper 4.41h, The Lord of Cinders 5.86h, The Watcher 47.46h
-- **idle**: Eskel 2.34h, Mother Nettle 41.50h, Archivist Null 43.03h, Saint Orvane 45.98h, The Keeper 49.02h
-- **noclick**: Eskel 2.43h, Mother Nettle 40.17h, Archivist Null 43.01h, Saint Orvane 53.49h, The Keeper 55.64h
+- **greedy**: the Pyre-Warden 8.6m, Mother Nettle 22.7m, Archivist Null 45.1m, Saint Orvane 1.50h, The Keeper 2.84h, The Renderer 4.07h, The Watcher 47.37h
+- **optimal**: the Pyre-Warden 9.4m, Mother Nettle 19.1m, Archivist Null 38.8m, Saint Orvane 1.34h, The Keeper 2.71h, The Renderer 3.74h, The Watcher 41.93h
+- **casual**: the Pyre-Warden 17.7m, Mother Nettle 39.8m, Archivist Null 1.18h, Saint Orvane 2.44h, The Keeper 4.41h, The Renderer 5.86h, The Watcher 47.46h
+- **idle**: the Pyre-Warden 2.34h, Mother Nettle 41.50h, Archivist Null 43.03h, Saint Orvane 45.98h, The Keeper 49.02h
+- **noclick**: the Pyre-Warden 2.43h, Mother Nettle 40.17h, Archivist Null 43.01h, Saint Orvane 53.49h, The Keeper 55.64h
 
 Stalls (no progress event for 20+ min):
 
@@ -188,13 +188,13 @@ Stalls (no progress event for 20+ min):
 - **noclick** stalled 25.5m from 46.92h at The Sanctum of the Vigil tier 4 (cleared 4), level 127
 - **noclick** stalled 21.4m from 47.34h at The Sanctum of the Vigil tier 4 (cleared 4), level 128
 
-Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
+Targets: first boss 6–16 min · first Snuff 3–7 h · first Severing 30–60 h · auto-attack by 10 min
 
 ---
 
 ### Run — 2026-09-04 12:24 UTC · 40h · seed 7
 
-| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Kindle | Sigil | Final L | Deepest | NG+ | Deaths | Stalls | Sim ms |
+| Strategy | Auto-attack | 1st death | 1st boss | Region 2 | Region 3 | 1st Snuff | Severing | Final L | Deepest | Waking  | Deaths | Stalls | Sim ms |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | greedy | 3.1m | 28.1m | 8.6m | 8.6m | 34.9m | 2.40h | — | 207 | 31 | 31 | 843 | 0 | 51524 |
 | optimal | 3.7m | 1.35h | 9.4m | 9.4m | 19.7m | 1.45h | — | 197 | 31 | 31 | 448 | 2 | 40309 |
@@ -202,7 +202,7 @@ Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h 
 | idle | 6.0m | 32.5m | 1.88h | 1.88h | — | 3.48h | — | 84 | 8 | 11 | 512 | 0 | 14877 |
 | noclick | 6.0m | 2.5m | 2.01h | 2.01h | — | 3.66h | — | 71 | 8 | 8 | 588 | 0 | 13657 |
 
-Souls earned per hour (first 12 buckets):
+Marrow earned per hour (first 12 buckets):
 
 | Strategy | h1 | h2 | h3 | h4 | h5 | h6 | h7 | h8 | h9 | h10 | h11 | h12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -214,17 +214,17 @@ Souls earned per hour (first 12 buckets):
 
 Bosses (first kill):
 
-- **greedy**: Eskel 8.6m, Mother Nettle 34.9m, Archivist Null 1.05h, Saint Orvane 3.49h, The Keeper 4.49h, The Lord of Cinders 6.98h
-- **optimal**: Eskel 9.4m, Mother Nettle 19.7m, Archivist Null 40.6m, Saint Orvane 1.44h, The Keeper 2.93h, The Lord of Cinders 4.50h
-- **casual**: Eskel 17.7m, Mother Nettle 44.5m, Archivist Null 1.88h, Saint Orvane 4.70h, The Keeper 6.02h
-- **idle**: Eskel 1.88h
-- **noclick**: Eskel 2.01h
+- **greedy**: the Pyre-Warden 8.6m, Mother Nettle 34.9m, Archivist Null 1.05h, Saint Orvane 3.49h, The Keeper 4.49h, The Renderer 6.98h
+- **optimal**: the Pyre-Warden 9.4m, Mother Nettle 19.7m, Archivist Null 40.6m, Saint Orvane 1.44h, The Keeper 2.93h, The Renderer 4.50h
+- **casual**: the Pyre-Warden 17.7m, Mother Nettle 44.5m, Archivist Null 1.88h, Saint Orvane 4.70h, The Keeper 6.02h
+- **idle**: the Pyre-Warden 1.88h
+- **noclick**: the Pyre-Warden 2.01h
 
 Stalls (no progress event for 20+ min):
 
-- **optimal** stalled 22.2m from 25.55h at The Kiln of the First Flame tier 3 (cleared 3), level 190
-- **optimal** stalled 21.1m from 27.90h at The Kiln of the First Flame tier 2 (cleared 3), level 192
+- **optimal** stalled 22.2m from 25.55h at The Rendering Works of the First Wick tier 3 (cleared 3), level 190
+- **optimal** stalled 21.1m from 27.90h at The Rendering Works of the First Wick tier 2 (cleared 3), level 192
 - **casual** stalled 22.1m from 33.99h at The Deep tier 2 (cleared 3), level 172
 
-Targets: first boss 6–16 min · first Kindle 3–7 h · first Sigil 30–60 h · auto-attack by 10 min
+Targets: first boss 6–16 min · first Snuff 3–7 h · first Severing 30–60 h · auto-attack by 10 min
 </details>

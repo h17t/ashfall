@@ -6,11 +6,11 @@ import { Plate } from '@/render/Plate';
 import { Slab } from '@/render/materials/Slab';
 import { hasAsset } from '../../../assets/manifest';
 
-/** Kept knowledge: every foe you have met, with its lore and its numbers. Survives Kindling and the Sigil. */
+/** Kept knowledge: every foe you have met, with its lore and its numbers. Survives Snuffing and the Severing. */
 export const BestiaryPanel = memo(function BestiaryPanel() {
   const seen = useSel((s) => s.unlockedZones.join(','));
   const ever = useSel((s) => s.prestige.bossesEverKilled.join(','));
-  const kindles = useSel((s) => s.prestige.kindles);
+  const wakings = useSel((s) => s.prestige.wakings);
   const [open, setOpen] = useState<string | null>(null);
   const zones = seen.split(',').filter(Boolean);
   const killed = new Set(ever.split(',').filter(Boolean));
@@ -31,10 +31,10 @@ export const BestiaryPanel = memo(function BestiaryPanel() {
           </div>
         );
       })}
-      {kindles > 0 && (
+      {wakings > 0 && (
         <div className="border border-ash/50 p-2">
           <div className="font-display text-[16px] text-parchment">Variants of the second burning</div>
-          {Object.entries(VARIANTS).filter(([, v]) => v.minNg <= kindles).map(([k, v]) => (
+          {Object.entries(VARIANTS).filter(([, v]) => v.minNg <= wakings).map(([k, v]) => (
             <div key={k} className="text-[14px]"><span className="text-ember-hot">{v.name}</span> <span className="text-bone/70">— {v.desc}</span></div>
           ))}
         </div>
@@ -61,7 +61,7 @@ function Entry({ id, boss, known = true, open, onToggle }: { id: string; boss?: 
             {plate && <div className="absolute left-2 top-2 w-[112px] h-[140px]" style={{ filter: 'sepia(0.35) contrast(1.05)' }}><Plate kind={kind} id={id} className="w-full h-full object-contain object-bottom" /></div>}
             <div className="t-display text-[17px]" style={{ color: 'var(--ink)' }}>{known ? name : 'Unknown'}</div>
             <div className="t-lore text-[14px] mt-1" style={{ color: 'var(--stone)' }}>{known ? def.lore : 'You have not yet seen it fall.'}</div>
-            {!boss && known && <div className="font-num text-[12px] mt-2" style={{ color: 'var(--ash)' }}>hp ×{(def as any).hpMult} · dmg ×{(def as any).dmgMult} · poise ×{(def as any).poiseMult} · resists {Object.entries((def as any).resist).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'} · status {Object.entries((def as any).statusResist).map(([k, v]) => `${k} ${v}`).join(', ') || 'normal'}</div>}
+            {!boss && known && <div className="font-num text-[12px] mt-2" style={{ color: 'var(--ash)' }}>hp ×{(def as any).hpMult} · dmg ×{(def as any).dmgMult} · composure ×{(def as any).composureMult} · resists {Object.entries((def as any).resist).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'} · status {Object.entries((def as any).statusResist).map(([k, v]) => `${k} ${v}`).join(', ') || 'normal'}</div>}
             {boss && known && <div className="text-[13px] mt-2" style={{ color: 'var(--ash)' }}>{(def as any).phases.map((p: any) => `${p.name}: ${p.mechanic ?? 'no trick'}`).join(' · ')}</div>}
           </Slab>
         </div>

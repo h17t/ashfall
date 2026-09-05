@@ -3,7 +3,7 @@ import { gsap } from 'gsap';
 /**
  * One cinematic at a time. Sequences are gsap timelines built against DOM the Cinema component
  * owns; the queue orders them, `skip` fast-forwards a skippable one, and nothing here touches
- * the engine: the game keeps running underneath, the way a Souls boss keeps swinging while the
+ * the engine: the game keeps running underneath, the way a Marrow boss keeps swinging while the
  * name card fades.
  */
 export interface Cinematic {

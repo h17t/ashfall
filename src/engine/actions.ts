@@ -9,7 +9,7 @@ import type { GameState, GameEvent, Action, StatKey } from './types';
 import { STAT_KEYS } from './types';
 import { levelCost, reinforceCost, statCurve, reinforceMult, levelDamageMult } from './formulas';
 import { computeMods, type Mods } from './mods';
-import { playerAttack, playerDodge, playerEstus, restAtBonfire, refreshPlayerMaxes, recoverBloodstain, damageEnemy, addStagger, applyStatus, weaponDamage } from './combat';
+import { playerAttack, playerDodge, playerEstus, restAtLantern, refreshPlayerMaxes, recoverBloodstain, damageEnemy, addStagger, applyStatus, weaponDamage } from './combat';
 import { newZoneProgress } from './state';
 import { actionHandlers } from './registry';
 export { registerActionHandler } from './registry';
@@ -25,7 +25,7 @@ export function travelBlocked(state: GameState, zone: string, tier: number): str
   if (!state.unlockedZones.includes(zone)) return 'That road is not yet open.';
   const z = getZone(zone);
   const zp = ensureZone(state, zone);
-  if (state.corpseRun) return 'Your bloodstain lies ahead. Reach it, or abandon it.';
+  if (state.remainsRun) return 'Your remains lies ahead. Reach it, or abandon it.';
   if (tier === -1) {
     if (zp.cleared < z.tiers.length - 1) return `Clear ${z.tiers[z.tiers.length - 1].name} first.`;
     return null;
@@ -36,7 +36,7 @@ export function travelBlocked(state: GameState, zone: string, tier: number): str
   }
   if (tier === -3) {
     const cb = cycleBossFor(zone);
-    if (!cb || state.prestige.kindles < (cb.cycle ?? 99)) return 'Nothing stirs there in this cycle.';
+    if (!cb || state.prestige.wakings < (cb.cycle ?? 99)) return 'Nothing stirs there in this cycle.';
     if (zp.bossKills <= 0) return 'It waits for the region\'s lord to fall first.';
     if (zp.cycleKills > 0) return 'Already put down this cycle.';
     return null;
@@ -56,12 +56,12 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
     case 'dodge':
       playerDodge(state, mods, events);
       return;
-    case 'estus':
+    case 'draughts':
       playerEstus(state, mods, events);
       return;
     case 'retreat':
       if (state.deathScreen > 0) return;
-      restAtBonfire(state, mods, events);
+      restAtLantern(state, mods, events);
       return;
     case 'travel': {
       if (state.deathScreen > 0) return;
@@ -70,10 +70,10 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
       const enc = state.encounter;
       const changingZone = enc.zone !== action.zone;
       if (changingZone) {
-        // Arriving in a new region lights its bonfire and rests there before setting out.
+        // Arriving in a new region lights its lantern and rests there before setting out.
         enc.zone = action.zone;
         enc.tier = 0;
-        restAtBonfire(state, mods, events);
+        restAtLantern(state, mods, events);
       }
       enc.tier = action.tier;
       enc.enemy = null;
@@ -82,19 +82,19 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
       enc.t = 0;
       return;
     }
-    case 'abandonBloodstain':
-      if (state.bloodstain) {
-        events.push({ type: 'bloodstainLost', souls: state.bloodstain.souls });
-        state.stats.soulsLost = state.stats.soulsLost.add(state.bloodstain.souls);
+    case 'abandonRemains':
+      if (state.remains) {
+        events.push({ type: 'remainsLost', marrow: state.remains.marrow });
+        state.stats.marrowLost = state.stats.marrowLost.add(state.remains.marrow);
       }
-      state.bloodstain = null;
-      state.corpseRun = null;
+      state.remains = null;
+      state.remainsRun = null;
       return;
     case 'levelUp': {
       if (!STAT_KEYS.includes(action.stat)) return err('No such stat.');
       const cost = levelCost(p.level);
-      if (state.souls.lt(cost)) return err('Not enough souls.');
-      state.souls = state.souls.sub(cost);
+      if (state.marrow.lt(cost)) return err('Not enough marrow.');
+      state.marrow = state.marrow.sub(cost);
       p.stats[action.stat]++;
       p.level++;
       const before = p.hpMax;
@@ -117,8 +117,8 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
       const regionUnlocked = state.unlockedZones.some((z) => getZone(z).region >= shopRegion);
       if (!regionUnlocked) return err('Not available here.');
       const cost = D(def.source.cost);
-      if (state.souls.lt(cost)) return err('Not enough souls.');
-      state.souls = state.souls.sub(cost);
+      if (state.marrow.lt(cost)) return err('Not enough marrow.');
+      state.marrow = state.marrow.sub(cost);
       p.weapons[def.id] = { id: def.id, level: mods.startWeaponLevel, infusion: 'none' };
       events.push({ type: 'unlock', what: 'weapon:' + def.id, text: `${def.name} acquired.` });
       return;
@@ -131,8 +131,8 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
       const cost = reinforceCost(def.region, inst.level);
       const mat = reinforceMaterial(inst.level);
       if ((state.materials[mat.id] ?? 0) < mat.count) return err(`Requires ${mat.count}× ${MATERIALS[mat.id].name}.`);
-      if (state.souls.lt(cost)) return err('Not enough souls.');
-      state.souls = state.souls.sub(cost);
+      if (state.marrow.lt(cost)) return err('Not enough marrow.');
+      state.marrow = state.marrow.sub(cost);
       state.materials[mat.id] -= mat.count;
       inst.level++;
       return;
@@ -141,80 +141,80 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
       const inst = p.weapons[action.weapon];
       if (!inst) return err('You do not own that.');
       const def = getWeapon(inst.id);
-      if (!def.infusable) return err('This weapon refuses the coal.');
+      if (!def.infusable) return err('This weapon refuses the pitchCoal.');
       if (action.infusion !== 'none' && !state.flags.infusionUnlocked) return err('You need Cinder Coal to unlock infusions.');
       if (action.infusion === inst.infusion) return;
       if (action.infusion !== 'none') {
-        if ((state.materials.coal ?? 0) < 1) return err('Requires 1× Cinder Coal.');
-        state.materials.coal -= 1;
+        if ((state.materials.pitchCoal ?? 0) < 1) return err('Requires 1× Cinder Coal.');
+        state.materials.pitchCoal -= 1;
       }
       inst.infusion = action.infusion;
       return;
     }
-    case 'chooseBossSoul': {
+    case 'chooseKeepsake': {
       const boss = getBoss(action.boss);
-      if ((state.bossSouls[action.boss] ?? 0) <= 0) return err('You hold no such soul.');
-      state.bossSouls[action.boss]--;
+      if ((state.keepsakes[action.boss] ?? 0) <= 0) return err('You hold no such Keepsake.');
+      state.keepsakes[action.boss]--;
       if (action.choice === 'weapon') {
-        if (p.weapons[boss.soulWeapon]) { state.bossSouls[action.boss]++; return err('Already forged.'); }
-        p.weapons[boss.soulWeapon] = { id: boss.soulWeapon, level: mods.startWeaponLevel, infusion: 'none' };
-        events.push({ type: 'unlock', what: 'weapon:' + boss.soulWeapon, text: `${getWeapon(boss.soulWeapon).name} forged from the soul.` });
+        if (p.weapons[boss.keepsakeWeapon]) { state.keepsakes[action.boss]++; return err('Already forged.'); }
+        p.weapons[boss.keepsakeWeapon] = { id: boss.keepsakeWeapon, level: mods.startWeaponLevel, infusion: 'none' };
+        events.push({ type: 'unlock', what: 'weapon:' + boss.keepsakeWeapon, text: `${getWeapon(boss.keepsakeWeapon).name} forged from the Marrow.` });
       } else {
-        if (state.spellsKnown.includes(boss.soulSpell)) { state.bossSouls[action.boss]++; return err('Already learned.'); }
-        state.spellsKnown.push(boss.soulSpell);
-        const sp = getSpell(boss.soulSpell);
-        if (sp.school === 'pyromancy') state.flags.hasFlame = true;
+        if (state.spellsKnown.includes(boss.keepsakeSpell)) { state.keepsakes[action.boss]++; return err('Already learned.'); }
+        state.spellsKnown.push(boss.keepsakeSpell);
+        const sp = getSpell(boss.keepsakeSpell);
+        if (sp.school === 'ruin') state.flags.hasBrand = true;
         state.flags.hasCatalyst = true;
         refreshPlayerMaxes(state, mods);
-        events.push({ type: 'unlock', what: 'spell:' + boss.soulSpell, text: `${sp.name} learned from the soul.` });
+        events.push({ type: 'unlock', what: 'spell:' + boss.keepsakeSpell, text: `${sp.name} learned from the Marrow.` });
       }
-      state.bossSoulChoices[action.boss] = action.choice;
+      state.keepsakeChoices[action.boss] = action.choice;
       return;
     }
-    case 'attune': {
-      if (action.slot < 0 || action.slot >= p.attunementSlots) return err('No such slot.');
+    case 'recite': {
+      if (action.slot < 0 || action.slot >= p.recitationSlots) return err('No such slot.');
       if (action.spell && !state.spellsKnown.includes(action.spell)) return err('Unknown spell.');
-      if (action.spell && p.attuned.includes(action.spell)) return err('Already attuned.');
-      p.attuned[action.slot] = action.spell;
+      if (action.spell && p.recited.includes(action.spell)) return err('Already recited.');
+      p.recited[action.slot] = action.spell;
       return;
     }
     case 'cast': {
-      const id = p.attuned[action.slot];
+      const id = p.recited[action.slot];
       if (!id) return;
       castSpell(state, mods, events, id);
       return;
     }
-    case 'upgradeFlame': {
-      const cost = D(300).mul(D(2.2).pow(p.flameLevel)).floor();
-      if (!state.flags.hasFlame && !p.weapons.pyromancyFlame) return err('You have no flame to feed.');
-      if (state.souls.lt(cost)) return err('Not enough souls.');
-      state.souls = state.souls.sub(cost);
-      p.flameLevel++;
+    case 'feedBrand': {
+      const cost = D(300).mul(D(2.2).pow(p.brandLevel)).floor();
+      if (!state.flags.hasBrand && !p.weapons.ruinBrand) return err('You have no flame to feed.');
+      if (state.marrow.lt(cost)) return err('Not enough marrow.');
+      state.marrow = state.marrow.sub(cost);
+      p.brandLevel++;
       return;
     }
-    case 'upgradeEstus': {
+    case 'upgradeDraught': {
       if (action.kind === 'count') {
-        if ((state.materials.estusShard ?? 0) < 1) return err('Requires an Estus Shard.');
-        state.materials.estusShard--;
+        if ((state.materials.wickStub ?? 0) < 1) return err('Requires an Tallowdraught Shard.');
+        state.materials.wickStub--;
         state.materials.__estusUpgrades = (state.materials.__estusUpgrades ?? 0) + 1;
         refreshPlayerMaxes(state, mods);
-        p.estus = p.estusMax;
+        p.draughts = p.draughtsMax;
       } else {
-        if ((state.materials.boneShard ?? 0) < 1) return err('Requires an Undead Bone Shard.');
-        state.materials.boneShard--;
-        p.estusPotency = Math.min(0.9, p.estusPotency + 0.08);
+        if ((state.materials.renderFat ?? 0) < 1) return err('Requires an Revenant Bone Shard.');
+        state.materials.renderFat--;
+        p.draughtPotency = Math.min(0.9, p.draughtPotency + 0.08);
       }
       return;
     }
     case 'respec': {
-      if (p.respecs <= 0 && (state.materials.soulVessel ?? 0) <= 0) return err('You have no Soul Vessel.');
+      if (p.respecs <= 0 && (state.materials.reliquaryBone ?? 0) <= 0) return err('You have no Reliquary Bone.');
       const total = STAT_KEYS.reduce((a, k) => a + p.stats[k], 0);
       const wanted = STAT_KEYS.reduce((a, k) => a + Math.max(0, Math.floor(action.stats[k] ?? 0)), 0);
       if (wanted !== total) return err('Points must add up.');
       const min = BALANCE.level.startingStats;
       for (const k of STAT_KEYS) if ((action.stats[k] ?? 0) < min[k]) return err('Cannot go below starting values.');
       for (const k of STAT_KEYS) p.stats[k] = Math.floor(action.stats[k]);
-      if (state.materials.soulVessel > 0) state.materials.soulVessel--; else p.respecs--;
+      if (state.materials.reliquaryBone > 0) state.materials.reliquaryBone--; else p.respecs--;
       refreshPlayerMaxes(state, mods);
       return;
     }
@@ -231,7 +231,7 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
       state.deathScreen = 0;
       return;
     default:
-      // Later-milestone actions are wired in their modules (phantoms, covenants, prestige).
+      // Later-milestone actions are wired in their modules (shades, creeds, prestige).
       return handleExtended(state, action, events, mods);
   }
 }
@@ -251,7 +251,7 @@ export function castSpell(state: GameState, mods: Mods, events: GameEvent[], id:
   if (p.fp < sp.fp) { events.push({ type: 'error', text: 'Not enough FP.' }); return; }
   const enemy = state.encounter.enemy;
   const eff = sp.effect;
-  const needsTarget = eff.kind === 'damage' || eff.kind === 'staggerBomb' || eff.kind === 'dot' || eff.kind === 'status';
+  const needsTarget = eff.kind === 'damage' || eff.kind === 'strainBomb' || eff.kind === 'dot' || eff.kind === 'status';
   if (needsTarget && (!enemy || enemy.hp.lte(0))) return;
   p.fp -= sp.fp;
   p.cooldowns[id] = sp.cooldown;
@@ -266,7 +266,7 @@ export function castSpell(state: GameState, mods: Mods, events: GameEvent[], id:
       damageEnemy(state, mods, events, dmg, eff.type, 'spell', { kind: id });
       return;
     }
-    case 'staggerBomb': {
+    case 'strainBomb': {
       const dmg = baseStrike.mul(eff.mult).mul(power).mul(wd.buffs);
       damageEnemy(state, mods, events, dmg, 'magic', 'spell', { kind: id });
       addStagger(state, mods, events, eff.amount * power);
@@ -300,8 +300,8 @@ export function castSpell(state: GameState, mods: Mods, events: GameEvent[], id:
       applyStatus(state, mods, events, eff.status, eff.amount * power);
       return;
     }
-    case 'squadBuff': {
-      state.squad.buff = { mult: eff.mult, t: eff.duration };
+    case 'cortegeBuff': {
+      state.cortege.buff = { mult: eff.mult, t: eff.duration };
       return;
     }
   }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { statCurve, statMarginal, levelCost, tierHp, tierSouls, reinforceMult, playerHpMax, gradeCoef } from '../formulas';
+import { statCurve, statMarginal, levelCost, tierHp, tierMarrow, reinforceMult, playerHpMax, gradeCoef } from '../formulas';
 import { BALANCE } from '@/content/balance';
 
 describe('statCurve', () => {
@@ -34,9 +34,9 @@ describe('costs and tiers', () => {
       prev = c;
     }
   });
-  it('tier hp and souls grow geometrically', () => {
+  it('tier hp and marrow grow geometrically', () => {
     expect(tierHp(1, 0).div(tierHp(0, 0)).toNumber()).toBeCloseTo(BALANCE.enemy.hpGrowth, 6);
-    expect(tierSouls(5, 0).div(tierSouls(4, 0)).toNumber()).toBeCloseTo(BALANCE.enemy.soulGrowth, 6);
+    expect(tierMarrow(5, 0).div(tierMarrow(4, 0)).toNumber()).toBeCloseTo(BALANCE.enemy.soulGrowth, 6);
     expect(tierHp(3, 2).div(tierHp(3, 0)).toNumber()).toBeCloseTo(BALANCE.ng.hpGrowth ** 2, 6);
   });
   it('reinforce +10 is roughly 4x', () => {
@@ -47,7 +47,7 @@ describe('costs and tiers', () => {
     const order = ['-', 'E', 'D', 'C', 'B', 'A', 'S'] as const;
     for (let i = 1; i < order.length; i++) expect(gradeCoef(order[i])).toBeGreaterThan(gradeCoef(order[i - 1]));
   });
-  it('player hp grows with vigor and level', () => {
+  it('player hp grows with vitality and level', () => {
     expect(playerHpMax(20, 1, 1)).toBeGreaterThan(playerHpMax(10, 1, 1));
     expect(playerHpMax(10, 20, 1)).toBeGreaterThan(playerHpMax(10, 1, 1));
     expect(playerHpMax(10, 1, 2)).toBe(playerHpMax(10, 1, 1) * 2);

@@ -3,9 +3,9 @@
  * One entry per asset: dimensions, anchor, and where it came from. Flipping `source` to
  * 'authored' and dropping a file in is the only change needed to replace procedural art.
  */
-import { ENEMIES, BOSSES, PHANTOMS, WEAPONS, SPELLS, COVENANTS, MATERIALS, ZONES, ZONE_ORDER } from '../src/content';
+import { ENEMIES, BOSSES, SHADES, WEAPONS, SPELLS, CREEDS, MATERIALS, ZONES, ZONE_ORDER } from '../src/content';
 
-export type AssetKind = 'enemy' | 'boss' | 'phantom' | 'weapon' | 'spell' | 'covenant' | 'item' | 'region' | 'ui';
+export type AssetKind = 'enemy' | 'boss' | 'shade' | 'weapon' | 'spell' | 'creed' | 'item' | 'region' | 'ui';
 export type AssetSource = 'generated' | 'procedural' | 'authored';
 
 export interface AssetEntry {
@@ -37,19 +37,19 @@ const put = (e: AssetEntry) => { MANIFEST[`${e.kind}:${e.id}`] = e; };
 
 for (const id of Object.keys(ENEMIES)) put(entry('enemy', id, 256, 320, { x: 0.5, y: 0.93 }));
 for (const id of Object.keys(BOSSES)) put(entry('boss', id, 384, 448, { x: 0.5, y: 0.93 }));
-for (const id of Object.keys(PHANTOMS)) put(entry('phantom', id, 256, 320, { x: 0.5, y: 0.93 }));
+for (const id of Object.keys(SHADES)) put(entry('shade', id, 256, 320, { x: 0.5, y: 0.93 }));
 for (const id of Object.keys(WEAPONS)) put(entry('weapon', id, 160, 160, { x: 0.5, y: 0.5 }));
 for (const id of Object.keys(SPELLS)) put(entry('spell', id, 96, 96, { x: 0.5, y: 0.5 }));
-for (const id of Object.keys(COVENANTS)) put(entry('covenant', id, 128, 128, { x: 0.5, y: 0.5 }));
+for (const id of Object.keys(CREEDS)) put(entry('creed', id, 128, 128, { x: 0.5, y: 0.5 }));
 for (const id of Object.keys(MATERIALS)) put(entry('item', id, 96, 96, { x: 0.5, y: 0.5 }));
 for (const id of ZONE_ORDER) {
   void ZONES[id];
   put(entry('region', id, 1600, 900, { x: 0.5, y: 1 }, { layers: [0, 1, 2, 3].map((i) => `/art/region/${id}.L${i}@2x.webp`), files: { x2: `/art/region/${id}.L0@2x.webp`, x1: `/art/region/${id}.L0.webp` } }));
 }
-// UI materials: tileable grain, foxing, hatch, slab edges are SVG at runtime; the bonfire plate is an asset.
-put(entry('ui', 'bonfire', 320, 240, { x: 0.5, y: 0.9 }));
-put(entry('ui', 'bloodstain', 128, 64, { x: 0.5, y: 0.5 }));
-put(entry('ui', 'emberTender', 256, 320, { x: 0.5, y: 0.93 }));
+// UI materials: tileable grain, foxing, hatch, slab edges are SVG at runtime; the lantern plate is an asset.
+put(entry('ui', 'lantern', 320, 240, { x: 0.5, y: 0.9 }));
+put(entry('ui', 'remains', 128, 64, { x: 0.5, y: 0.5 }));
+put(entry('ui', 'revenant', 256, 320, { x: 0.5, y: 0.93 }));
 
 export function asset(kind: AssetKind, id: string): AssetEntry {
   const e = MANIFEST[`${kind}:${id}`];

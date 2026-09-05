@@ -2,15 +2,15 @@ import { memo } from 'react';
 import { useSel } from '../store';
 import { ZONE_ORDER } from '@/content';
 
-/** The bonfire flame grows with progression: lords felled, Kindles, Sigils. Pure CSS/SVG. */
-export const Bonfire = memo(function Bonfire() {
+/** The lantern flame grows with progression: lords felled, Wakings, Severings. Pure CSS/SVG. */
+export const Lantern = memo(function Lantern() {
   const lords = useSel((s) => s.prestige.bossesEverKilled.length);
-  const kindles = useSel((s) => s.prestige.kindles);
-  const sigils = useSel((s) => s.prestige.sigils);
-  const dark = useSel((s) => s.prestige.darkLevel);
-  const size = Math.min(1.9, 0.6 + lords * 0.06 + kindles * 0.04 + sigils * 0.15 + dark * 0.1);
-  const tone = dark > 0 || sigils > 0 ? 'var(--soul)' : 'var(--ember)';
-  const toneHot = dark > 0 || sigils > 0 ? 'var(--parchment)' : 'var(--ember-hot)';
+  const wakings = useSel((s) => s.prestige.wakings);
+  const severings = useSel((s) => s.prestige.severings);
+  const dark = useSel((s) => s.prestige.unmaking);
+  const size = Math.min(1.9, 0.6 + lords * 0.06 + wakings * 0.04 + severings * 0.15 + dark * 0.1);
+  const tone = dark > 0 || severings > 0 ? 'var(--wisp)' : 'var(--ember)';
+  const toneHot = dark > 0 || severings > 0 ? 'var(--parchment)' : 'var(--ember-hot)';
   return (
     <div className="pointer-events-none fixed bottom-0 left-1/2 -translate-x-1/2 z-0 flex items-end justify-center" style={{ width: 240 * size, height: 160 * size, opacity: 0.9 }} aria-hidden>
       <svg viewBox="0 0 120 100" className="w-full h-full flame" style={{ transformOrigin: '50% 90%', willChange: 'transform' }}>

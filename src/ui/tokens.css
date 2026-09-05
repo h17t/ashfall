@@ -11,8 +11,8 @@
   --blood: #6E1212;
   --blood-bright: #A81C1C;
   --verdigris: #3D5A4C;
-  --soul: #5C7A99;
+  --wisp: #5C7A99;
   --gold: #B8912F;
-  /* the bonfire's flicker, written by the render loop: 0.85..1.15 */
+  /* the lantern's flicker, written by the render loop: 0.85..1.15 */
   --fire: 1;
 }

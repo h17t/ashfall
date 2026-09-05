@@ -10,7 +10,7 @@ describe('content integrity', () => {
       expect(Object.keys(w.scaling).length + (w.archetype === 'catalyst' ? 1 : 0)).toBeGreaterThan(0);
       expect(w.lore.length).toBeGreaterThan(40);
       expect(w.stamina).toBeGreaterThan(0);
-      expect(w.riposteMult).toBeGreaterThan(1);
+      expect(w.reprisalMult).toBeGreaterThan(1);
     }
   });
   it('every boss has multiple phases with a mechanic somewhere', () => {

@@ -2,7 +2,7 @@ import { toRgb } from './gl';
 import { seeded } from '@/render/seed';
 
 /**
- * CPU particle pool, drawn as GL points. Two blend groups: additive (embers, wisps, sparks, glow)
+ * CPU particle pool, drawn as GL points. Two blend groups: additive (motes, wisps, sparks, glow)
  * and normal (ash, blood, drips). Positions are stage pixels with y up.
  */
 export type Blend = 0 | 1; // 0 normal, 1 additive

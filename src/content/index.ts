@@ -6,14 +6,14 @@ import { ENEMIES } from './enemies';
 import { ZONES, ZONE_ORDER } from './zones';
 import { BOSSES } from './bosses';
 import { SPELLS } from './spells';
-import { PHANTOMS } from './phantoms';
-import { COVENANTS } from './covenants';
-import { TREE, SIGIL_UNLOCKS, BRANCH_INFO } from './tree';
+import { SHADES } from './shades';
+import { CREEDS } from './creeds';
+import { TREE, SEVERING_UNLOCKS, BRANCH_INFO } from './tree';
 import { MATERIALS, reinforceMaterial } from './materials';
 import { BALANCE } from './balance';
 import type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef } from './types';
 
-export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, PHANTOMS, COVENANTS, TREE, SIGIL_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial };
+export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, SHADES, CREEDS, TREE, SEVERING_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial };
 export { UPCOMING_SPELLS } from './spells';
 export type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef };
 
@@ -43,8 +43,8 @@ export function getSpell(id: string): SpellDef {
   return s;
 }
 export function getPhantom(id: string): PhantomDef {
-  const p = PHANTOMS[id];
-  if (!p) throw new Error(`Unknown phantom ${id}`);
+  const p = SHADES[id];
+  if (!p) throw new Error(`Unknown shade ${id}`);
   return p;
 }
 
@@ -72,7 +72,7 @@ export function zoneOffset(zone: string): number {
   return zoneOffsets[zone] ?? 0;
 }
 
-/** The NG+ cycle boss of a zone, if any. */
+/** The Waking cycle boss of a zone, if any. */
 export function cycleBossFor(zone: string): BossDef | null {
   for (const b of Object.values(BOSSES)) if (b.zone === zone && b.cycle !== undefined) return b;
   return null;
@@ -89,15 +89,15 @@ export function validateContent(): string[] {
   for (const z of Object.values(ZONES)) {
     if (!BOSSES[z.boss]) errs.push(`zone ${z.id} boss ${z.boss} missing`);
     if (z.secretBoss && !BOSSES[z.secretBoss]) errs.push(`zone ${z.id} secret boss ${z.secretBoss} missing`);
-    if (z.phantom && !PHANTOMS[z.phantom]) errs.push(`zone ${z.id} phantom ${z.phantom} missing`);
+    if (z.shade && !SHADES[z.shade]) errs.push(`zone ${z.id} shade ${z.shade} missing`);
     if (z.requires && !BOSSES[z.requires]) errs.push(`zone ${z.id} requires ${z.requires} missing`);
-    if (z.requiresUnlock && !SIGIL_UNLOCKS[z.requiresUnlock]) errs.push(`zone ${z.id} requiresUnlock ${z.requiresUnlock} missing`);
+    if (z.requiresUnlock && !SEVERING_UNLOCKS[z.requiresUnlock]) errs.push(`zone ${z.id} requiresUnlock ${z.requiresUnlock} missing`);
     z.tiers.forEach((t, i) => t.enemies.forEach((e) => { if (!ENEMIES[e]) errs.push(`zone ${z.id} tier ${i} enemy ${e} missing`); }));
     if (!ZONE_ORDER.includes(z.id)) errs.push(`zone ${z.id} not in ZONE_ORDER`);
   }
   for (const b of Object.values(BOSSES)) {
-    if (!WEAPONS[b.soulWeapon]) errs.push(`boss ${b.id} soul weapon ${b.soulWeapon} missing`);
-    if (!SPELLS[b.soulSpell]) errs.push(`boss ${b.id} soul spell ${b.soulSpell} missing`);
+    if (!WEAPONS[b.keepsakeWeapon]) errs.push(`boss ${b.id} keepsake weapon ${b.keepsakeWeapon} missing`);
+    if (!SPELLS[b.keepsakeSpell]) errs.push(`boss ${b.id} keepsake spell ${b.keepsakeSpell} missing`);
     if (!ZONES[b.zone]) errs.push(`boss ${b.id} zone ${b.zone} missing`);
     for (const d of Object.keys(b.drops)) if (!MATERIALS[d]) errs.push(`boss ${b.id} drop ${d} missing`);
     if (b.phases.length === 0) errs.push(`boss ${b.id} has no phases`);
@@ -108,23 +108,23 @@ export function validateContent(): string[] {
     if (e.attacks.length === 0) errs.push(`enemy ${e.id} has no attacks`);
   }
   for (const w of Object.values(WEAPONS)) {
-    if (w.source.kind === 'bossSoul' && !BOSSES[w.source.boss]) errs.push(`weapon ${w.id} boss ${w.source.boss} missing`);
+    if (w.source.kind === 'keepsake' && !BOSSES[w.source.boss]) errs.push(`weapon ${w.id} boss ${w.source.boss} missing`);
     if (w.source.kind === 'drop' && !ZONES[w.source.zone]) errs.push(`weapon ${w.id} zone missing`);
     if (!w.lore || w.lore.length < 40) errs.push(`weapon ${w.id} lore too short`);
   }
-  for (const p of Object.values(PHANTOMS)) {
-    if (!WEAPONS[p.defaultWeapon]) errs.push(`phantom ${p.id} weapon missing`);
-    if (!ZONES[p.zone]) errs.push(`phantom ${p.id} zone missing`);
-    if (p.requiresBoss && !BOSSES[p.requiresBoss]) errs.push(`phantom ${p.id} requires missing boss`);
-    if (!p.greeting) errs.push(`phantom ${p.id} has no greeting`);
+  for (const p of Object.values(SHADES)) {
+    if (!WEAPONS[p.defaultWeapon]) errs.push(`shade ${p.id} weapon missing`);
+    if (!ZONES[p.zone]) errs.push(`shade ${p.id} zone missing`);
+    if (p.requiresBoss && !BOSSES[p.requiresBoss]) errs.push(`shade ${p.id} requires missing boss`);
+    if (!p.greeting) errs.push(`shade ${p.id} has no greeting`);
   }
   for (const s of Object.values(SPELLS)) {
-    if (s.source.kind === 'bossSoul' && !BOSSES[s.source.boss]) errs.push(`spell ${s.id} boss missing`);
+    if (s.source.kind === 'keepsake' && !BOSSES[s.source.boss]) errs.push(`spell ${s.id} boss missing`);
   }
   for (const n of Object.values(TREE)) for (const r of n.requires) if (!TREE[r]) errs.push(`tree ${n.id} requires ${r} missing`);
-  for (const n of Object.values(SIGIL_UNLOCKS)) for (const r of n.requires) if (!SIGIL_UNLOCKS[r]) errs.push(`sigil ${n.id} requires ${r} missing`);
+  for (const n of Object.values(SEVERING_UNLOCKS)) for (const r of n.requires) if (!SEVERING_UNLOCKS[r]) errs.push(`severing ${n.id} requires ${r} missing`);
   const placeholder = /placeholder|coming soon|todo|lorem/i;
-  const allText = [...Object.values(WEAPONS), ...Object.values(ENEMIES), ...Object.values(BOSSES), ...Object.values(ZONES), ...Object.values(SPELLS), ...Object.values(PHANTOMS), ...Object.values(MATERIALS)].map((x) => x.lore + ' ' + x.name);
+  const allText = [...Object.values(WEAPONS), ...Object.values(ENEMIES), ...Object.values(BOSSES), ...Object.values(ZONES), ...Object.values(SPELLS), ...Object.values(SHADES), ...Object.values(MATERIALS)].map((x) => x.lore + ' ' + x.name);
   allText.forEach((t) => { if (placeholder.test(t)) errs.push(`placeholder text: ${t.slice(0, 40)}`); });
   return errs;
 }

@@ -13,10 +13,10 @@ export interface WeaponDef {
   damageType: DamageType;
   /** stamina cost per attack */
   stamina: number;
-  /** stagger build per hit */
-  stagger: number;
-  /** multiplier applied to hits during a riposte window */
-  riposteMult: number;
+  /** strain build per hit */
+  strain: number;
+  /** multiplier applied to hits during a reprisal window */
+  reprisalMult: number;
   /** base crit chance (0..1) */
   crit: number;
   scaling: Partial<Record<StatKey, Grade>>;
@@ -25,9 +25,9 @@ export interface WeaponDef {
   /** innate status buildup per hit */
   status?: Partial<Record<StatusKey, number>>;
   infusable: boolean;
-  /** how to obtain: 'start' | 'shop' | {drop zone/tier} | {boss soul} */
-  source: { kind: 'start' } | { kind: 'shop'; cost: number; region: number } | { kind: 'drop'; zone: string; tier: number; chance: number } | { kind: 'bossSoul'; boss: string };
-  /** attack rate for auto-attack and phantoms (attacks per second) */
+  /** how to obtain: 'start' | 'shop' | {drop zone/tier} | {keepsake} */
+  source: { kind: 'start' } | { kind: 'shop'; cost: number; region: number } | { kind: 'drop'; zone: string; tier: number; chance: number } | { kind: 'keepsake'; boss: string };
+  /** attack rate for auto-attack and shades (attacks per second) */
   speed: number;
   lore: string;
   /** region tier used for material tier & shop gating */
@@ -43,7 +43,7 @@ export interface AttackPattern {
   mult: number;
   /** weight in random selection */
   weight: number;
-  /** if true, this attack cannot be dodged with iframes alone; requires being staggered/other (rare, boss-only) */
+  /** if true, this attack cannot be dodged with iframes alone; requires being broken/other (rare, boss-only) */
   unblockable?: boolean;
   /** applies status to player */
   status?: 'poison';
@@ -56,14 +56,14 @@ export interface EnemyDef {
   hpMult: number;
   /** damage multiplier vs tier baseline */
   dmgMult: number;
-  /** poise multiplier vs baseline */
-  poiseMult: number;
+  /** composure multiplier vs baseline */
+  composureMult: number;
   /** attack interval seconds (time between attacks) */
   attackInterval: number;
   attacks: AttackPattern[];
   resist: Partial<Record<DamageType, number>>; // multiplier on damage taken (0.5 = resists)
   statusResist: Partial<Record<StatusKey, number>>; // multiplier on buildup (0 = immune)
-  soulMult: number;
+  marrowMult: number;
   /** material drops: id -> chance per kill */
   drops: Record<string, number>;
   lore: string;
@@ -96,22 +96,22 @@ export interface BossDef {
   /** HP multiplier vs the zone's final tier baseline */
   hpMult: number;
   dmgMult: number;
-  poiseMult: number;
+  composureMult: number;
   phases: BossPhase[];
-  soulMult: number;
-  /** boss soul rewards */
-  soulWeapon: string;
-  soulSpell: string;
+  marrowMult: number;
+  /** keepsake rewards */
+  keepsakeWeapon: string;
+  keepsakeSpell: string;
   /** guaranteed drops */
   drops: Record<string, number>;
   lore: string;
   shape: string;
   /** unlock condition for secret bosses */
-  secretCondition?: { kind: 'kills'; zone: string; count: number } | { kind: 'covenant'; covenant: string } | { kind: 'item'; item: string };
-  /** for NG+ cycle bosses: appears from this kindle count */
+  secretCondition?: { kind: 'kills'; zone: string; count: number } | { kind: 'creed'; creed: string } | { kind: 'item'; item: string };
+  /** for Waking cycle bosses: appears from this snuff count */
   cycle?: number;
-  /** cycle bosses drop Dark Embers instead of a boss soul */
-  noSoul?: boolean;
+  /** cycle bosses drop Dark the Wick instead of a keepsake */
+  noKeepsake?: boolean;
 }
 
 export interface ZoneTier {
@@ -130,13 +130,13 @@ export interface ZoneDef {
   secretBoss?: string;
   /** zone unlocked by killing this boss (previous region) */
   requires: string | null;
-  phantom?: string; // phantom recruitable here
+  shade?: string; // shade recruitable here
   lore: string;
   /** material family dropped here */
   materialTier: number;
   /** endless zone: every boss kill descends one depth; tiers re-scale by depth × tier count */
   endless?: boolean;
-  /** requires this sigil unlock as well as the boss */
+  /** requires this severing unlock as well as the boss */
   requiresUnlock?: string;
 }
 
@@ -149,13 +149,13 @@ export interface SpellDef {
   req: Partial<Record<StatKey, number>>;
   effect:
     | { kind: 'damage'; mult: number; type: DamageType }
-    | { kind: 'staggerBomb'; amount: number; mult: number }
-    | { kind: 'buff'; buff: { dmg?: number; souls?: number; stagger?: number; taken?: number; stamRegen?: number; hpRegen?: number }; duration: number }
+    | { kind: 'strainBomb'; amount: number; mult: number }
+    | { kind: 'buff'; buff: { dmg?: number; marrow?: number; strain?: number; taken?: number; stamRegen?: number; hpRegen?: number }; duration: number }
     | { kind: 'dot'; mult: number; duration: number; type: DamageType }
     | { kind: 'heal'; frac: number }
     | { kind: 'status'; status: StatusKey; amount: number }
-    | { kind: 'squadBuff'; mult: number; duration: number };
-  source: { kind: 'shop'; cost: number; region: number } | { kind: 'bossSoul'; boss: string } | { kind: 'drop'; zone: string; tier: number; chance: number } | { kind: 'sigil' } | { kind: 'start' };
+    | { kind: 'cortegeBuff'; mult: number; duration: number };
+  source: { kind: 'shop'; cost: number; region: number } | { kind: 'keepsake'; boss: string } | { kind: 'drop'; zone: string; tier: number; chance: number } | { kind: 'severing' } | { kind: 'start' };
   lore: string;
 }
 
@@ -163,15 +163,15 @@ export interface CovenantUpgrade {
   id: string;
   name: string;
   desc: string;
-  cost: number; // souls (scaled)
+  cost: number; // marrow (scaled)
   repReq: number;
   maxRank: number;
   effect: Partial<Record<CovenantEffectKey, number>>;
 }
 
 export type CovenantEffectKey =
-  | 'soulMult' | 'dmgMult' | 'phantomRate' | 'phantomDmg' | 'statusBuild' | 'statusDmg'
-  | 'offlineCapHours' | 'offlineRate' | 'takenMult' | 'bloodstainKeep' | 'estusPotency' | 'staggerMult' | 'materialMult' | 'humanityMult'
+  | 'marrowMult' | 'dmgMult' | 'phantomRate' | 'phantomDmg' | 'statusBuild' | 'statusDmg'
+  | 'offlineCapHours' | 'offlineRate' | 'takenMult' | 'remainsKeep' | 'draughtPotency' | 'strainMult' | 'materialMult' | 'humanityMult'
   | 'phantomSlot' | 'critChance' | 'dodgeCd';
 
 export interface CovenantDef {
@@ -184,7 +184,7 @@ export interface CovenantDef {
   desc: string;
   upgrades: CovenantUpgrade[];
   lore: string;
-  /** region where the covenant can be joined */
+  /** region where the creed can be joined */
   region: number;
 }
 
@@ -198,24 +198,24 @@ export interface PhantomDef {
   speed: number;
   /** base hp at level 1 */
   hp: number;
-  /** stagger build multiplier */
-  stagger: number;
-  /** heal per action as fraction of squad/player max hp (healer) */
+  /** strain build multiplier */
+  strain: number;
+  /** heal per action as fraction of cortege/player max hp (healer) */
   heal: number;
   /** buffer: damage multiplier granted */
   buff: number;
   /** status applier: buildup per hit */
   status?: Partial<Record<StatusKey, number>>;
-  covenant: string; // affinity
+  creed: string; // affinity
   affinityBonus: string;
   defaultWeapon: string;
   zone: string;
   recruitCost: number;
-  /** boss that must have been killed (ever) before this phantom will answer the summon */
+  /** boss that must have been killed (ever) before this shade will answer the calls */
   requiresBoss?: string;
   lore: string;
   shape: string;
-  /** what the phantom says when recruited / when it levels */
+  /** what the shade says when recruited / when it levels */
   greeting: string;
 }
 
@@ -223,8 +223,8 @@ export interface TreeNode {
   id: string;
   name: string;
   desc: string;
-  branch: 'ember' | 'bone' | 'shadow' | 'flame';
-  cost: number; // humanity per rank, scaled by rank
+  branch: 'wick' | 'bone' | 'shadow' | 'flame';
+  cost: number; // vestige per rank, scaled by rank
   costGrowth: number;
   maxRank: number;
   requires: string[];
@@ -233,10 +233,10 @@ export interface TreeNode {
 }
 
 export type TreeEffectKey =
-  | 'dmgMult' | 'soulMult' | 'offlineCapHours' | 'startWeaponLevel' | 'phantomRate' | 'estusCount' | 'estusPotency'
-  | 'startLevels' | 'staminaRegen' | 'staggerMult' | 'humanityMult' | 'materialMult' | 'critChance' | 'riposteMult'
+  | 'dmgMult' | 'marrowMult' | 'offlineCapHours' | 'startWeaponLevel' | 'phantomRate' | 'draughtCount' | 'draughtPotency'
+  | 'startLevels' | 'staminaRegen' | 'strainMult' | 'humanityMult' | 'materialMult' | 'critChance' | 'reprisalMult'
   | 'unlockAutoAttack' | 'unlockAutoLevel' | 'unlockAutoRiposte' | 'unlockAutoDodge' | 'unlockAutoEstus' | 'unlockAutoAdvance'
-  | 'phantomSlot' | 'attunementSlot' | 'fpMult' | 'keepWeapons' | 'startSouls' | 'bloodstainKeep' | 'dodgeCd' | 'hpMult' | 'phantomDmg' | 'ngScaling';
+  | 'phantomSlot' | 'attunementSlot' | 'fpMult' | 'keepWeapons' | 'startSouls' | 'remainsKeep' | 'dodgeCd' | 'hpMult' | 'phantomDmg' | 'ngScaling';
 
 export interface SigilUnlock {
   id: string;
@@ -249,7 +249,7 @@ export interface SigilUnlock {
 }
 
 export type SigilEffectKey =
-  | 'phantomSlot' | 'unlockHex' | 'unlockAutoKindle' | 'unlockAutoSpells' | 'unlockAbyss' | 'keepTree' | 'dmgMult' | 'soulMult'
+  | 'phantomSlot' | 'unlockHex' | 'unlockAutoKindle' | 'unlockAutoSpells' | 'unlockAbyss' | 'keepTree' | 'dmgMult' | 'marrowMult'
   | 'humanityMult' | 'ngScaling' | 'attunementSlot' | 'unlockAutoCovenant' | 'phantomDmg' | 'offlineCapHours' | 'startKindles';
 
 export interface MaterialDef {

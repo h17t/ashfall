@@ -13,8 +13,8 @@ export function FloatingNumbers() {
     const add: Num[] = [];
     for (const e of events) {
       if (e.type === 'hit') {
-        const cls = e.riposte ? 'num-riposte' : e.crit ? 'text-ember-hot text-[30px]' : e.source === 'dot' ? 'text-soul text-[15px]' : e.source === 'phantom' ? 'text-bone text-[15px]' : 'text-parchment text-[22px]';
-        add.push({ id: nextId++, text: (e.crit && !e.riposte ? '¶ ' : '') + fmt(e.dmg), x: 35 + Math.random() * 30, y: 30 + Math.random() * 30, cls });
+        const cls = e.reprisal ? 'num-reprisal' : e.crit ? 'text-ember-hot text-[30px]' : e.source === 'dot' ? 'text-wisp text-[15px]' : e.source === 'shade' ? 'text-bone text-[15px]' : 'text-parchment text-[22px]';
+        add.push({ id: nextId++, text: (e.crit && !e.reprisal ? '¶ ' : '') + fmt(e.dmg), x: 35 + Math.random() * 30, y: 30 + Math.random() * 30, cls });
       } else if (e.type === 'enemyAttack') {
         if (e.dodged) add.push({ id: nextId++, text: e.perfect ? 'PERFECT DODGE' : 'dodged', x: 40 + Math.random() * 20, y: 70, cls: e.perfect ? 'text-ember-hot text-[24px]' : 'text-bone text-[17px]' });
         else add.push({ id: nextId++, text: `-${e.dmg}`, x: 40 + Math.random() * 20, y: 75, cls: 'text-blood-bright text-[30px]' });
@@ -23,7 +23,7 @@ export function FloatingNumbers() {
       } else if (e.type === 'exhausted') {
         add.push({ id: nextId++, text: 'exhausted', x: 45, y: 60, cls: 'text-bone text-[13px]' });
       } else if (e.type === 'statusProc') {
-        add.push({ id: nextId++, text: e.status.toUpperCase(), x: 50, y: 40, cls: 'text-soul text-[22px]' });
+        add.push({ id: nextId++, text: e.status.toUpperCase(), x: 50, y: 40, cls: 'text-wisp text-[22px]' });
       }
     }
     if (add.length) {
