@@ -46,5 +46,11 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
 - Cloud save via export string is enough for now; no accounts
 
 ## Deferred / known gaps
-- Level-up UI, weapon panel, zone/tier navigation UI (Milestone 4/5)
 - Enemy sprites are dark on dark; polish pass (M12)
+- Pass 3 residuals:
+  - The name: USPTO/EUIPO, Steam and itch could not be reached from the sandbox (NAMING.md); check them before any public listing.
+  - The "Stair pays" simulator column reads near zero since holdfasts and expeditions joined the income it is compared against; redefine it against kill marrow (BALANCE.md rev 9).
+  - The skilled first Snuff sits at 0.9 h against the brief's 3–7 h; a cadence the simulator does not model, but a human tune on a real phone should confirm it.
+  - Onboarding is hint-driven and touch-aware; a first-minute rehearsal with a stranger on a mid-range Android (QA.md) is the missing test.
+  - Text contrast is only measured on flat surfaces; most text sits on painted slabs the audit skips.
+  - The stair region borrows the Nadir's ambient particle set with small changes; a dedicated pass could give it weather of its own.
