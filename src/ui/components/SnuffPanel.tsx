@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useGame, useSel } from '../store';
 import { fmt, D, vestigePreview, canSnuff, snuffLedger, nodeCost, nodeBlocked, computeMods } from '@/engine';
 import { wakingName } from '@/engine/prestige';
@@ -67,13 +67,23 @@ function Tree() {
   const B = JSON.parse(blocked) as Record<string, string | null>;
   const C = JSON.parse(costs) as Record<string, string>;
   const branches = ['wick', 'bone', 'shadow', 'flame'] as const;
-  const COL = 108, ROW = 96, PAD = 18;
+  // the page narrows to fit the column it is in (a sideways phone gives it ~260px): the vines close up, the medallions keep their 48px
+  const [avail, setAvail] = useState(360);
+  const measure = useCallback((el: HTMLDivElement | null) => {
+    if (!el) return;
+    const ro = new ResizeObserver(() => setAvail(el.clientWidth));
+    ro.observe(el);
+    setAvail(el.clientWidth);
+  }, []);
+  const PAD = 18, ROW = 96;
+  const COL = Math.max(64, Math.min(108, Math.floor((avail - PAD * 2) / 3)));
   return (
     <Slab material="parchment" seed="tree" rough={8} ornament="fold" className="px-4 pt-3 pb-4 flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
         <span className="t-display text-[18px]" style={{ color: 'var(--ink)' }}>The Vestige Tree</span>
         <span className="t-label" style={{ color: 'var(--ash)' }}>permanent · <span className="font-num" style={{ color: 'var(--ember)' }}>{fmt(D(vestige))}</span> to spend</span>
       </div>
+      <div ref={measure} className="flex flex-col gap-3">
       {branches.map((b) => {
         const nodes = Object.values(TREE).filter((n) => n.branch === b);
         const rows = Math.max(...nodes.map((n) => n.pos.y)) + 1;
@@ -126,6 +136,7 @@ function Tree() {
           </div>
         );
       })}
+      </div>
     </Slab>
   );
 }

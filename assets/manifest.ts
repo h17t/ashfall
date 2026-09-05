@@ -26,7 +26,16 @@ export interface AssetEntry {
 }
 
 const seedOf = (s: string) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h % 1000003; };
-const files = (kind: string, id: string) => ({ x2: `/art/${kind}/${id}@2x.webp`, x1: `/art/${kind}/${id}.webp`, mask: `/art/${kind}/${id}.mask.png`, ...(kind === 'weapon' ? { icon: `/art/${kind}/${id}.icon.webp` } : {}) });
+/**
+ * Where the served root is. Vite builds with `base: './'` so the game runs from any sub-path
+ * (GitHub Pages serves it under the repository's name); at runtime BASE_URL is './' and every plate is
+ * requested relative to the page. Node tools (generate, audit, sheets) see no Vite env and get
+ * the plain '/' root they join onto the output folder.
+ */
+const ROOT = ((import.meta as unknown as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/').replace(/\/$/, '');
+const art = (kind: string, file: string) => `${ROOT}/art/${kind}/${file}`;
+const files = (kind: string, id: string) => ({ x2: art(kind, `${id}@2x.webp`), x1: art(kind, `${id}.webp`), mask: art(kind, `${id}.mask.png`), ...(kind === 'weapon' ? { icon: art(kind, `${id}.icon.webp`) } : {}) });
+const region = (id: string) => ({ layers: [0, 1, 2, 3].map((i) => art('region', `${id}.L${i}@2x.webp`)), files: { x2: art('region', `${id}.L0@2x.webp`), x1: art('region', `${id}.L0.webp`) } });
 
 function entry(kind: AssetKind, id: string, w: number, h: number, anchor: { x: number; y: number }, extra: Partial<AssetEntry> = {}): AssetEntry {
   return { id, kind, w, h, anchor, source: 'procedural', files: files(kind, id), seed: seedOf(kind + ':' + id), ...extra };
@@ -44,10 +53,10 @@ for (const id of Object.keys(CREEDS)) put(entry('creed', id, 128, 128, { x: 0.5,
 for (const id of Object.keys(MATERIALS)) put(entry('item', id, 96, 96, { x: 0.5, y: 0.5 }));
 for (const id of ZONE_ORDER) {
   void ZONES[id];
-  put(entry('region', id, 1600, 900, { x: 0.5, y: 1 }, { layers: [0, 1, 2, 3].map((i) => `/art/region/${id}.L${i}@2x.webp`), files: { x2: `/art/region/${id}.L0@2x.webp`, x1: `/art/region/${id}.L0.webp` } }));
+  put(entry('region', id, 1600, 900, { x: 0.5, y: 1 }, region(id)));
 }
 // pass 3: the Stair's own picture, boons, arts, affixes, sets, the hours
-put(entry('region', 'stair', 1600, 900, { x: 0.5, y: 1 }, { layers: [0, 1, 2, 3].map((i) => `/art/region/stair.L${i}@2x.webp`), files: { x2: '/art/region/stair.L0@2x.webp', x1: '/art/region/stair.L0.webp' } }));
+put(entry('region', 'stair', 1600, 900, { x: 0.5, y: 1 }, region('stair')));
 for (const id of Object.keys(BOONS)) put(entry('boon', id, 96, 96, { x: 0.5, y: 0.5 }));
 for (const a of Object.values(ARTS)) put(entry('art', a.id, 96, 96, { x: 0.5, y: 0.5 }));
 for (const id of Object.keys(AFFIXES)) put(entry('affix', id, 96, 96, { x: 0.5, y: 0.5 }));

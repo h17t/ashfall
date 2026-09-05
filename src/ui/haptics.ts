@@ -27,6 +27,9 @@ let lastAt = 0;
 export function haptic(kind: HapticKind): boolean {
   if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return false;
   if (!useSettings.getState().haptics) return false;
+  // browsers refuse (and log) a vibration before the first tap; no reason to ask until then
+  const act = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation;
+  if (act && !act.hasBeenActive) return false;
   const now = Date.now();
   // hits arrive many times a second; never queue more than one tick per 60ms
   if (kind === 'hit' && now - lastAt < 60) return false;

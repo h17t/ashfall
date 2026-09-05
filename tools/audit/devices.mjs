@@ -51,7 +51,7 @@ for (const d of DEVICES) {
   await page.getByRole('button', { name: /^Combat$/ }).first().click().catch(() => {});
   await page.waitForTimeout(400);
   const layout = await page.evaluate(() => document.querySelector('.shell')?.className.match(/shell-(portrait|landscape|wide)/)?.[1]);
-  if (d.w >= 900 && layout !== 'wide') fail.push(`${d.name}: expected the wide layout, got ${layout}`);
+  if (d.w >= 900 && d.h >= 560 && layout !== 'wide') fail.push(`${d.name}: expected the wide layout, got ${layout}`);
   if (d.w < 640 && layout !== 'portrait') fail.push(`${d.name}: expected portrait, got ${layout}`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   if (overflow) fail.push(`${d.name}: the page scrolls sideways`);

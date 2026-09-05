@@ -109,7 +109,7 @@ export default function App() {
       <Encounter />
       <DescentStrip />
       <RaidStrip />
-      {layout === 'portrait' ? <ActionBar /> : <div className="flex flex-col gap-3"><ActionBar /><AutomationBar />{extras}</div>}
+      {layout === 'portrait' ? <ActionBar /> : <><ActionBar /><div className="wide-under flex flex-col gap-3"><AutomationBar />{extras}</div></>}
     </>
   );
   const sections: Record<Pillar, ReactNode> = {
@@ -149,7 +149,6 @@ export default function App() {
       <HaulSheet />
       <Fx />
       <Lantern />
-      {layout !== 'portrait' && <Hints />}
       <MoteField />
       {errorBar}
       {layout === 'portrait' ? (
@@ -178,6 +177,7 @@ export default function App() {
           )}
           <div className="wide-combat">
             <StatusStrip />
+            <Hints />
             {combat}
           </div>
           <div className="wide-section">

@@ -280,17 +280,24 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 /* wide: the combat frame beside the section, a rail of pillars on the left */
 .shell-wide .shell-main { flex-direction: row; gap: 16px; max-width: 1440px; margin: 0 auto; width: 100%; padding: 12px 20px 24px; align-items: flex-start; }
-.shell-wide .wide-combat { flex: 1 1 60%; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
-.shell-wide .wide-section { flex: 0 0 420px; min-width: 0; }
-.shell-wide .section-scroll { max-height: calc(100dvh - 40px); overflow-y: auto; }
-.shell-landscape .shell-main { flex-direction: row; gap: 8px; padding: 6px 8px calc(6px + var(--safe-bottom)); }
+.shell-wide .wide-combat { flex: 1 1 60%; min-width: 0; display: flex; flex-direction: column; gap: 12px; max-height: calc(100dvh - 36px); overflow-y: auto; }
+.shell-wide .wide-section { flex: 0 0 clamp(340px, 38%, 420px); min-width: 0; display: flex; flex-direction: column; max-height: calc(100dvh - 36px); }
+.shell-wide .section-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+/* sideways and wide: the arena gives way before the action bar does, and orders/log scroll in their own box under it */
+.shell-wide .arena, .shell-landscape .arena { flex: 1 1 auto; min-height: auto; }
+.shell-wide .arena-stage { min-height: clamp(200px, 100dvh - 400px, 560px) !important; }
+.wide-under { flex: 1 1 auto; min-height: 120px; overflow-y: auto; }
+.wide-under .section, .wide-under .section-scroll { flex: none; min-height: auto; overflow: visible; }
+.shell-wide .hint-card p, .shell-landscape .shell-main { flex-direction: row; gap: 8px; padding: 6px 8px calc(6px + var(--safe-bottom)); }
 .shell-landscape .wide-combat { flex: 1 1 58%; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-.shell-landscape .wide-section { flex: 1 1 42%; min-width: 0; }
-.shell-landscape .section-scroll { max-height: calc(100dvh - 12px); overflow-y: auto; }
-.shell-landscape .arena-stage { min-height: 46dvh !important; }
+.shell-landscape .wide-section { flex: 1 1 42%; min-width: 0; display: flex; flex-direction: column; max-height: calc(100dvh - 12px - var(--safe-bottom)); }
+.shell-landscape .section-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.shell-landscape .arena-stage { min-height: clamp(160px, 100dvh - 400px, 400px) !important; }
+.shell-landscape .subtab { min-height: 44px; padding: 0 10px; }
+.shell-landscape .subtabs { gap: 6px; row-gap: 4px; }
 .shell-landscape .arena-lore { display: none; }
-.subtabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 -14px; padding: 0 14px; }
-.subtabs::-webkit-scrollbar { display: none; }
+@media (max-height: 700px) { .shell-wide .arena-lore { display: none; } }
+.subtabs { display: flex; flex-wrap: wrap; gap: 4px; row-gap: 8px; margin: 0 -14px; padding: 0 14px; }
 .subtab { flex: 0 0 auto; min-height: 48px; padding: 0 14px; font-family: var(--font-num); font-weight: 600; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: color-mix(in srgb, var(--bone) 70%, transparent); border-bottom: 2px solid transparent; }
 .subtab.is-active { color: var(--ember-hot); border-bottom-color: var(--ember); }
 .seg { display: inline-flex; border: 1px solid var(--ash); }
@@ -301,7 +308,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .bottom-nav-four { grid-template-columns: repeat(4, 1fr); }
 .bottom-nav-vertical.bottom-nav-four { grid-template-columns: 1fr; }
 .shell-landscape .bottom-nav { position: static; height: auto; padding: 4px 0 8px; background: transparent; border-top: 0; }
-.shell-landscape .wide-combat { overflow-y: auto; max-height: calc(100dvh - 12px); }
+.shell-landscape .wide-combat { overflow-y: auto; max-height: calc(100dvh - 12px - var(--safe-bottom)); }
 /* touch-target floor: every interactive thing is at least 48px tall with 8px of air */
 .tip-wrap { min-height: 48px; display: flex; flex-direction: column; justify-content: center; }
 .bottom-nav { gap: 8px; }
@@ -336,7 +343,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 @keyframes away-row { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .away .ledger { animation: none !important; } }
 .action-bar, .arena-stage { touch-action: none; }
-.shell-landscape .hint-card { position: static; transform: none; width: auto; max-width: none; margin: 2px 0 6px; left: auto; bottom: auto; }
+.shell-landscape .hint-card, .shell-wide .hint-card { position: static; transform: none; width: auto; max-width: none; margin: 2px 0 6px; left: auto; bottom: auto; }
 /* sideways pans belong to the swipe; vertical scrolling stays native */
 .shell-portrait .section-scroll, .shell-portrait .status-strip { touch-action: pan-y; }
 
@@ -375,6 +382,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
    inside it flow rather than scroll, so nothing is trapped under the fold. */
 .shell-portrait .shell-main.is-combat { overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
 .shell-portrait .shell-main.is-combat .section, .shell-portrait .shell-main.is-combat .section-scroll { flex: none; overflow: visible; }
+/* the column grows with its content so the nav padding lands after the last order, not under it */
+.shell-portrait .shell-main.is-combat > * { flex: none; min-height: 0; }
 
 /* ---- the Study and the forge ---- */
 .study-bar { padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--ash) 70%, transparent); }

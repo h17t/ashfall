@@ -9,7 +9,8 @@ export type Layout = 'portrait' | 'landscape' | 'wide';
 function compute(): Layout {
   if (typeof window === 'undefined') return 'portrait';
   const w = window.innerWidth, h = window.innerHeight;
-  if (w >= 900) return 'wide';
+  // wide needs room for the rail, the arena and a section column; a sideways phone is wide but short
+  if (w >= 900 && h >= 560) return 'wide';
   if (w > h && w >= 640) return 'landscape';
   return 'portrait';
 }
