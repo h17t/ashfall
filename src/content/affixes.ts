@@ -17,7 +17,7 @@ export interface AffixDef {
   set: SetId;
   text: string;
   /** what the Study must hold before this affix can roll */
-  gate?: { kind: 'poisoner' | 'lord' | 'creature'; id?: string; rank: number };
+  gate?: { kind: 'poisoner' | 'lord' | 'creature' | 'holdfast'; id?: string; rank: number };
 }
 
 export const AFFIXES: Record<string, AffixDef> = {
@@ -32,8 +32,8 @@ export const AFFIXES: Record<string, AffixDef> = {
   draining: { id: 'draining', name: 'Draining', stat: 'lifesteal', mag: [0.004, 0.007, 0.011], set: 'wick', text: 'HP mended per hit' },
   stalwart: { id: 'stalwart', name: 'Stalwart', stat: 'hp', mag: [0.05, 0.08, 0.12], set: 'wick', text: 'Max HP' },
   warding: { id: 'warding', name: 'Warding', stat: 'taken', mag: [0.04, 0.07, 0.10], set: 'mason', text: 'Damage taken, less' },
-  gilded: { id: 'gilded', name: 'Gilded', stat: 'materials', mag: [0.15, 0.25, 0.40], set: 'usurer', text: 'Material drops' },
-  vengeful: { id: 'vengeful', name: 'Vengeful', stat: 'reprisal', mag: [0.12, 0.20, 0.30], set: 'mason', text: 'Reprisal damage' },
+  gilded: { id: 'gilded', name: 'Gilded', stat: 'materials', mag: [0.15, 0.25, 0.40], set: 'usurer', text: 'Material drops', gate: { kind: 'holdfast', rank: 1 } },
+  vengeful: { id: 'vengeful', name: 'Vengeful', stat: 'reprisal', mag: [0.12, 0.20, 0.30], set: 'mason', text: 'Reprisal damage', gate: { kind: 'holdfast', rank: 2 } },
   breathing: { id: 'breathing', name: 'Breathing', stat: 'stamRegen', mag: [0.10, 0.18, 0.28], set: 'wick', text: 'Stamina regen' },
   usurious: { id: 'usurious', name: 'Usurious', stat: 'marrow', mag: [0.05, 0.09, 0.14], set: 'usurer', text: 'Marrow from kills', gate: { kind: 'lord', rank: 1 } },
 };

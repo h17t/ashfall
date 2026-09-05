@@ -405,3 +405,14 @@ html.toll-dusk .arena-stage::after { content: ''; position: absolute; inset: 0; 
 .affl-row { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 6px 10px; border: 1px solid color-mix(in srgb, var(--ash) 70%, transparent); }
 .affl-row.is-on { border-color: var(--blood); background: color-mix(in srgb, var(--blood) 12%, var(--ink)); }
 .toll-bullet { display: inline-block; width: 7px; height: 7px; transform: rotate(45deg); flex: none; position: relative; top: -1px; }
+
+/* ---- dispatch, holdfasts, the war, the arts ---- */
+.mission-card { display: block; width: 100%; text-align: left; padding: 12px 14px; min-height: 96px; border: 1px solid var(--ash); background: color-mix(in srgb, var(--ink) 80%, transparent); color: var(--parchment); }
+.mission-card.risky { border-color: color-mix(in srgb, var(--wisp) 70%, var(--ash)); }
+.mission-card.perilous { border-color: var(--blood); }
+.mission-card:disabled { opacity: 0.55; }
+.raid-strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; margin: 8px 0 0; border: 1px solid color-mix(in srgb, var(--blood) 60%, transparent); background: linear-gradient(90deg, color-mix(in srgb, var(--blood) 16%, var(--ink)), var(--ink)); }
+.war-board { padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--ash) 70%, transparent); }
+.war-track { flex: 1; height: 8px; background: color-mix(in srgb, var(--ash) 35%, transparent); }
+.war-fill { display: block; height: 100%; }
+.act-art.is-on { box-shadow: inset 0 0 0 2px var(--ember-hot); }

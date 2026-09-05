@@ -9,6 +9,9 @@ import { DESCENT_TIER, spawnDescentEnemy, descentOnKill, descentOnDeath, secondW
 import { recordStudyKill, studyVsMult } from './study';
 import { playerAffixFx } from './forge';
 import { tollPhase } from './toll';
+import { recordMasteryKill, masteryDmgMult } from './mastery';
+import { raidKill } from './holdfasts';
+import { contribute } from './war';
 import { getEnemy, getZone, getBoss, getWeapon, getSpell, globalTier, nextZone, cycleBossFor, BOSSES, WEAPONS } from '@/content';
 const getSpellSchool = (id: string) => getSpell(id).school;
 import type { AttackPattern, BossPhase, EnemyDef } from '@/content/types';
@@ -106,7 +109,7 @@ export function weaponDamage(state: GameState, mods: Mods, weaponId = state.play
   const reinforce = 1 + (reinforceMult(level) - 1) * mods.reinforceScale;
   const buffs = buffMult(p.buffs, 'dmg');
   const levelMult = levelDamageMult(p.level);
-  const total = D(def.base).mul(reinforce).mul(1 + scalingSum).mul(infusionMult).mul(reqPenalty).mul(buffs).mul(mods.dmg).mul(levelMult);
+  const total = D(def.base).mul(reinforce).mul(1 + scalingSum).mul(infusionMult).mul(reqPenalty).mul(buffs).mul(mods.dmg).mul(levelMult).mul(masteryDmgMult(inst));
   return {
     base: def.base,
     reinforce,
@@ -425,6 +428,15 @@ export function playerAttack(state: GameState, mods: Mods, events: GameEvent[], 
   const afx = playerAffixFx(state);
   const crit = chance(state.rng, br.crit + (rfx?.crit ?? 0));
   if (crit) dmg = dmg.mul(BALANCE.player.critMult * (rfx?.critDmg ?? 1) * afx.critDmg);
+  // the weapon's Art, if it is spent on this swing
+  const art = p.artBuff;
+  const artPow = (art as any)?.power ?? 1;
+  let flurry = 0, crush = false;
+  if (art && art.uses > 0 && (art.kind === 'flurry' || art.kind === 'crush')) {
+    if (art.kind === 'flurry') { flurry = 2; dmg = dmg.mul(0.7 * artPow); }
+    else { crush = true; dmg = dmg.mul(2.5 * artPow); }
+    art.uses = 0;
+  }
   if (run && rfx) {
     if (!run.hitOnce) { run.hitOnce = true; dmg = dmg.mul(rfx.firstHit); }
   }
@@ -432,17 +444,18 @@ export function playerAttack(state: GameState, mods: Mods, events: GameEvent[], 
   if (afx.lifesteal > 0) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * afx.lifesteal);
   const reprisal = enemy.reprisal > 0;
   if (reprisal) {
-    dmg = dmg.mul(br.reprisal);
+    dmg = dmg.mul(br.reprisal * (art?.kind === 'stance' && art.uses > 0 ? 2 * artPow : 1));
     enemy.mech.riposteHit = (enemy.mech.riposteHit ?? 0) + 1;
     state.stats.reprisals++;
   }
   // roll variance ±8% so numbers feel alive
   dmg = dmg.mul(0.92 + rand(state.rng) * 0.16);
   damageEnemy(state, mods, events, dmg, br.type, 'player', { crit, reprisal });
+  for (let i = 0; i < flurry && state.encounter.enemy && state.encounter.enemy.hp.gt(0); i++) damageEnemy(state, mods, events, dmg.mul(0.92 + rand(state.rng) * 0.16), br.type, 'player', { crit: false, reprisal, kind: 'flurry' });
   if (state.encounter.enemy && state.encounter.enemy.hp.gt(0)) {
     if (!exhausted) {
       const strBonus = 1 + statCurve(p.stats.mig) * 0.25;
-      addStagger(state, mods, events, def.strain * strBonus * (reprisal ? 0 : 1));
+      addStagger(state, mods, events, def.strain * strBonus * (reprisal ? 0 : 1) * (crush ? 3 : 1) * (flurry ? 3 : 1));
     }
     // status from weapon + infusion
     const inst = p.weapons[p.weapon];
@@ -558,7 +571,10 @@ export function onKill(state: GameState, mods: Mods, events: GameEvent[]) {
   const enemy = enc.enemy!;
   const marrowMult = mods.marrow * buffMult(state.player.buffs, 'marrow');
   recordStudyKill(state, events, enemy.id);
+  recordMasteryKill(state, events);
+  contribute(state, enemy.isBoss ? BALANCE.war.lord : BALANCE.war.kill);
   if (state.descent.run && enc.tier === DESCENT_TIER) { descentOnKill(state, mods, events, enemy, marrowMult); return; }
+  raidKill(state, events, enc.zone);
   const zone = getZone(enc.zone);
   const g = gTier(state, enc.zone, enc.tier);
   const zp = state.zones[enc.zone];

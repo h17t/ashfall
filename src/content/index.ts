@@ -14,11 +14,13 @@ import { BOONS, BOON_ORDER, RARITY_WEIGHT } from './boons';
 import { AFFIXES, AFFIX_ORDER, SETS, SET_PIECES, TIER_NAMES } from './affixes';
 import { AFFLICTIONS, AFFLICTION_ORDER } from './afflictions';
 import { TOLL_PHASES, TOLL_CYCLE_SECONDS } from './toll';
+import { ARTS, MASTERY_RANKS, MASTERY_RANK_NAMES, MASTERY_DMG_PER_RANK, MASTERY_ART_PER_RANK } from './arts';
 import { STUDY_RANKS_ENEMY, STUDY_RANKS_BOSS, STUDY_RANK_NAMES, STUDY_REVEALS, STUDY_BONUS, STUDY_VS_PER_RANK } from './study';
 import { BALANCE } from './balance';
 import type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef } from './types';
 
-export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, SHADES, CREEDS, TREE, SEVERING_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial, BOONS, BOON_ORDER, RARITY_WEIGHT, AFFIXES, AFFIX_ORDER, SETS, SET_PIECES, TIER_NAMES, STUDY_RANKS_ENEMY, STUDY_RANKS_BOSS, STUDY_RANK_NAMES, STUDY_REVEALS, STUDY_BONUS, STUDY_VS_PER_RANK, AFFLICTIONS, AFFLICTION_ORDER, TOLL_PHASES, TOLL_CYCLE_SECONDS };
+export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, SHADES, CREEDS, TREE, SEVERING_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial, BOONS, BOON_ORDER, RARITY_WEIGHT, AFFIXES, AFFIX_ORDER, SETS, SET_PIECES, TIER_NAMES, STUDY_RANKS_ENEMY, STUDY_RANKS_BOSS, STUDY_RANK_NAMES, STUDY_REVEALS, STUDY_BONUS, STUDY_VS_PER_RANK, AFFLICTIONS, AFFLICTION_ORDER, TOLL_PHASES, TOLL_CYCLE_SECONDS, ARTS, MASTERY_RANKS, MASTERY_RANK_NAMES, MASTERY_DMG_PER_RANK, MASTERY_ART_PER_RANK };
+export type { ArtDef } from './arts';
 export type { AfflictionDef } from './afflictions';
 export type { TollPhase, TollPhaseDef } from './toll';
 export type { AffixDef, AffixTier, AffixStat, SetId, SetDef } from './affixes';
@@ -118,6 +120,7 @@ export function validateContent(): string[] {
     if (a.gate?.kind === 'creature' && !ENEMIES[a.gate.id ?? '']) errs.push(`affix ${a.id} gate creature missing`);
   }
   for (const a of Object.values(AFFLICTIONS)) if (!a.lore || a.lore.length < 30 || !a.cost || !a.gain) errs.push(`affliction ${a.id} incomplete`);
+  for (const a of Object.values(ARTS)) if (!a.lore || a.lore.length < 20 || !a.text) errs.push(`art ${a.id} incomplete`);
   for (const ph of TOLL_PHASES) if (!CREEDS[ph.creed]) errs.push(`toll phase ${ph.id} creed ${ph.creed} missing`);
   for (const st of Object.values(SETS)) if (!st.lore || st.lore.length < 30) errs.push(`set ${st.id} lore too short`);
   for (const b of Object.values(BOONS)) {

@@ -16,7 +16,7 @@ export type InfusionKey = 'none' | 'heavy' | 'keen' | 'magic' | 'blessed' | 'ble
 export type WeaponArchetype = 'fast' | 'heavy' | 'hybrid' | 'catalyst';
 export type SchoolKey = 'weaving' | 'litany' | 'ruin' | 'hex';
 export type PhantomRole = 'dps' | 'strain' | 'healer' | 'buffer' | 'status';
-export type PhantomAssignment = 'beside' | 'hunt';
+export type PhantomAssignment = 'beside' | 'hunt' | 'away' | 'garrison';
 
 /** Player-side timed buff. */
 export interface Buff {
@@ -88,6 +88,8 @@ export interface WeaponInstance {
   affixes?: WeaponAffix[];
   /** affix ids held through the next reroll (at most two) */
   locked?: string[];
+  /** kills made with this weapon in hand; mastery */
+  mastery?: number;
 }
 
 export interface PlayerState {
@@ -123,6 +125,9 @@ export interface PlayerState {
   perfectPending: boolean;
   /** consumables */
   respecs: number;
+  /** weapon Art cooldown and the stance or stoking it left */
+  artCd?: number;
+  artBuff?: { kind: string; t: number; uses: number } | null;
 }
 
 export interface Remains {
@@ -310,6 +315,9 @@ export interface GameState {
   afflictions: string[];
   /** the Toll: the world's clock in seconds, running online and away */
   toll: { t: number; phase: string };
+  dispatch: DispatchState;
+  holdfasts: Record<string, Holdfast>;
+  war: WarState;
 }
 
 /** A Descent in progress: floor, the boons taken, the haul not yet banked. */
@@ -350,7 +358,7 @@ export interface DescentState {
 
 /** Standing Orders: WHEN <conditions> THEN <action>, evaluated in order every tick. */
 export type OrderCondKind = 'always' | 'hp' | 'stamina' | 'fp' | 'draughts' | 'marrow' | 'enemyHp' | 'composure' | 'reprisal' | 'telegraph' | 'boss' | 'streak' | 'floor' | 'haul' | 'boonOffer';
-export type OrderActKind = 'strike' | 'dodge' | 'drink' | 'cast' | 'levelUp' | 'reinforce' | 'advance' | 'retreat' | 'withdraw' | 'descend' | 'takeBoon' | 'equipBest' | 'recruit';
+export type OrderActKind = 'strike' | 'dodge' | 'drink' | 'cast' | 'levelUp' | 'reinforce' | 'advance' | 'retreat' | 'withdraw' | 'descend' | 'takeBoon' | 'equipBest' | 'recruit' | 'art';
 export interface OrderCond {
   kind: OrderCondKind;
   /** '<' or '>' against `value`; ignored for yes/no kinds, where value 1 means "is" and 0 "is not" */
@@ -378,6 +386,14 @@ export interface OrdersState {
   nextId: number;
 }
 
+/** A shade away on an expedition. */
+export interface Mission { id: number; shade: string; kind: 'safe' | 'risky' | 'perilous'; remaining: number; total: number; zone: string }
+export interface DispatchState { missions: Mission[]; nextId: number; /** shades lost on the road, each a permanent Echo */ echoes: string[]; sent: number; lost: number }
+/** A claimed region. */
+export interface Holdfast { garrison: string[]; raidIn: number; raid: { remaining: number; kills: number } | null; raids: number; held: number; lost: number; /** seconds of halved production left after a lost raid */ slowed: number; produced: Decimal; /** fractional marrow and slag not yet paid out */ acc?: number; slagAcc?: number }
+/** The Creed War. */
+export interface WarState { standing: Record<string, number>; roundT: number; round: number; dominion: string | null; contributed: number }
+
 export interface OfflineSummary {
   seconds: number;
   cappedSeconds: number;
@@ -390,6 +406,10 @@ export interface OfflineSummary {
   wiped: boolean;
   /** share of the time away that fell in the Black Hour, credited generously */
   blackShare?: number;
+  /** expeditions that came home while away */
+  returns?: { shade: string; kind: string; outcome: 'success' | 'fail' | 'lost'; marrow: string }[];
+  /** what the holdfasts produced while away */
+  holdfastMarrow?: string;
 }
 
 // ---------------- Actions ----------------
@@ -435,7 +455,11 @@ export type Action =
   | { type: 'setOrders'; rules: Order[] }
   | { type: 'reforge'; weapon: string }
   | { type: 'lockAffix'; weapon: string; affix: string | null }
-  | { type: 'toggleAffliction'; affliction: string };
+  | { type: 'toggleAffliction'; affliction: string }
+  | { type: 'dispatch'; shade: string; kind: 'safe' | 'risky' | 'perilous' }
+  | { type: 'claimHoldfast'; zone: string }
+  | { type: 'garrison'; shade: string; zone: string | null }
+  | { type: 'art' };
 
 // ---------------- Events ----------------
 
@@ -469,4 +493,13 @@ export type GameEvent =
   | { type: 'studyRank'; enemy: string; rank: number; isBoss: boolean }
   | { type: 'reforged'; weapon: string; affixes: WeaponAffix[] }
   | { type: 'tollPhase'; phase: string }
+  | { type: 'dispatched'; shade: string; kind: string; seconds: number }
+  | { type: 'returned'; shade: string; kind: string; outcome: 'success' | 'fail' | 'lost'; marrow: Decimal; drops: Record<string, number>; keepsake: string | null }
+  | { type: 'echo'; shade: string; text: string }
+  | { type: 'holdfastClaimed'; zone: string }
+  | { type: 'raid'; zone: string }
+  | { type: 'raidEnded'; zone: string; outcome: 'repelled' | 'held' | 'lost'; marrow: Decimal }
+  | { type: 'warRound'; round: number; dominion: string | null }
+  | { type: 'masteryRank'; weapon: string; rank: number }
+  | { type: 'art'; art: string }
   | { type: 'error'; text: string };

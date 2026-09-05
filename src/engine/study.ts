@@ -5,6 +5,7 @@
  */
 import { ENEMIES, BOSSES, STUDY_RANKS_ENEMY, STUDY_RANKS_BOSS, STUDY_BONUS, STUDY_VS_PER_RANK } from '@/content';
 import type { GameState, GameEvent } from './types';
+import { holdfastMaxRegion } from './holdfasts';
 
 export function studyKills(state: GameState, id: string): number { return state.study?.[id] ?? 0; }
 export function studyThresholds(id: string): number[] { return BOSSES[id] ? STUDY_RANKS_BOSS : STUDY_RANKS_ENEMY; }
@@ -46,7 +47,8 @@ export function studyVsMult(state: GameState, id: string): number {
 }
 
 /** Has the Study met a gate: a poisoner, any lord, or a named creature at a rank? */
-export function studyMeets(state: GameState, gate: { kind: 'poisoner' | 'lord' | 'creature'; id?: string; rank: number }): boolean {
+export function studyMeets(state: GameState, gate: { kind: 'poisoner' | 'lord' | 'creature' | 'holdfast'; id?: string; rank: number }): boolean {
+  if (gate.kind === 'holdfast') return holdfastMaxRegion(state) >= gate.rank;
   if (gate.kind === 'creature') return studyRank(state, gate.id ?? '') >= gate.rank;
   if (gate.kind === 'lord') return Object.keys(BOSSES).some((b) => studyRank(state, b) >= gate.rank);
   return Object.values(ENEMIES).some((e) => e.attacks.some((a) => a.status === 'poison') && studyRank(state, e.id) >= gate.rank);

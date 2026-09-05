@@ -5,7 +5,8 @@ import { WEAPONS, MATERIALS, reinforceMaterial, getZone, getWeapon, BALANCE } fr
 import { Tooltip } from './Tooltip';
 import { Plate } from '@/render/Plate';
 import { ReforgeSheet, AffixRow } from './ReforgeSheet';
-import { affixesOf, lockedOf, setPieces, setTier } from '@/engine';
+import { affixesOf, lockedOf, setPieces, setTier, masteryRank, masteryKills, masteryNext, artPower } from '@/engine';
+import { ARTS, MASTERY_RANK_NAMES, MASTERY_RANKS } from '@/content';
 import { SETS, SET_PIECES, type SetId } from '@/content';
 
 const INFUSIONS: { id: InfusionKey; name: string; desc: string }[] = [
@@ -67,6 +68,25 @@ function SetsRow() {
           </Tooltip>
         ))}
       </div>
+    </div>
+  );
+}
+
+function Mastery({ id }: { id: string }) {
+  const kills = useSel((s) => masteryKills(s.player.weapons[id]));
+  const rank = useSel((s) => masteryRank(s.player.weapons[id]));
+  const next = useSel((s) => masteryNext(s.player.weapons[id]));
+  const power = useSel((s) => artPower(s.player.weapons[id]));
+  const art = ARTS[getWeapon(id).archetype];
+  const prev = rank > 0 ? MASTERY_RANKS[rank - 1] : 0;
+  const frac = next === null ? 1 : Math.min(1, (kills - prev) / (next - prev));
+  return (
+    <div className="flex flex-col gap-1 border-t border-ash/50 pt-2">
+      <div className="flex items-center justify-between"><span className="t-label">Mastery · {MASTERY_RANK_NAMES[rank]}</span><span className="t-num text-[12px]" style={{ color: 'var(--bone)' }}>{kills}{next !== null ? `/${next}` : ''} kills · +{rank * 4}% damage</span></div>
+      <div className="study-track"><div className="study-fill" style={{ width: `${Math.round(frac * 100)}%` }} /></div>
+      <Tooltip tip={<div><div className="t-display text-[17px]">{art.name}</div><div className="text-[14px] mt-1" style={{ color: 'var(--parchment)' }}>{art.text}</div><div className="text-[14px] italic mt-2" style={{ color: 'var(--bone)' }}>{art.lore}</div><div className="t-label mt-2">{art.cooldown}s cooldown · opens at {MASTERY_RANKS[0]} kills · +15% power per rank after</div></div>}>
+        <div className="text-[14px]" style={{ color: rank >= 1 ? 'var(--parchment)' : 'color-mix(in srgb, var(--bone) 65%, transparent)' }}><span className="t-display">{art.name}</span> · {rank >= 1 ? `${art.text} Power ×${power.toFixed(2)}.` : `opens at ${MASTERY_RANKS[0]} kills with this weapon.`}</div>
+      </Tooltip>
     </div>
   );
 }
@@ -146,6 +166,7 @@ function WeaponDetail({ id, owned }: { id: string; owned: boolean }) {
           ))}
         </div>
       )}
+      {owned && <Mastery id={id} />}
       {owned && <Affixes id={id} />}
     </div>
   );

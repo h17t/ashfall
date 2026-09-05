@@ -61,4 +61,6 @@ export interface SimResult {
   notes: string[];
   /** the Stair: runs made, runs that died, best floor, marrow banked, and the median over banked runs of (the run's marrow per minute ÷ the road's marrow per minute since the previous run) */
   descent: { runs: number; deaths: number; bestFloor: number; banked: string; ratio: number };
+  /** the stretch mechanics: expeditions sent and shades lost, holdfasts held and raids repelled, war contribution, arts used */
+  stretch: { sent: number; lost: number; holdfasts: number; raids: number; repelled: number; contributed: number; arts: number };
 }

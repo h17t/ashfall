@@ -296,3 +296,15 @@ Artifacts: `art/mobile/m8-toll.png` (the Toll page at Dusk with two afflictions 
 **The Black Hour on the arena.** The header names the hour in the wisp's blue; the stage darkens at its edges with a blue-black radial wash under multiply, so the picture keeps its colour and loses its light. Dusk warms the top of the stage instead. Both are classes on `<html>` and cost nothing per frame.
 
 **Harsh reading.** Three bullets drawn as a glyph tripped the asset audit's emoji rule and became a rotated square in CSS; three colour literals in the tints became palette mixes. The audit is doing its job.
+
+### Round 16 — Pass 3, Milestone 9 (the stretch mechanics)
+
+Artifacts: `art/mobile/m9-dispatch.png` (the three roads), `art/mobile/m9-holdfast.png` (a holdfast row under a raid), `art/mobile/m9-war.png` (the war board), `art/mobile/m9-art.png` (the Art on the hand), `scripts/shot-stretch.mjs`.
+
+**Dispatch.** A third segment on the shade's card, and a stone sheet of three cards: the near road, the far road, into the dark. Each names its length, its lore, its haul in marrow and slag, the Keepsake chance, the odds of returning and, in the blood's colour, the odds of not. The card's border deepens with the danger. An away shade's card says where it went and when it is back.
+
+**Holdfasts.** A row under each felled region on the Road: claim for a price, then the yield per minute and slag per hour, the garrison by name, held and lost, the raid countdown; a select posts or relieves shades. When a raid is on, the Combat column grows a blood-edged strip under the arena with the window and the kills to repel, and a Go button that travels there.
+
+**The war.** A board above the creeds: five bars scaled to the leader, yours in the fire's colour, the leader in gold, the round's remaining hours, the dominion holder and what your side pays for being where it is.
+
+**The Art.** A button in the recitation row with "Art" where the slot number goes and the Art's name; it lights when ready, carries its cooldown, and outlines itself while a stance or a stoking is live. Mastery sits under the weapon's infusions: rank, kills to the next, the Art's line and its power.

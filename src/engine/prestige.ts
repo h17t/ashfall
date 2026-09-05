@@ -90,6 +90,10 @@ export function snuff(state: GameState, events: GameEvent[], mods: Mods = comput
   state.remains = null;
   state.remainsRun = null;
   state.deathScreen = 0;
+  // ---- holdfasts fall with the cycle; garrisons and expeditions come home ----
+  state.holdfasts = {};
+  state.dispatch.missions = [];
+  for (const ph of state.cortege.shades) if (ph.assignment === 'garrison' || ph.assignment === 'away') ph.assignment = 'beside';
   // ---- cortege ----
   for (const ph of state.cortege.shades) { ph.level = 1; ph.xp = ZERO; ph.weapon = null; ph.actIn = 1; ph.retreat = 0; }
   state.cortege.huntAuto = true;

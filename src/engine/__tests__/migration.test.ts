@@ -10,6 +10,7 @@ const fixtureV2 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v2.json
 const fixtureV3 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v3.json'), 'utf8');
 const fixtureV4 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v4.json'), 'utf8');
 const fixtureV5 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v5.json'), 'utf8');
+const fixtureV6 = fs.readFileSync(path.join(__dirname, 'fixtures', 'save-v6.json'), 'utf8');
 
 describe('save migration v1 → v2 (the rename)', () => {
   it('loads the pre-rename fixture and every value survives under its new key', () => {
@@ -125,7 +126,7 @@ describe('save migration v3 → v4 (Standing Orders)', () => {
     everyScalarSurvives(raw.state, s);
   });
   it('every fixture from every version loads to the current version', () => {
-    for (const f of [fixture, fixtureV2, fixtureV3, fixtureV4, fixtureV5]) expect(parseSave(f).version).toBe(SAVE_VERSION);
+    for (const f of [fixture, fixtureV2, fixtureV3, fixtureV4, fixtureV5, fixtureV6]) expect(parseSave(f).version).toBe(SAVE_VERSION);
   });
 });
 
@@ -151,6 +152,21 @@ describe('save migration v5 → v6 (afflictions and the Toll)', () => {
     expect(s.afflictions).toEqual([]);
     expect(s.toll).toEqual({ t: 0, phase: 'dawn' });
     expect(Object.keys(s.study).length).toBe(Object.keys(raw.state.study).length);
+    everyScalarSurvives(raw.state, s);
+  });
+});
+
+describe('save migration v6 → v7 (Dispatch, Holdfasts, the War, Mastery)', () => {
+  it('loads a v6 save made by a 100-minute bold playthrough; nothing sent, nothing held, the war level, weapons unmastered', () => {
+    const raw = JSON.parse(fixtureV6);
+    expect(raw.v).toBe(6);
+    const s = parseSave(fixtureV6);
+    expect(s.version).toBe(SAVE_VERSION);
+    expect(s.afflictions).toEqual(raw.state.afflictions);
+    expect(s.dispatch).toEqual({ missions: [], nextId: 1, echoes: [], sent: 0, lost: 0 });
+    expect(s.holdfasts).toEqual({});
+    expect(s.war.round).toBe(1); expect(s.war.dominion).toBeNull();
+    for (const w of Object.values(s.player.weapons)) expect(w.mastery).toBe(0);
     everyScalarSurvives(raw.state, s);
   });
 });

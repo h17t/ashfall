@@ -90,6 +90,20 @@ Six hours, seed 7: greedy holds 100 of 220 Study ranks (+27%), casual 91 (+24%) 
 
 Six hours, seed 7: `bold` (greedy under Thin Blood, Short Breath, Iron Composure, Brittle Steel) level 165 vs greedy 147, marrow/hour 1.0e11 vs 1.8e11 in hour five but ahead in hour four, 31 deaths vs 4, first Snuff 1.09 h vs 0.95 h. Idle is unchanged by the dial and gains about 10% from the clock. The pacing test's first-Snuff floor is 0.8 h from this revision.
 
+## Rev 8 — Pass 3, Milestone 9 (Dispatch, Holdfasts, the War, Mastery)
+
+| Knob | Value | Why |
+|---|---|---|
+| Expeditions | near road 10 min, always, pay ×0.8 · far road 20 min, 70%, ×2.2, 10% Keepsake · the dark 30 min, 55%, ×4.5, 25% Keepsake, 20% lost | the expected value climbs with the risk, and only the dark can take a shade |
+| Pay rate | the shade's worth at the deepest cleared tier: 8% of the tier's kill × power × level growth, per second | a benched shade earns about what it would beside you, for the length of the road |
+| Holdfast claim | one level-up's marrow | at two, a strategy that levels the instant it can never has the purse |
+| Holdfast rate | 1.5% of the region's last-tier kill per second, +50% per garrisoned shade; 0.05 slag per minute | an old region keeps paying a little forever |
+| Raids | every 25–40 min; 2-minute window; 5 kills repel for 90 min of production and a 15% Keepsake; garrison holds at 30% + 20% per shade (cap 90%) for 30 min; a loss halves production for an hour | defending is worth three times letting it ride; losing is never losing the holdfast |
+| The war | rounds of 6 h; drift 0.12/s per creed ±60% on a slow tide; a kill 1, a lord 50; underdog +10% standing and +4% marrow per rank below the leader; dominion at power 0.5, standings carry ×0.5 | a losing side is worth backing; dominion is a gift to the world, never a penalty |
+| Mastery | ranks at 50 / 200 / 600 / 1500 kills; +4% damage per rank; Art at rank 1, +15% Art power per rank after | the first Art comes inside the first hour; a weapon carried for a day is a quarter stronger |
+
+Six hours, seed 7: greedy L111, 8 expeditions, 2 raids answered by the garrison, 31,875 war contribution, 1,063 Arts; bold L181, 9 expeditions into the dark with none lost this seed; idle L81, 2 expeditions, 14 raids never answered; casual 6 expeditions and 5 raids. Holdfasts show 0 at the end of every run because each strategy Snuffs and the holdfasts fall with the cycle. First Snuff greedy 0.91 h (floor 0.8 h holds).
+
 ## Latest simulator run
 
 ### Run — 2026-09-05 08:25 UTC · 12h · seed 7

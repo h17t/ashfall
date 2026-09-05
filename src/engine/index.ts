@@ -22,3 +22,7 @@ export * from './study';
 export * from './forge';
 export * from './afflictions';
 export * from './toll';
+export * from './dispatch';
+export * from './holdfasts';
+export * from './war';
+export * from './mastery';

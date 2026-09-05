@@ -44,6 +44,7 @@ export function runSim(opts: SimOptions): SimResult {
   let prevKindles = 0;
   let prevSigils = 0;
   let descentDeaths = 0;
+  let arts = 0, repelled = 0, raids = 0;
   let runEndEarned = state.stats.marrowEarned;
   let runEndT = 0;
   let runStartT = 0;
@@ -86,6 +87,9 @@ export function runSim(opts: SimOptions): SimResult {
           if (ms.firstKindle === null) ms.firstKindle = t;
           ms.wakings.push(t);
           break;
+        case 'art': arts++; break;
+        case 'raid': raids++; break;
+        case 'raidEnded': if (e.outcome === 'repelled') repelled++; break;
         case 'descentLost':
           descentDeaths++;
           runEndEarned = state.stats.marrowEarned; runEndT = t;
@@ -154,6 +158,7 @@ export function runSim(opts: SimOptions): SimResult {
     stalls,
     invariantErrors,
     notes,
+    stretch: { sent: state.dispatch.sent, lost: state.dispatch.lost, holdfasts: Object.keys(state.holdfasts).length, raids, repelled, contributed: Math.round(state.war.contributed), arts },
     descent: { runs: state.descent.runs, deaths: descentDeaths, bestFloor: state.descent.bestFloor, banked: state.descent.bankedTotal.toString(), ratio: runRatios.length ? runRatios.slice().sort((a, b) => a - b)[Math.floor(runRatios.length / 2)] : 0 },
   };
 }

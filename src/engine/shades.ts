@@ -90,7 +90,7 @@ export function cortegeSlots(state: GameState, mods: Mods): number {
 
 export function activeShades(state: GameState, mods: Mods): PhantomState[] {
   const slots = cortegeSlots(state, mods);
-  return state.cortege.shades.slice(0, slots);
+  return state.cortege.shades.filter((p) => p.assignment !== 'away' && p.assignment !== 'garrison').slice(0, slots);
 }
 
 // ---------------------------------------------------------------------------
@@ -339,6 +339,9 @@ registerActionHandler((state, action, events, mods) => {
     case 'assignShade': {
       const ph = state.cortege.shades.find((p) => p.id === action.shade);
       if (!ph) return err('No such shade.');
+      if (action.assignment !== 'beside' && action.assignment !== 'hunt') return err('Send them with a dispatch or a garrison order.');
+      if (ph.assignment === 'away') return err('Away on an expedition.');
+      if (ph.assignment === 'garrison') return err('Holding a holdfast. Relieve it first.');
       ph.assignment = action.assignment;
       ph.retreat = 0;
       return true;

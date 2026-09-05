@@ -5,6 +5,9 @@
 import { D, ZERO, Decimal, safe } from './num';
 import { BALANCE } from '@/content/balance';
 import { blackShare, advanceToll } from './toll';
+import { advanceMissions } from './dispatch';
+import { advanceHoldfasts, holdfastCount } from './holdfasts';
+import { advanceWar } from './war';
 import type { GameState, OfflineSummary } from './types';
 import type { Mods } from './mods';
 import { computeMods } from './mods';
@@ -66,6 +69,9 @@ export function applyOffline(state: GameState, elapsedSeconds: number, mods: Mod
   const marrow = safe(marrow0.mul(blackMult).floor());
   for (const id of Object.keys(materials)) materials[id] = Math.floor(materials[id] * blackMult);
   advanceToll(state, elapsedSeconds);
+  const returns = advanceMissions(state, elapsedSeconds, null);
+  const holdfastMarrow = holdfastCount(state) > 0 ? advanceHoldfasts(state, secs, null) : ZERO;
+  advanceWar(state, elapsedSeconds, null);
   state.marrow = state.marrow.add(marrow);
   state.stats.marrowEarned = state.stats.marrowEarned.add(marrow);
   state.stats.cycleMarrow = state.stats.cycleMarrow.add(marrow);
@@ -81,7 +87,7 @@ export function applyOffline(state: GameState, elapsedSeconds: number, mods: Mod
   state.player.buffs = [];
   state.encounter.enemy = null;
   state.encounter.respawnIn = 0.8;
-  const summary: OfflineSummary = { seconds: elapsedSeconds, cappedSeconds: secs, marrow, materials, kills, shadeXp: xp, zone: rate.zone, tier: rate.tier, wiped: rate.wiped, blackShare: share };
+  const summary: OfflineSummary = { seconds: elapsedSeconds, cappedSeconds: secs, marrow, materials, kills, shadeXp: xp, zone: rate.zone, tier: rate.tier, wiped: rate.wiped, blackShare: share, returns, holdfastMarrow: holdfastMarrow.toString() };
   state.offline = summary;
   return summary;
 }

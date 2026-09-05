@@ -8,3 +8,4 @@ import './ext-descent';
 import './ext-orders';
 import './ext-forge';
 import './ext-afflictions';
+import './ext-stretch';

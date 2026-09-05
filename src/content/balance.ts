@@ -203,6 +203,57 @@ export const BALANCE = {
     blackSpawnChance: 0.35,
   },
 
+  // ---- Dispatch, Holdfasts, the Creed War ----
+  dispatch: {
+    /** seconds, success chance, marrow multiplier on the shade's hunting rate, chance of a Keepsake, chance the shade is lost */
+    kinds: {
+      safe: { seconds: 10 * 60, success: 1.0, pay: 0.8, keepsake: 0, lost: 0 },
+      risky: { seconds: 20 * 60, success: 0.7, pay: 2.2, keepsake: 0.1, lost: 0 },
+      perilous: { seconds: 30 * 60, success: 0.55, pay: 4.5, keepsake: 0.25, lost: 0.2 },
+    },
+    /** a failed expedition sends the shade home hurt for this long */
+    failRetreat: 60,
+  },
+  holdfast: {
+    /** claim cost in level-ups */
+    claimLevels: 1,
+    /** marrow per second as a share of the region's last-tier kill, times (1 + garrisonPerShade × garrison) */
+    rate: 0.015,
+    garrisonPerShade: 0.5,
+    /** slag per minute */
+    slagPerMinute: 0.05,
+    /** seconds between raids, min and max */
+    raidEvery: [25 * 60, 40 * 60],
+    /** the window in which the player may defend, and the kills that repel */
+    raidWindow: 120,
+    raidKills: 5,
+    /** rewards: minutes of production for a defended, a held, and the halving after a loss (seconds) */
+    repelMinutes: 90,
+    heldMinutes: 30,
+    slowedSeconds: 3600,
+    /** the garrison's chance to hold: base + per shade, capped */
+    holdBase: 0.3,
+    holdPerShade: 0.2,
+    holdCap: 0.9,
+    repelKeepsake: 0.15,
+  },
+  war: {
+    /** seconds in a round (of the clock, online or away) */
+    roundSeconds: 6 * 3600,
+    /** the rest of the world's contribution per second per creed, and how much it sways */
+    drift: 0.12,
+    driftSway: 0.6,
+    /** what a kill and a lord add to your creed */
+    kill: 1,
+    lord: 50,
+    /** standing and marrow bonus for the creed from the bottom: the weakest gets the most */
+    underdogRepPerRank: 0.1,
+    underdogMarrowPerRank: 0.04,
+    /** dominion: the round's winner lends the gifts of its passive to everyone at this power (an exponent) */
+    dominionPower: 0.5,
+    carry: 0.5,
+  },
+
   // ---- Prestige ----
   prestige: {
     /** vestige = (cycleMarrow / divisor) ^ exponent * bossBonus */

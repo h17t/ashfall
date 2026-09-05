@@ -249,13 +249,15 @@ export function castSpell(state: GameState, mods: Mods, events: GameEvent[], id:
   const sp = getSpell(id);
   if (state.deathScreen > 0) return;
   if ((p.cooldowns[id] ?? 0) > 0) return;
-  const free = state.descent.run ? runFx(state.descent.run).freeCasts > 0 : false;
+  const stoke = state.player.artBuff?.kind === 'stoke' && state.player.artBuff.uses > 0 ? state.player.artBuff : null;
+  const free = (state.descent.run ? runFx(state.descent.run).freeCasts > 0 : false) || !!stoke;
   if (!free && p.fp < sp.fp) { events.push({ type: 'error', text: 'Not enough FP.' }); return; }
   const enemy = state.encounter.enemy;
   const eff = sp.effect;
   const needsTarget = eff.kind === 'damage' || eff.kind === 'strainBomb' || eff.kind === 'dot' || eff.kind === 'status';
   if (needsTarget && (!enemy || enemy.hp.lte(0))) return;
   if (!free) p.fp -= sp.fp;
+  if (stoke) stoke.uses--;
   p.cooldowns[id] = sp.cooldown;
   events.push({ type: 'cast', spell: id });
   const power = spellPower(state, mods, id);
@@ -264,7 +266,7 @@ export function castSpell(state: GameState, mods: Mods, events: GameEvent[], id:
   const baseStrike = D(getWeapon(p.weapon).base).mul(reinforceMult(p.weapons[p.weapon]?.level ?? 0)).mul(mods.dmg).mul(levelDamageMult(p.level));
   switch (eff.kind) {
     case 'damage': {
-      const dmg = baseStrike.mul(eff.mult).mul(power).mul(wd.buffs);
+      const dmg = baseStrike.mul(eff.mult).mul(power).mul(wd.buffs).mul(stoke ? 1.3 * ((stoke as any).power ?? 1) : 1);
       damageEnemy(state, mods, events, dmg, eff.type, 'spell', { kind: id });
       return;
     }

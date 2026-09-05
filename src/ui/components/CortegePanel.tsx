@@ -5,6 +5,9 @@ import { SHADES, getPhantom, getZone, getWeapon, CREEDS } from '@/content';
 import { Tooltip } from './Tooltip';
 import { Bar } from './Bar';
 import { Plate } from '@/render/Plate';
+import { DispatchSheet } from './DispatchSheet';
+import { missionOf } from '@/engine';
+import { useState } from 'react';
 
 const ROLE_DESC: Record<string, string> = {
   dps: 'Raw damage. Worth most beside you, where kills pay full marrow.',
@@ -80,6 +83,9 @@ function ShadeCard({ id, benched }: { id: string; benched: boolean }) {
   const def = getPhantom(id);
   const level = useSel((s) => s.cortege.shades.find((p) => p.id === id)?.level ?? 1);
   const assignment = useSel((s) => s.cortege.shades.find((p) => p.id === id)?.assignment ?? 'beside');
+  const mission = useSel((s) => { const m = missionOf(s, id); return m ? JSON.stringify({ kind: m.kind, remaining: Math.ceil(m.remaining), total: m.total }) : ''; });
+  const canSend = useSel((s) => !!s.flags.dispatchUnlocked);
+  const [sending, setSending] = useState(false);
   const weapon = useSel((s) => s.cortege.shades.find((p) => p.id === id)?.weapon ?? null);
   const retreat = useSel((s) => (s.cortege.shades.find((p) => p.id === id)?.retreat ?? 0) > 0);
   const nums = useSel((s) => { const ph = s.cortege.shades.find((p) => p.id === id)!; const n = shadeNumbers(s, computeMods(s), ph); return JSON.stringify({ dps: n.dps.toString(), hp: n.hp, heal: n.healPerAct, buff: n.buffMult, strain: n.staggerPerHit, xp: ph.xp.toString(), next: shadeXpToNext(ph).toString(), cost: shadeLevelCost(ph).toString(), weaponName: n.weaponName }); });
@@ -108,9 +114,13 @@ function ShadeCard({ id, benched }: { id: string; benched: boolean }) {
       <div className="flex gap-2 flex-wrap items-center">
         <Tooltip mode="inline" tip="Beside you: fights in your encounter, feeds your reprisal, heals or buffs you. Hunting: grinds a cleared tier on its own for 45% marrow per kill, online and offline. Away from the keyboard, everyone hunts.">
           <div className="seg">
-            <button className={`seg-btn ${assignment === 'beside' ? 'is-on' : ''}`} onClick={() => dispatch({ type: 'assignShade', shade: id, assignment: 'beside' })}>Beside</button>
-            <button className={`seg-btn ${assignment === 'hunt' ? 'is-on' : ''}`} onClick={() => dispatch({ type: 'assignShade', shade: id, assignment: 'hunt' })}>Hunt</button>
+            <button className={`seg-btn ${assignment === 'beside' ? 'is-on' : ''}`} disabled={assignment === 'away' || assignment === 'garrison'} onClick={() => dispatch({ type: 'assignShade', shade: id, assignment: 'beside' })}>Beside</button>
+            <button className={`seg-btn ${assignment === 'hunt' ? 'is-on' : ''}`} disabled={assignment === 'away' || assignment === 'garrison'} onClick={() => dispatch({ type: 'assignShade', shade: id, assignment: 'hunt' })}>Hunt</button>
+            {canSend && <button className={`seg-btn ${assignment === 'away' ? 'is-on' : ''}`} disabled={assignment === 'away' || assignment === 'garrison'} onClick={() => setSending(true)}>Dispatch</button>}
           </div>
+          {mission && (() => { const m = JSON.parse(mission) as { kind: string; remaining: number; total: number }; return <div className="text-[13px] mt-1" style={{ color: 'var(--wisp)' }}>Away on {m.kind === 'safe' ? 'the near road' : m.kind === 'risky' ? 'the far road' : 'the dark road'} · back in <span className="t-num">{Math.floor(m.remaining / 60)}:{String(m.remaining % 60).padStart(2, '0')}</span></div>; })()}
+          {assignment === 'garrison' && <div className="text-[13px] mt-1" style={{ color: 'var(--gold)' }}>Holding a holdfast (the Road).</div>}
+          {sending && <DispatchSheet shade={id} onClose={() => setSending(false)} />}
         </Tooltip>
         <select className="basis-full text-[14px] px-2" value={weapon ?? ''} onChange={(e) => dispatch({ type: 'equipShade', shade: id, weapon: e.target.value || null })} aria-label="Gear slot: any weapon you own and are not wielding.">
           <option value="">{n.weaponName.includes('(worn)') ? n.weaponName : 'No weapon'}</option>

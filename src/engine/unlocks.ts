@@ -32,6 +32,18 @@ export function checkUnlocks(state: GameState, mods: Mods, events: GameEvent[]) 
     f.afflictionsUnlocked = true;
     events.push({ type: 'unlock', what: 'afflictions', text: 'The afflictions offer themselves (Lantern, the Toll): curses you take on by choice, each a cost and a gain, stacking as far as you dare.' });
   }
+  if (!f.holdfastsUnlocked && state.stats.bossKills >= 1) {
+    f.holdfastsUnlocked = true;
+    events.push({ type: 'unlock', what: 'holdfasts', text: 'The lord\'s seat is empty. Claim the region as a Holdfast (the Road): it produces while you are elsewhere, opens the forge, and will be raided; hold it yourself or let a garrison answer.' });
+  }
+  if (!f.dispatchUnlocked && state.cortege.recruited.length >= 2) {
+    f.dispatchUnlocked = true;
+    events.push({ type: 'unlock', what: 'dispatch', text: 'Two shades: one can be spared. Dispatch a shade (Cortege) on an expedition: safe pays little and always returns; perilous pays most and may not.' });
+  }
+  if (!f.warUnlocked && state.creed.current) {
+    f.warUnlocked = true;
+    events.push({ type: 'unlock', what: 'war', text: 'The Creed War: five creeds in a standing contest. Your kills count for yours; the weaker your side, the better it pays; the round\'s winner holds dominion for the next.' });
+  }
   if (!f.descentUnlocked && state.stats.bossKills >= 1) {
     f.descentUnlocked = true;
     events.push({ type: 'unlock', what: 'descent', text: 'Behind the lord\'s seat, a stair going down. The Stair: descend floor by floor, take what you can carry, and climb out before it takes you.' });

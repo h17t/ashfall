@@ -41,6 +41,10 @@ lines.push('| Strategy | ' + Array.from({ length: Math.min(12, hours) }, (_, i) 
 lines.push('|---|' + Array.from({ length: Math.min(12, hours) }, () => '---').join('|') + '|');
 for (const r of results) lines.push(`| ${r.strategy} | ` + r.marrowPerHour.slice(0, 12).map((s) => fmt(D(s))).join(' | ') + ' |');
 lines.push('');
+lines.push('Expeditions, holdfasts, the war, the arts:');
+lines.push('');
+for (const r of results) lines.push(`- **${r.strategy}**: ${r.stretch.sent} expeditions (${r.stretch.lost} shades lost), ${r.stretch.holdfasts} holdfasts held, ${r.stretch.raids} raids (${r.stretch.repelled} repelled by hand), war contribution ${r.stretch.contributed}, ${r.stretch.arts} Arts used`);
+lines.push('');
 lines.push('Bosses (first kill):');
 lines.push('');
 for (const r of results) {

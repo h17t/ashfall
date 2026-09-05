@@ -5,7 +5,7 @@ import { STARTING_WEAPON, ZONE_ORDER } from '@/content';
 import type { GameState, PlayerState, StatKey, ZoneProgress } from './types';
 import { playerHpMax, playerStaminaMax, playerFpMax } from './formulas';
 
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 export function newZoneProgress(tierCount: number): ZoneProgress {
   return { kills: new Array(tierCount).fill(0), cleared: -1, bossKills: 0, secretKills: 0, cycleKills: 0, secretFound: false };
@@ -87,6 +87,9 @@ export function newGame(seed = 1): GameState {
     study: {},
     afflictions: [],
     toll: { t: 0, phase: 'dawn' },
+    dispatch: { missions: [], nextId: 1, echoes: [], sent: 0, lost: 0 },
+    holdfasts: {},
+    war: { standing: { wick: 100, legion: 100, rot: 100, vigil: 100, nadir: 100 }, roundT: 0, round: 1, dominion: null, contributed: 0 },
   };
 }
 

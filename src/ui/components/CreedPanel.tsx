@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { useGame, useSel } from '../store';
-import { fmt, D, creedAvailable, switchCost, upgradeCost } from '@/engine';
+import { fmt, D, creedAvailable, switchCost, upgradeCost, warOrder, underdogBonus, warRoundRemaining } from '@/engine';
 import { CREEDS, getZone } from '@/content';
 import { Tooltip } from './Tooltip';
 import { Plate } from '@/render/Plate';
@@ -25,6 +25,7 @@ export const CreedPanel = memo(function CreedPanel() {
         <span className="t-display text-[20px] text-ember-hot">Creeds</span>
         <Tooltip tip="One oath at a time. The first is free; each new oath after that costs three level-ups' worth of marrow, growing by half each time. Standing (reputation) is kept forever, even through Snuffing."><span className="t-label cursor-help">{current ? `sworn: ${CREEDS[current].name}` : 'unsworn'} · next oath {fmt(D(cost))}</span></Tooltip>
       </div>
+      <WarBoard />
       {Object.values(CREEDS).filter((c) => c.region <= maxRegion || c.id === current).map((c) => {
         const isCurrent = c.id === current;
         const why = avail[c.id];
@@ -68,3 +69,35 @@ export const CreedPanel = memo(function CreedPanel() {
     </div>
   );
 });
+
+/** The Creed War: five sides, their standing, whose hour it is, and what backing yours pays. */
+function WarBoard() {
+  const unlocked = useSel((s) => !!s.flags.warUnlocked);
+  const current = useSel((s) => s.creed.current);
+  const board = useSel((s) => JSON.stringify({ order: warOrder(s), standing: s.war.standing, dominion: s.war.dominion, round: s.war.round, left: Math.floor(warRoundRemaining(s)), bonus: underdogBonus(s, s.creed.current), contributed: Math.round(s.war.contributed) }));
+  if (!unlocked) return null;
+  const b = JSON.parse(board) as { order: string[]; standing: Record<string, number>; dominion: string | null; round: number; left: number; bonus: { rep: number; marrow: number; rank: number }; contributed: number };
+  const top = Math.max(1, ...b.order.map((c) => b.standing[c] ?? 0));
+  const h = Math.floor(b.left / 3600), m = Math.floor((b.left % 3600) / 60);
+  return (
+    <div className="war-board">
+      <div className="flex items-baseline justify-between">
+        <span className="t-display text-[17px]" style={{ color: 'var(--parchment)' }}>The Creed War · round <span className="t-num">{b.round}</span></span>
+        <span className="t-label">ends in <span className="t-num">{h}h {m}m</span></span>
+      </div>
+      <div className="flex flex-col gap-1 mt-2">
+        {b.order.map((c, i) => (
+          <div key={c} className="flex items-center gap-2 text-[13px]">
+            <span className="w-[110px] truncate" style={{ color: c === current ? 'var(--ember-hot)' : 'var(--bone)' }}>{CREEDS[c].name}</span>
+            <span className="war-track"><span className="war-fill" style={{ width: `${Math.round(((b.standing[c] ?? 0) / top) * 100)}%`, background: c === current ? 'var(--ember)' : i === 0 ? 'var(--gold)' : 'var(--ash)' }} /></span>
+            <span className="t-num w-[52px] text-right" style={{ color: 'var(--parchment)' }}>{fmt(D(Math.round(b.standing[c] ?? 0)))}</span>
+          </div>
+        ))}
+      </div>
+      <div className="text-[13px] mt-2" style={{ color: 'var(--bone)' }}>
+        {b.dominion ? <span>Dominion: <span style={{ color: 'var(--gold)' }}>{CREEDS[b.dominion].name}</span> lends the gifts of its passive to everyone this round. </span> : <span>No dominion yet: the first round decides it. </span>}
+        {current && <span>Your side is {b.bonus.rank === 0 ? 'the strongest and pays no more' : `${['', 'second', 'third', 'fourth', 'the weakest'][b.bonus.rank]} and pays ×${b.bonus.rep.toFixed(1)} standing, +${Math.round((b.bonus.marrow - 1) * 100)}% marrow`}. You have added <span className="t-num" style={{ color: 'var(--parchment)' }}>{b.contributed}</span>.</span>}
+      </div>
+    </div>
+  );
+}

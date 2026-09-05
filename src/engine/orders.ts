@@ -8,6 +8,7 @@
 import { BALANCE } from '@/content/balance';
 import { SHADES, BOONS, getWeapon, getZone, WEAPONS, reinforceMaterial } from '@/content';
 import type { GameState, GameEvent, Order, OrderCond, OrderCondKind, OrderActKind, StatKey, Action } from './types';
+import { canArt, masteryRank } from './mastery';
 import { STAT_KEYS } from './types';
 import type { Mods } from './mods';
 import { levelCost, reinforceCost } from './formulas';
@@ -20,7 +21,7 @@ import { weaponDamage } from './combat';
 const B = BALANCE.orders;
 
 export const COND_KINDS: OrderCondKind[] = ['always', 'hp', 'stamina', 'fp', 'draughts', 'marrow', 'enemyHp', 'composure', 'reprisal', 'telegraph', 'boss', 'streak', 'floor', 'haul', 'boonOffer'];
-export const ACT_KINDS: OrderActKind[] = ['strike', 'dodge', 'drink', 'cast', 'levelUp', 'reinforce', 'advance', 'retreat', 'withdraw', 'descend', 'takeBoon', 'equipBest', 'recruit'];
+export const ACT_KINDS: OrderActKind[] = ['strike', 'dodge', 'drink', 'cast', 'levelUp', 'reinforce', 'advance', 'retreat', 'withdraw', 'descend', 'takeBoon', 'equipBest', 'recruit', 'art'];
 /** yes/no conditions: no operator, value 1 = is, 0 = is not */
 export const BOOL_CONDS = new Set<OrderCondKind>(['always', 'reprisal', 'telegraph', 'boss', 'boonOffer']);
 
@@ -51,6 +52,7 @@ export function availableActs(state: GameState): OrderActKind[] {
   if (state.flags.descentUnlocked) out.push('withdraw', 'descend', 'takeBoon');
   if (Object.keys(state.player.weapons).length >= 2) out.push('equipBest');
   if (state.cortege.recruited.length > 0 || state.marrow.gte(400)) out.push('recruit');
+  if (Object.values(state.player.weapons).some((w) => masteryRank(w) >= 1)) out.push('art');
   return out;
 }
 
@@ -155,6 +157,7 @@ export function orderAction(state: GameState, mods: Mods, rule: Order): Action |
       for (const id of Object.keys(SHADES)) if (canRecruit(state, id) === null) return { type: 'recruit', shade: id };
       return null;
     }
+    case 'art': return canArt(state) === null ? { type: 'art' } : null;
   }
 }
 
@@ -195,7 +198,7 @@ export function condName(k: OrderCondKind): string {
   return ({ always: 'always', hp: 'HP', stamina: 'Stamina', fp: 'FP', draughts: 'Draughts', marrow: 'Marrow', enemyHp: 'Enemy HP', composure: 'Composure', reprisal: 'Reprisal open', telegraph: 'Attack coming', boss: 'A lord', streak: 'Streak', floor: 'Stair floor', haul: 'Haul', boonOffer: 'Boons offered' } as Record<OrderCondKind, string>)[k];
 }
 export function actName(k: OrderActKind): string {
-  return ({ strike: 'Strike', dodge: 'Dodge', drink: 'Drink', cast: 'Cast', levelUp: 'Level up', reinforce: 'Reinforce', advance: 'Advance', retreat: 'Retreat', withdraw: 'Withdraw', descend: 'Descend', takeBoon: 'Take a boon', equipBest: 'Equip the best', recruit: 'Recruit a shade' } as Record<OrderActKind, string>)[k];
+  return ({ strike: 'Strike', dodge: 'Dodge', drink: 'Drink', cast: 'Cast', levelUp: 'Level up', reinforce: 'Reinforce', advance: 'Advance', retreat: 'Retreat', withdraw: 'Withdraw', descend: 'Descend', takeBoon: 'Take a boon', equipBest: 'Equip the best', recruit: 'Recruit a shade', art: 'Use the Art' } as Record<OrderActKind, string>)[k];
 }
 /** A condition in words: "HP < 35%", "Marrow > 2× a level", "Reprisal open". */
 export function condText(c: OrderCond): string {

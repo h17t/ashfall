@@ -8,6 +8,7 @@ import { startPwa } from './pwa';
 import { InstallSheet } from './components/InstallSheet';
 import { StairPanel } from './components/StairPanel';
 import { DescentStrip } from './components/DescentStrip';
+import { RaidStrip } from './components/RaidStrip';
 import { BoonSheet } from './components/BoonSheet';
 import { HaulSheet } from './components/HaulSheet';
 import { OrdersPanel } from './components/OrdersPanel';
@@ -101,6 +102,7 @@ export default function App() {
     <>
       <Encounter />
       <DescentStrip />
+      <RaidStrip />
       {layout === 'portrait' ? <ActionBar /> : <div className="flex flex-col gap-3"><ActionBar /><AutomationBar />{extras}</div>}
     </>
   );
@@ -151,7 +153,7 @@ export default function App() {
           <div className={`shell-main ${pillar === 'combat' ? 'is-combat' : ''}`} ref={mainRef}>
             {pillar === 'combat' ? (
               <div className="flex flex-col flex-1 min-h-0">
-                <div className="px-2 flex flex-col"><Encounter /><DescentStrip /></div>
+                <div className="px-2 flex flex-col"><Encounter /><DescentStrip /><RaidStrip /></div>
                 <ActionBar />
                 <div className="px-2 pt-2"><AutomationBar /></div>
                 {extras}

@@ -11,6 +11,8 @@ import { studyBonus } from './study';
 import { playerAffixFx } from './forge';
 import { applyAfflictions } from './afflictions';
 import { applyToll, creedHourFavoured } from './toll';
+import { applyEchoes } from './dispatch';
+import { applyDominion, applyUnderdog } from './war';
 import { BOONS } from '@/content';
 
 export interface Mods {
@@ -118,6 +120,11 @@ export function computeMods(state: GameState): Mods {
   m.dmg *= fx.dmg; m.marrow *= fx.marrow; m.critBonus += fx.crit; m.strain *= fx.strain; m.taken *= fx.taken; m.materialMult *= fx.materials;
   m.reprisalMult *= fx.reprisal; m.stamRegen *= fx.stamRegen; m.hpMult *= fx.hp; m.statusBuild *= fx.statusBuild; m.statusDmg *= fx.statusDmg; m.stairPay *= fx.stairPay;
   for (const src of fx.sources) add(src.name, src.effect);
+  // ---- the Creed War: dominion and the weaker side ----
+  applyDominion(state, m, add, applyEffects, favourable);
+  applyUnderdog(state, m, add);
+  // ---- Echoes of lost shades ----
+  applyEchoes(state, m, add);
   // ---- afflictions: the dial the player set ----
   applyAfflictions(state, m, add);
   // ---- the Toll: the hour of the world ----
