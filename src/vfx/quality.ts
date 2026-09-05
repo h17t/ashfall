@@ -36,10 +36,17 @@ let autoTier: Tier = 'balanced';
 let detected = false;
 const listeners = new Set<() => void>();
 
+/** The effective tier as a class on <html> (tier-battery ...), so CSS can drop the weather without a React subscription. */
+function applyTierClass() {
+  if (typeof document === 'undefined') return;
+  const cls = document.documentElement.classList;
+  for (const t of TIERS) cls.toggle('tier-' + t, t === currentTier());
+}
+
 export function currentTier(): Tier {
-  if (!detected) { autoTier = detectTier(); detected = true; }
+  if (!detected) { autoTier = detectTier(); detected = true; queueMicrotask(applyTierClass); }
   const pref = useSettings.getState().quality;
-  return pref === 'auto' ? autoTier : pref;
+  return pref === 'auto' || !pref ? autoTier : pref;
 }
 export function knobs(): TierKnobs { return KNOBS[currentTier()]; }
 
@@ -49,6 +56,7 @@ export function stepDown(): Tier | null {
   const i = TIERS.indexOf(autoTier);
   if (i >= TIERS.length - 1) return null;
   autoTier = TIERS[i + 1];
+  applyTierClass();
   listeners.forEach((l) => l());
   return autoTier;
 }
@@ -57,7 +65,7 @@ export function autoTierName(): Tier { if (!detected) currentTier(); return auto
 
 // a hand-picked tier is a tier change too
 let lastPref: string | null = null;
-useSettings.subscribe((st) => { if (st.quality !== lastPref) { lastPref = st.quality; listeners.forEach((l) => l()); } });
+useSettings.subscribe((st) => { if (st.quality !== lastPref) { lastPref = st.quality; applyTierClass(); listeners.forEach((l) => l()); } });
 
 /**
  * The effective tier, for React: re-renders on step-down and on a settings change. A plain

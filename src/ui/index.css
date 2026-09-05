@@ -172,6 +172,7 @@ html.fire-still .fire-lit, .reduce-fx .fire-lit { animation: none; }
 /* perf-lite: set by the VFX stage when even its degraded tier cannot hold the frame; ambient motion stops, the picture stays */
 html.perf-lite .backdrop-drift, html.perf-lite .flame, html.perf-lite .fire-lit { animation: none !important; }
 html.perf-lite .mote { display: none; }
+html.perf-lite .grain-layer, html.tier-battery .grain-layer { display: none; }
 @media (prefers-reduced-motion: reduce) { .fire-lit { animation: none; } }
 
 /* while a cinematic plays, everything that is not the frame steps back */
