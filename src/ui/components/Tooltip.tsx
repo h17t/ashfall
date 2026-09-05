@@ -1,19 +1,32 @@
 import { useState, type ReactNode } from 'react';
-import { Slab } from '@/render/materials/Slab';
+import { Sheet } from '../shell/Sheet';
 
-/** Lightweight hover tooltip. Everything numeric in the game is explained through these. */
-export function Tooltip({ tip, children, className = '' }: { tip: ReactNode; children: ReactNode; className?: string }) {
+/**
+ * There is no hover. Anything that used to live in a hover tooltip now opens a bottom sheet on
+ * tap (and on long-press, Milestone 3). The wrapped element stays whatever it was; an info mark
+ * beside it makes the affordance visible and gives the sheet a 48px target of its own.
+ *
+ * `inline` puts the mark after the children in the flow; `wrap` (default) makes the whole
+ * wrapper the tap target, for rows and cards that carry no other action.
+ */
+interface Props { tip: ReactNode; children: ReactNode; className?: string; title?: ReactNode; mode?: 'wrap' | 'inline' }
+
+export function Tooltip({ tip, children, className = '', title, mode = 'wrap' }: Props) {
   const [open, setOpen] = useState(false);
+  const sheet = <Sheet open={open} onClose={() => setOpen(false)} title={title}>{tip}</Sheet>;
+  if (mode === 'inline') {
+    return (
+      <span className={`inline-flex items-center gap-1 ${className}`}>
+        {children}
+        <button type="button" className="info-mark" aria-label="Details" onClick={(e) => { e.stopPropagation(); setOpen(true); }}>i</button>
+        {sheet}
+      </span>
+    );
+  }
   return (
-    <span className={`relative inline-block ${className}`} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <span className={`tip-wrap ${className}`} role="button" tabIndex={0} aria-haspopup="dialog" onClick={() => setOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true); } }}>
       {children}
-      {open && (
-        <div className="absolute z-40 left-0 top-full mt-1 w-72 pointer-events-none">
-          <Slab material="parchment" seed="tip" rough={7} ornament="none" className="px-4 py-3 text-[14px] leading-snug">
-            {tip}
-          </Slab>
-        </div>
-      )}
+      {sheet}
     </span>
   );
 }

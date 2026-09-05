@@ -81,7 +81,7 @@ function Tree() {
         const at = (n: { pos: { x: number; y: number } }) => ({ x: PAD + n.pos.x * COL + COL / 2, y: 22 + n.pos.y * ROW });
         return (
           <div key={b}>
-            <Tooltip tip={BRANCH_INFO[b].desc}><div className="t-display text-[15px] cursor-help" style={{ color: 'var(--stone)', letterSpacing: '0.1em' }}>{BRANCH_INFO[b].name}</div></Tooltip>
+            <Tooltip className="tree-branch-title" tip={BRANCH_INFO[b].desc}><div className="t-display text-[15px] cursor-help" style={{ color: 'var(--stone)', letterSpacing: '0.1em' }}>{BRANCH_INFO[b].name}</div></Tooltip>
             <div className="relative" style={{ width: w, height: h, maxWidth: '100%' }}>
               <svg className="absolute inset-0" width={w} height={h} aria-hidden>
                 {nodes.flatMap((n) => n.requires.map((req) => {
@@ -109,7 +109,7 @@ function Tree() {
                         disabled={!!why}
                         aria-label={`${n.name}, rank ${rank} of ${n.maxRank}`}
                         onClick={() => dispatch({ type: 'buyTreeNode', node: n.id })}
-                        style={{ width: 30, height: 30, background: 'transparent', border: 0, padding: 0, opacity: open || maxed || rank > 0 ? 1 : 0.6, cursor: why ? 'default' : 'pointer', filter: maxed ? 'drop-shadow(0 0 6px color-mix(in srgb, var(--ember-hot) 70%, transparent))' : undefined }}
+                        style={{ width: 48, height: 48, background: 'transparent', border: 0, padding: 9, opacity: open || maxed || rank > 0 ? 1 : 0.6, cursor: why ? 'default' : 'pointer', filter: maxed ? 'drop-shadow(0 0 6px color-mix(in srgb, var(--ember-hot) 70%, transparent))' : undefined }}
                       >
                         <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden><polygon points={shape} fill={fill} stroke={ring} strokeWidth="2" strokeLinejoin="round" />{rank > 0 && !maxed && <circle cx="15" cy="15" r="4" fill="var(--ember)" />}</svg>
                       </button>

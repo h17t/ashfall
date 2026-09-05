@@ -17,7 +17,7 @@ export const ENEMIES: Record<string, EnemyDef> = {
   // ---------------- Region 1: The Tollroad ----------------
   wanedPilgrim: {
     id: 'wanedPilgrim',
-    name: 'Revenant Pilgrim',
+    name: 'Waned Pilgrim',
     hpMult: 1.0,
     dmgMult: 1.0,
     composureMult: 1.0,
@@ -122,7 +122,7 @@ export const ENEMIES: Record<string, EnemyDef> = {
   },
   tallowWraith: {
     id: 'tallowWraith',
-    name: 'Cinder Wraith',
+    name: 'Tallow Wraith',
     hpMult: 1.2,
     dmgMult: 1.2,
     composureMult: 0.8,

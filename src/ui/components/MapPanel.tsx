@@ -73,7 +73,7 @@ function TierRow({ zone, tier, name, cleared, here, boss }: { zone: string; tier
       <span className="w-3 text-center">{current ? '›' : cleared ? '·' : boss ? '†' : '·'}</span>
       <Tooltip className="flex-1" tip={tip}><span className={`cursor-help ${boss ? 'font-display text-[15px]' : ''}`}>{name}</span></Tooltip>
       {tier >= 0 && !cleared && <span className="font-num text-[12px] text-bone/70">{kills}/{need}</span>}
-      <button className="btn text-[12px] px-2 py-0.5" disabled={!!blocked || current} title={blocked ?? 'Travel here'} onClick={() => dispatch({ type: 'travel', zone, tier })}>{current ? 'here' : boss ? 'Challenge' : 'Go'}</button>
+      <button className="btn text-[12px] px-2 py-0.5" disabled={!!blocked || current} onClick={() => dispatch({ type: 'travel', zone, tier })}>{current ? 'here' : boss ? 'Challenge' : 'Go'}</button>
     </div>
   );
 }

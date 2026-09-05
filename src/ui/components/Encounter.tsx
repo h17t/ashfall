@@ -73,7 +73,7 @@ export const Encounter = memo(function Encounter() {
 
   return (
     <Slab material="stone" seed="arena" rough={7} ornament="scorch" outer={`arena w-full flex ${!GL && shake % 2 ? 'shake' : ''}`} className="flex-1 flex flex-col min-h-0">
-      <div className={`relative flex-1 min-h-[520px] cursor-pointer overflow-hidden ${broken ? 'reprisal-glow' : ''}`} onMouseDown={onClick}>
+      <div className={`arena-stage relative flex-1 min-h-[520px] cursor-pointer overflow-hidden ${broken ? 'reprisal-glow' : ''}`} onPointerDown={(e) => { if (e.pointerType === 'mouse' && e.button !== 0) return; onClick(); }} role="button" aria-label="Strike the enemy" tabIndex={-1}>
         {GL ? (
           <Vfx />
         ) : (
@@ -89,9 +89,9 @@ export const Encounter = memo(function Encounter() {
         {/* name card */}
         <div className="arena-namecard absolute left-7 top-6 max-w-[62%] pointer-events-none">
           <div className="t-label">{zoneName} · {tierName}</div>
-          <div className={`t-display leading-none mt-2 ${isBoss ? 'text-[44px]' : 'text-[30px]'}`} style={{ textShadow: '0 2px 0 var(--void), 0 0 24px var(--void)' }}>{isBoss ? bossName : name || '—'}</div>
+          <div className={`t-display leading-none mt-2 ${isBoss ? 'text-[44px] bossname' : 'text-[30px] arena-name'}`} style={{ textShadow: '0 2px 0 var(--void), 0 0 24px var(--void)' }}>{isBoss ? bossName : name || '—'}</div>
           {isBoss && bossTitle && <div className="t-display text-[17px] mt-2" style={{ color: 'var(--bone)', letterSpacing: '0.2em' }}>{bossTitle}</div>}
-          {!isBoss && lore && <div className="t-lore text-[14px] mt-2 max-w-[360px] leading-snug" style={{ textShadow: '0 1px 2px var(--void)' }}>{lore}</div>}
+          {!isBoss && lore && <div className="arena-lore t-lore text-[14px] mt-2 max-w-[360px] leading-snug" style={{ textShadow: '0 1px 2px var(--void)' }}>{lore}</div>}
         </div>
 
         {broken && (
@@ -108,7 +108,7 @@ export const Encounter = memo(function Encounter() {
           <div className="absolute inset-x-0 bottom-4 text-center t-label" style={{ color: 'color-mix(in srgb, var(--bone) 72%, transparent)' }}>Something moves in the dark.</div>
         )}
         {telegraph && !blind && !broken && (
-          <div className="absolute inset-x-0 bottom-4 pl-10 pr-10 lg:pr-[120px] pointer-events-none">
+          <div className="absolute inset-x-0 bottom-4 pl-10 pr-10 pointer-events-none">
             <div className="t-label mb-1 flex justify-between" style={{ color: 'var(--parchment)' }}><span><span aria-hidden style={{ display: 'inline-block', width: 8, height: 8, background: 'var(--blood-bright)', marginRight: 8, clipPath: 'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)' }} />{attackId}</span><span className="t-num">{attackDmg} · {attackPct}% of you · dodge</span></div>
             <Gauge value={windupTotal - windup} max={windupTotal} tone="blood" height={5} cut={1} />
           </div>
@@ -117,7 +117,7 @@ export const Encounter = memo(function Encounter() {
       </div>
 
       {/* the foot: health, composure, statuses */}
-      <div className="relative px-7 lg:pr-[120px] pt-3 pb-5" style={{ background: 'linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--void) 35%, transparent) 100%)' }}>
+      <div className="arena-foot relative px-7 pt-3 pb-5" style={{ background: 'linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--void) 35%, transparent) 100%)' }}>
         <div className="flex justify-between items-end mb-1">
           <div className="t-label" style={{ color: isBoss ? 'var(--ember-hot)' : undefined }}>{isBoss ? `Phase ${phase + 1} · ${phaseName}` : tier >= 0 ? <TierProgress /> : ' '}</div>
           <span className="t-num text-[18px]" style={{ color: 'var(--parchment)' }}>{fmt(hpNum)} <span style={{ color: 'color-mix(in srgb, var(--bone) 72%, transparent)' }}>/ {fmt(hpMaxNum)}</span></span>

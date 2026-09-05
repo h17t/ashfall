@@ -206,3 +206,19 @@ On a machine with a GPU the GL rungs hold; the ladder is the guarantee, not the 
 **What would still be done with more days**, in order: ash particles through the Snuffing ritual's second act; a lantern plate with the tender beside it for the ritual and the away report; the Mire's hanging moss and the Deep's stalactites; `pyreGolem`'s mote pocks, the chime and the flame plates; the region ridges could take one more octave of shape. None of these is a placeholder; each is a plate or a sequence that ships today and could be better.
 
 **Verdict.** The boss intro, the reprisal moment and the lantern frame could sit on a Steam page. The pass is done.
+
+## 7. Pass 3: the phone
+
+### Round 9 — Pass 3, Milestone 2 (mobile foundation)
+
+Artifacts: `art/mobile/m2-sheet.png` (the five pillars at 390×844), `art/mobile/m2-combat-landscape.png`, `art/mobile/m2-wide.png`, `art/mobile/m2-sheet-open.png`.
+
+**The shell.** Portrait is the design; the others are arrangements of it. A status strip at the top (Marrow, level, HP, stamina: information where the eye goes), the section in the middle, the hand at the bottom: a bottom navigation of the five pillars (Combat, Cortege, Arsenal, Creeds, Lantern) over the safe area, and in Combat a thumb-zone action bar with Strike as the one big target, Dodge and Draught beside it, recitation slots above. Landscape phones and wide screens show the combat frame beside the current section with the pillars as a rail; the Combat pillar disappears from the rail because the frame is already on screen.
+
+**No hover.** The tooltip became a bottom sheet: the whole row is a tap target where the row carries no other action, and a 48px information mark sits beside anything that does. Seventy-eight tooltips moved without rewriting their content; `tools/audit/hover.mjs` fails the build on a `title=` attribute, a mouse-enter handler, or a `:hover` rule that reveals content.
+
+**Touch targets.** `tools/audit/touch-targets.mjs` renders the built game at 390×844, walks every pillar and sub-tab at the top and scrolled to the end, and fails on any interactive element under 48×48 or with less than 8px of air from another in the same scroll scope. The first run found 182 problems; the fixes were structural, not per-element: every button carries a 48px floor, rows that open a sheet are 48px rows, gaps are 8–12px, the settings toggles are 64×48 switches, tree medallions have a 48px hit area, and the section owns its own scrolling so nothing passes under the nav. It now checks 319 targets and finds none.
+
+**Harsh reading of the first shots.** Duplicate headings (the section title over the panel's own title): the panels keep theirs. The hint card sat on the Strike button: on a phone it is now part of the flow under the status strip. The Cortege card squashed a segmented control, a select and a button into one row: the control is a real segmented switch and the select takes its own line. The enemy names the multi-line rename missed read "Revenant Pilgrim": they are the Waned now. The info sheet rendered at two-thirds width because its slab shrank to its content inside a flex parent: it spans the phone.
+
+**Legibility.** Body copy is 16px, labels 12px in Barlow, numbers 14–26px; the HP figure at the top reads at arm's length in the 2× capture.

@@ -105,14 +105,14 @@ function ShadeCard({ id, benched }: { id: string; benched: boolean }) {
         <span>{def.role === 'healer' ? `heals ${Math.round(n.heal * 100)}%` : def.role === 'buffer' ? `×${n.buff.toFixed(2)} party` : `${n.strain.toFixed(1)} strain`}</span>
       </div>
       <Bar value={Number(n.xp)} max={Number(n.next)} color="#4A423C" height={3} />
-      <div className="flex gap-1 flex-wrap items-center">
-        <Tooltip tip="Beside you: fights in your encounter, feeds your reprisal, heals or buffs you. Hunting: grinds a cleared tier on its own for 45% marrow per kill, online and offline. Away from the keyboard, everyone hunts.">
-          <div className="flex border border-ash overflow-hidden">
-            <button className={`t-label px-2 py-0.5 ${assignment === 'beside' ? 'bg-ember/40 text-ember-hot' : 'text-bone/70'}`} onClick={() => dispatch({ type: 'assignShade', shade: id, assignment: 'beside' })}>Beside</button>
-            <button className={`t-label px-2 py-0.5 ${assignment === 'hunt' ? 'bg-ember/40 text-ember-hot' : 'text-bone/70'}`} onClick={() => dispatch({ type: 'assignShade', shade: id, assignment: 'hunt' })}>Hunt</button>
+      <div className="flex gap-2 flex-wrap items-center">
+        <Tooltip mode="inline" tip="Beside you: fights in your encounter, feeds your reprisal, heals or buffs you. Hunting: grinds a cleared tier on its own for 45% marrow per kill, online and offline. Away from the keyboard, everyone hunts.">
+          <div className="seg">
+            <button className={`seg-btn ${assignment === 'beside' ? 'is-on' : ''}`} onClick={() => dispatch({ type: 'assignShade', shade: id, assignment: 'beside' })}>Beside</button>
+            <button className={`seg-btn ${assignment === 'hunt' ? 'is-on' : ''}`} onClick={() => dispatch({ type: 'assignShade', shade: id, assignment: 'hunt' })}>Hunt</button>
           </div>
         </Tooltip>
-        <select className="bg-ink border border-ash text-parchment text-[13px] px-1 py-0.5 flex-1 min-w-[100px]" value={weapon ?? ''} onChange={(e) => dispatch({ type: 'equipShade', shade: id, weapon: e.target.value || null })} title="Gear slot: any weapon you own and are not wielding.">
+        <select className="basis-full text-[14px] px-2" value={weapon ?? ''} onChange={(e) => dispatch({ type: 'equipShade', shade: id, weapon: e.target.value || null })} aria-label="Gear slot: any weapon you own and are not wielding.">
           <option value="">{n.weaponName.includes('(worn)') ? n.weaponName : 'No weapon'}</option>
           {freeWeapons.split(',').filter(Boolean).map((w) => <option key={w} value={w}>{getWeapon(w).name}</option>)}
         </select>

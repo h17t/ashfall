@@ -1,0 +1,20 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: typecheck, tests (engine, asset audit, banned terms, migration), hover audit
+        run: npm run typecheck && npm test && npm run lint:terms && npm run audit:hover
+      - name: build
+        run: npm run build
+      - name: touch-target audit at a phone viewport
+        run: |
+          npx vite preview --port 4173 &
+          sleep 3
+          node tools/audit/touch-targets.mjs

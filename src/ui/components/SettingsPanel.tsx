@@ -93,11 +93,11 @@ function Stats() {
 
 function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
-    <label className="flex items-center justify-between cursor-pointer">
-      <span className="text-bone">{label}</span>
-      <button className={`w-9 h-5  border transition-colors ${value ? 'bg-ember border-ember' : 'bg-ink border-ash'}`} onClick={() => onChange(!value)}>
-        <span className={`block w-4 h-4  bg-bone transition-transform ${value ? 'translate-x-4' : 'translate-x-0.5'}`} />
+    <div className="flex items-center justify-between gap-3 min-h-[48px]">
+      <span className="text-bone text-[16px]">{label}</span>
+      <button role="switch" aria-checked={value} aria-label={label} className={`switch ${value ? 'is-on' : ''}`} onClick={() => onChange(!value)}>
+        <span className="switch-knob" aria-hidden />
       </button>
-    </label>
+    </div>
   );
 }
