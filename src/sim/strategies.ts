@@ -36,6 +36,8 @@ export interface PolicyParams {
   respectsMechanics: boolean;
   /** the Stair: when to descend, how deep, how much nerve (absent = never descends) */
   descent?: { every: number; withdrawAt: number; nerve: number };
+  /** afflictions the strategy takes on as soon as they offer themselves */
+  afflictions?: string[];
   /** Standing Orders the strategy writes, in priority order, as slots and kinds allow */
   orders?: { when: { kind: string; op: '<' | '>'; value: number }[]; then: { kind: string; arg?: string | number }; on?: boolean }[];
 }
@@ -286,6 +288,13 @@ export const STRATEGIES: Record<string, () => Strategy> = {
     clickRate: 4, dodgeSkill: 0.85, perfectSkill: 0.5, riposteAware: true, estusAt: 0.4, retreatAt: 0.15,
     levelPlan: 'weaponBest', soulsReserve: 0, pushLead: 6, bossRetryLevels: 2, respectsMechanics: true,
     descent: { every: 10 * 60, withdrawAt: 10, nerve: 0.35 },
+  }),
+  bold: () => makePolicy({
+    id: 'bold', description: 'Greedy under four afflictions: Thin Blood, Short Breath, Iron Composure, Brittle Steel. The dial turned up by a hand that can take it.',
+    clickRate: 4, dodgeSkill: 0.85, perfectSkill: 0.5, riposteAware: true, estusAt: 0.4, retreatAt: 0.15,
+    levelPlan: 'weaponBest', soulsReserve: 0, pushLead: 6, bossRetryLevels: 2, respectsMechanics: true,
+    descent: { every: 10 * 60, withdrawAt: 10, nerve: 0.35 },
+    afflictions: ['thinBlood', 'shortBreath', 'ironComposure', 'brittleSteel'],
   }),
   reckless: () => makePolicy({
     id: 'reckless', description: 'Greedy who never climbs out: pushes the Stair until it kills them. The cost of pushing, measured.',

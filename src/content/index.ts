@@ -12,11 +12,15 @@ import { TREE, SEVERING_UNLOCKS, BRANCH_INFO } from './tree';
 import { MATERIALS, reinforceMaterial } from './materials';
 import { BOONS, BOON_ORDER, RARITY_WEIGHT } from './boons';
 import { AFFIXES, AFFIX_ORDER, SETS, SET_PIECES, TIER_NAMES } from './affixes';
+import { AFFLICTIONS, AFFLICTION_ORDER } from './afflictions';
+import { TOLL_PHASES, TOLL_CYCLE_SECONDS } from './toll';
 import { STUDY_RANKS_ENEMY, STUDY_RANKS_BOSS, STUDY_RANK_NAMES, STUDY_REVEALS, STUDY_BONUS, STUDY_VS_PER_RANK } from './study';
 import { BALANCE } from './balance';
 import type { WeaponDef, EnemyDef, ZoneDef, BossDef, SpellDef, PhantomDef, CovenantDef, TreeNode, SigilUnlock, MaterialDef } from './types';
 
-export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, SHADES, CREEDS, TREE, SEVERING_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial, BOONS, BOON_ORDER, RARITY_WEIGHT, AFFIXES, AFFIX_ORDER, SETS, SET_PIECES, TIER_NAMES, STUDY_RANKS_ENEMY, STUDY_RANKS_BOSS, STUDY_RANK_NAMES, STUDY_REVEALS, STUDY_BONUS, STUDY_VS_PER_RANK };
+export { WEAPONS, ENEMIES, ZONES, ZONE_ORDER, BOSSES, SPELLS, SHADES, CREEDS, TREE, SEVERING_UNLOCKS, BRANCH_INFO, MATERIALS, BALANCE, STARTING_WEAPON, reinforceMaterial, BOONS, BOON_ORDER, RARITY_WEIGHT, AFFIXES, AFFIX_ORDER, SETS, SET_PIECES, TIER_NAMES, STUDY_RANKS_ENEMY, STUDY_RANKS_BOSS, STUDY_RANK_NAMES, STUDY_REVEALS, STUDY_BONUS, STUDY_VS_PER_RANK, AFFLICTIONS, AFFLICTION_ORDER, TOLL_PHASES, TOLL_CYCLE_SECONDS };
+export type { AfflictionDef } from './afflictions';
+export type { TollPhase, TollPhaseDef } from './toll';
 export type { AffixDef, AffixTier, AffixStat, SetId, SetDef } from './affixes';
 export type { BoonDef, BoonFx, BoonRarity } from './boons';
 export { UPCOMING_SPELLS } from './spells';
@@ -113,6 +117,8 @@ export function validateContent(): string[] {
     if (a.mag.length !== 3 || !(a.mag[0] < a.mag[1] && a.mag[1] < a.mag[2])) errs.push(`affix ${a.id} tiers must climb`);
     if (a.gate?.kind === 'creature' && !ENEMIES[a.gate.id ?? '']) errs.push(`affix ${a.id} gate creature missing`);
   }
+  for (const a of Object.values(AFFLICTIONS)) if (!a.lore || a.lore.length < 30 || !a.cost || !a.gain) errs.push(`affliction ${a.id} incomplete`);
+  for (const ph of TOLL_PHASES) if (!CREEDS[ph.creed]) errs.push(`toll phase ${ph.id} creed ${ph.creed} missing`);
   for (const st of Object.values(SETS)) if (!st.lore || st.lore.length < 30) errs.push(`set ${st.id} lore too short`);
   for (const b of Object.values(BOONS)) {
     if (!b.lore || b.lore.length < 30) errs.push(`boon ${b.id} lore too short`);

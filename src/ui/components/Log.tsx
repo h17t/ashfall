@@ -40,6 +40,7 @@ export function Log() {
         case 'descentLost': push(e.haul.gt(0) ? `The stair keeps ${fmt(e.haul)} marrow of haul. Floor ${e.floor}.` : `The stair took you on floor ${e.floor}.`, 'text-ember-hot'); break;
         case 'studyRank': push(`${e.isBoss ? BOSSES[e.enemy]?.name ?? e.enemy : ENEMIES[e.enemy]?.name ?? e.enemy}: ${['', 'noted', 'known', 'understood', 'mastered'][e.rank]}. ${['', 'Its resistances are yours to read.', 'You know its attacks and their tells.', 'You know what it carries.', 'You know its measure.'][e.rank]}`, 'text-wisp'); break;
         case 'reforged': push(`Reforged: ${e.affixes.map((a) => `${AFFIXES[a.id]?.name ?? a.id} (${TIER_NAMES[a.tier]})`).join(', ')}.`, 'text-ember-hot'); break;
+        case 'tollPhase': push(({ dawn: 'Dawn. The ash is grey and the road is quiet.', day: 'Day. The lords hold court; the road pays its due.', dusk: 'Dusk. Things come out of the walls to feed.', black: 'The Black Hour. Every lantern but yours goes out.' } as Record<string, string>)[e.phase] ?? e.phase, e.phase === 'black' ? 'text-wisp' : 'text-bone/70'); break;
         case 'snuffed': push(`The flame is snuffed. ${fmt(e.vestige)} Vestige gathered.`, 'text-ember-hot'); break;
       }
     }

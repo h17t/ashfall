@@ -195,6 +195,14 @@ export const BALANCE = {
     tierWeightsHigh: [30, 45, 25],
   },
 
+  // ---- Afflictions and the Toll ----
+  toll: {
+    /** the Black Hour's marrow bonus is credited to time away in proportion to the share of it that fell in the Hour */
+    offlineBlackBonus: 1.0,
+    /** share of Black Hour spawns that come dark-touched (the nadiral variant) */
+    blackSpawnChance: 0.35,
+  },
+
   // ---- Prestige ----
   prestige: {
     /** vestige = (cycleMarrow / divisor) ^ exponent * bossBonus */

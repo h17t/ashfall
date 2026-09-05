@@ -306,6 +306,10 @@ export interface GameState {
   orders: OrdersState;
   /** the Study: lifetime kills per creature and lord id; kept through every fire */
   study: Record<string, number>;
+  /** curses taken on by choice */
+  afflictions: string[];
+  /** the Toll: the world's clock in seconds, running online and away */
+  toll: { t: number; phase: string };
 }
 
 /** A Descent in progress: floor, the boons taken, the haul not yet banked. */
@@ -384,6 +388,8 @@ export interface OfflineSummary {
   zone: string;
   tier: number;
   wiped: boolean;
+  /** share of the time away that fell in the Black Hour, credited generously */
+  blackShare?: number;
 }
 
 // ---------------- Actions ----------------
@@ -428,7 +434,8 @@ export type Action =
   | { type: 'descentWithdraw' }
   | { type: 'setOrders'; rules: Order[] }
   | { type: 'reforge'; weapon: string }
-  | { type: 'lockAffix'; weapon: string; affix: string | null };
+  | { type: 'lockAffix'; weapon: string; affix: string | null }
+  | { type: 'toggleAffliction'; affliction: string };
 
 // ---------------- Events ----------------
 
@@ -461,4 +468,5 @@ export type GameEvent =
   | { type: 'orderFired'; id: number; action: OrderActKind }
   | { type: 'studyRank'; enemy: string; rank: number; isBoss: boolean }
   | { type: 'reforged'; weapon: string; affixes: WeaponAffix[] }
+  | { type: 'tollPhase'; phase: string }
   | { type: 'error'; text: string };

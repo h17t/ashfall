@@ -89,6 +89,7 @@ describe('creeds', () => {
     advance(s, 0, [{ type: 'joinCreed', creed: 'wick' }]);
     expect(s.creed.current).toBe('wick');
     expect(switchCost(s).gt(0)).toBe(true);
+    s.toll.t = 22 * 60; // Dusk: not the Wickkeepers' hour, and no marrow tilt of its own
     const mods = computeMods(s);
     expect(mods.marrow).toBeCloseTo(1.25, 6);
     expect(mods.remainsKeep).toBeCloseTo(0.7, 6);

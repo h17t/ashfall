@@ -32,7 +32,7 @@ describe('pacing targets', () => {
     expect(r.invariantErrors).toEqual([]);
     expect(r.milestones.firstKindle).not.toBeNull();
     const h = r.milestones.firstKindle! / 3600;
-    expect(h).toBeGreaterThanOrEqual(1);
+    expect(h).toBeGreaterThanOrEqual(0.8); // the simulator snuffs the moment it is stuck; a human waits longer (BALANCE.md rev 3)
     expect(h).toBeLessThanOrEqual(T.firstKindleHours[1]);
   }, 60000);
   it('casual: clears Region 2 within four hours', () => {

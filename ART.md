@@ -284,3 +284,15 @@ Artifacts: `art/mobile/m7-study.png` (the bestiary with ranks, one entry open), 
 **The weapon.** Under infusions, an Affixes block: each affix a row with its tier on the left in the tier's colour (bone, wisp, the fire), its name, its effect and its set; a locked row fills. Reforge opens a stone sheet: the same rows with a lock switch each, the price with the slag count coloured by whether you have it, one button that names how many slots it rolls, and the pool as chips with the shut ones dashed. A reroll flashes the rows.
 
 **Sets.** A row of chips under the weapon, one per set with pieces held; the chip opens the set's lore and its three bonuses, lit as they are reached.
+
+### Round 15 — Pass 3, Milestone 8 (Afflictions and the Toll)
+
+Artifacts: `art/mobile/m8-toll.png` (the Toll page at Dusk with two afflictions on), `art/mobile/m8-black.png` (the arena in the Black Hour), `scripts/shot-toll.mjs`.
+
+**The dial.** One ring in four arcs, each the length of its hour and in its colour (bone for Dawn, gold for Day, verdigris for Dusk, the wisp's blue for the Black Hour), the present hour drawn thicker, a needle for now. Beside it the hour's name in the display face, its line of lore, the minutes left and the minutes to the Black Hour. Under it the hour's effects as a list, and the four hours as tiles that open their lore and effects.
+
+**The afflictions.** Below a rule, in the blood's colour: a readout of what the carried curses multiply, and each affliction as a row with its cost in red and its gain in the fire's orange on one line, a switch at the right, and its lore behind a tap. A taken row fills with a wash of blood. The switch hums a hurt pattern going on and a tap going off.
+
+**The Black Hour on the arena.** The header names the hour in the wisp's blue; the stage darkens at its edges with a blue-black radial wash under multiply, so the picture keeps its colour and loses its light. Dusk warms the top of the stage instead. Both are classes on `<html>` and cost nothing per frame.
+
+**Harsh reading.** Three bullets drawn as a glyph tripped the asset audit's emoji rule and became a rotated square in CSS; three colour literals in the tints became palette mixes. The audit is doing its job.

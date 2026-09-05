@@ -7,3 +7,4 @@ import './ext-prestige';
 import './ext-descent';
 import './ext-orders';
 import './ext-forge';
+import './ext-afflictions';

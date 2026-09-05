@@ -28,6 +28,10 @@ export function checkUnlocks(state: GameState, mods: Mods, events: GameEvent[]) 
     f.forgeUnlocked = true;
     events.push({ type: 'unlock', what: 'forge', text: 'The forge takes. Reforge a weapon (Arsenal) to roll three affixes; lock the one you like and roll the rest. Pieces of a set, in your hand and your shades\', pay at two, four and six.' });
   }
+  if (!f.afflictionsUnlocked && state.stats.bossKills >= 1) {
+    f.afflictionsUnlocked = true;
+    events.push({ type: 'unlock', what: 'afflictions', text: 'The afflictions offer themselves (Lantern, the Toll): curses you take on by choice, each a cost and a gain, stacking as far as you dare.' });
+  }
   if (!f.descentUnlocked && state.stats.bossKills >= 1) {
     f.descentUnlocked = true;
     events.push({ type: 'unlock', what: 'descent', text: 'Behind the lord\'s seat, a stair going down. The Stair: descend floor by floor, take what you can carry, and climb out before it takes you.' });

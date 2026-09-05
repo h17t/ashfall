@@ -8,6 +8,7 @@ import { BALANCE } from '@/content/balance';
 import { DESCENT_TIER, spawnDescentEnemy, descentOnKill, descentOnDeath, secondWind, runFx, floorTier } from './descent';
 import { recordStudyKill, studyVsMult } from './study';
 import { playerAffixFx } from './forge';
+import { tollPhase } from './toll';
 import { getEnemy, getZone, getBoss, getWeapon, getSpell, globalTier, nextZone, cycleBossFor, BOSSES, WEAPONS } from '@/content';
 const getSpellSchool = (id: string) => getSpell(id).school;
 import type { AttackPattern, BossPhase, EnemyDef } from '@/content/types';
@@ -102,7 +103,7 @@ export function weaponDamage(state: GameState, mods: Mods, weaponId = state.play
   for (const [k, need] of Object.entries(def.req)) {
     if (p.stats[k as StatKey] < (need ?? 0)) reqPenalty = BALANCE.weapon.reqPenalty;
   }
-  const reinforce = reinforceMult(level);
+  const reinforce = 1 + (reinforceMult(level) - 1) * mods.reinforceScale;
   const buffs = buffMult(p.buffs, 'dmg');
   const levelMult = levelDamageMult(p.level);
   const total = D(def.base).mul(reinforce).mul(1 + scalingSum).mul(infusionMult).mul(reqPenalty).mul(buffs).mul(mods.dmg).mul(levelMult);
@@ -163,7 +164,7 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
     const bossId = enc.tier === -1 ? zone.boss : enc.tier === -2 ? zone.secretBoss! : cycleBossFor(enc.zone)!.id;
     const boss = getBoss(bossId);
     const secret = boss.secret || enc.tier === -3;
-    const hp = tierHp(g, ng).mul(secret ? BALANCE.enemy.secretBossHpMult : BALANCE.enemy.bossHpMult).mul(boss.hpMult).floor();
+    const hp = tierHp(g, ng).mul(secret ? BALANCE.enemy.secretBossHpMult : BALANCE.enemy.bossHpMult).mul(boss.hpMult).mul(mods.enemyHp).floor();
     const killsThisCycle = enc.tier === -1 ? state.zones[enc.zone]?.bossKills : enc.tier === -2 ? state.zones[enc.zone]?.secretKills : state.zones[enc.zone]?.cycleKills;
     const alreadyKilled = state.prestige.bossesEverKilled.includes(bossId) && (killsThisCycle ?? 0) > 0;
     const marrow = tierMarrow(g, ng).mul(secret ? BALANCE.enemy.secretBossSoulMult : BALANCE.enemy.bossSoulMult).mul(boss.marrowMult).mul(alreadyKilled ? 0.25 : 1).floor();
@@ -175,7 +176,7 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
       hp,
       hpMax: hp,
       strain: 0,
-      composure: tierPoise(g) * BALANCE.enemy.bossPoiseMult * boss.composureMult,
+      composure: tierPoise(g) * BALANCE.enemy.bossPoiseMult * boss.composureMult * mods.enemyComposure,
       reprisal: 0,
       attackIn: boss.phases[0].attackInterval * 0.8,
       windup: 0,
@@ -195,8 +196,10 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
   const defId = pick(state.rng, tier.enemies);
   const def = getEnemy(defId);
   const variants = pickVariants(state, state.prestige.wakings);
+  // the Black Hour sends the dark-touched
+  if (tollPhase(state).fx.blackSpawns && !variants.includes('nadiral') && chance(state.rng, BALANCE.toll.blackSpawnChance)) variants.push('nadiral');
   const vMult = variantMults(variants);
-  const hp = tierHp(g, ng).mul(def.hpMult).mul(vMult.hp).floor();
+  const hp = tierHp(g, ng).mul(def.hpMult).mul(vMult.hp).mul(mods.enemyHp).floor();
   const marrow = tierMarrow(g, ng).mul(def.marrowMult).mul(vMult.marrow).floor();
   enc.enemy = {
     id: defId,
@@ -206,7 +209,7 @@ export function spawnEnemy(state: GameState, mods: Mods, events: GameEvent[]) {
     hp,
     hpMax: hp,
     strain: 0,
-    composure: tierPoise(g) * def.composureMult * vMult.composure,
+    composure: tierPoise(g) * def.composureMult * vMult.composure * mods.enemyComposure,
     reprisal: 0,
     attackIn: def.attackInterval * (0.5 + rand(state.rng) * 0.5),
     windup: 0,
@@ -778,7 +781,7 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
     enemy.reprisal = Math.max(0, enemy.reprisal - dt);
     if (enemy.reprisal <= 0 && !(enemy.mech.riposteHit > 0)) events.push({ type: 'riposteMissed' });
     // auto-reprisal
-    if (state.automation.autoReprisal && enemy.reprisal > 0 && mods.unlocks.has('autoReprisal')) {
+    if (state.automation.autoReprisal && enemy.reprisal > 0 && mods.unlocks.has('autoReprisal') && !mods.reflexesSleep) {
       enemy.mech.autoRip = (enemy.mech.autoRip ?? 0) - dt;
       if (enemy.mech.autoRip <= 0) { enemy.mech.autoRip = 0.35; playerAttack(state, mods, events, false); }
     }
@@ -789,7 +792,7 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
     if (enemy.windup > 0) {
       enemy.windup -= dt / slow;
       // auto-dodge (blind phases hide the telegraph from the reflex too)
-      if (state.automation.autoDodge && mods.unlocks.has('autoDodge') && enemy.mech.blind !== 1 && enemy.windup <= BALANCE.player.perfectWindow * 0.8 && p.dodgeCd <= 0 && p.iframes <= 0) {
+      if (state.automation.autoDodge && mods.unlocks.has('autoDodge') && !mods.reflexesSleep && enemy.mech.blind !== 1 && enemy.windup <= BALANCE.player.perfectWindow * 0.8 && p.dodgeCd <= 0 && p.iframes <= 0) {
         playerDodge(state, mods, events);
       }
       if (enemy.windup <= 0) {
@@ -841,7 +844,7 @@ function beginTelegraph(state: GameState, mods: Mods) {
   for (const a of attacks) { r -= a.weight; if (r <= 0) { atk = a; break; } }
   const g = gTier(state, state.encounter.zone, state.encounter.tier);
   const ng = wakingLevel(state, mods);
-  const base = tierDmg(g, ng);
+  const base = tierDmg(g, ng) * mods.enemyDmg;
   let mult = atk.mult;
   if (enemy.isBoss) mult *= BALANCE.enemy.bossDmgMult * getBoss(enemy.id).dmgMult;
   else mult *= enemyDef(enemy)!.dmgMult * variantMults(enemy.variants).dmg;

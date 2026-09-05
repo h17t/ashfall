@@ -35,6 +35,7 @@ Captured headless at 1400×900 from the built game (`npm run build && npx vite p
 | ![The Stair](art/mobile/m5-stair.png) | **The Stair page**: the way down, the records, every boon. |
 | ![Orders](art/mobile/m6-orders.png) | **Standing Orders**: WHEN this, THEN that, as chips. |
 | ![The forge](art/mobile/m7-forge.png) | **The forge**: three affixes, a lock, the price. |
+| ![The Toll](art/mobile/m8-toll.png) | **The Toll**: the dial, the hour, the afflictions. |
 
 ## The plates
 

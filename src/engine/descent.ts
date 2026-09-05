@@ -14,7 +14,6 @@ import { tierHp, tierMarrow, tierPoise } from './formulas';
 import type { Mods } from './mods';
 import { registerActionHandler, registerTickHook } from './registry';
 import { recordStudyKill } from './study';
-import { playerAffixFx } from './forge';
 
 /** the encounter tier that marks a stair floor */
 export const DESCENT_TIER = -4;
@@ -155,11 +154,11 @@ export function spawnDescentEnemy(state: GameState, mods: Mods, events: GameEven
   if (floorIsLord(run.floor) && lords.length > 0) {
     const bossId = pick(state.rng, lords);
     const boss = getBoss(bossId);
-    const hp = tierHp(g, ng).mul(B.bossHpMult).mul(boss.hpMult).floor();
+    const hp = tierHp(g, ng).mul(B.bossHpMult).mul(boss.hpMult).mul(mods.enemyHp).floor();
     const marrow = floorMarrowMult(state, run.floor).mul(B.bossMarrowMult).mul(boss.marrowMult).floor();
     const e: EnemyInstance = {
       id: bossId, name: `${boss.name}, ${boss.title}`, isBoss: true, phase: 0, hp, hpMax: hp, strain: 0,
-      composure: tierPoise(g) * BALANCE.enemy.bossPoiseMult * boss.composureMult * 0.6, reprisal: 0,
+      composure: tierPoise(g) * BALANCE.enemy.bossPoiseMult * boss.composureMult * 0.6 * mods.enemyComposure, reprisal: 0,
       attackIn: boss.phases[0].attackInterval * 0.8, windup: 0, windupTotal: 0, attackDamage: 0, attackId: '',
       statuses: statuses(), mech: { phaseStart: 0 }, variants: [], marrow,
     };
@@ -172,11 +171,11 @@ export function spawnDescentEnemy(state: GameState, mods: Mods, events: GameEven
   if (pool.size === 0) for (const t of getZone(ZONE_ORDER[0]).tiers) for (const id of t.enemies) pool.add(id);
   const defId = pick(state.rng, [...pool]);
   const def = getEnemy(defId);
-  const hp = tierHp(g, ng).mul(def.hpMult).floor();
+  const hp = tierHp(g, ng).mul(def.hpMult).mul(mods.enemyHp).floor();
   const marrow = floorMarrowMult(state, run.floor).mul(def.marrowMult).floor();
   enc.enemy = {
     id: defId, name: def.name, isBoss: false, phase: 0, hp, hpMax: hp, strain: 0,
-    composure: tierPoise(g) * def.composureMult, reprisal: 0,
+    composure: tierPoise(g) * def.composureMult * mods.enemyComposure, reprisal: 0,
     attackIn: def.attackInterval * (0.5 + rand(state.rng) * 0.5), windup: 0, windupTotal: 0, attackDamage: 0, attackId: '',
     statuses: statuses(), mech: {}, variants: [], marrow,
   };
@@ -188,7 +187,7 @@ export function descentOnKill(state: GameState, mods: Mods, events: GameEvent[],
   const enc = state.encounter;
   const fx = runFx(run);
   recordStudyKill(state, events, enemy.id);
-  const marrow = safe(enemy.marrow.mul(marrowMult).mul(fx.haul).mul(playerAffixFx(state).stairPay).floor());
+  const marrow = safe(enemy.marrow.mul(marrowMult).mul(fx.haul).mul(mods.stairPay).floor());
   run.haul = run.haul.add(marrow);
   state.stats.kills = state.stats.kills.add(1);
   state.stats.cycleKills = state.stats.cycleKills.add(1);

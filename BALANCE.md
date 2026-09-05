@@ -78,6 +78,18 @@ The metric is "Stair pays": the median over banked runs of the run's marrow per 
 
 Six hours, seed 7: greedy holds 100 of 220 Study ranks (+27%), casual 91 (+24%) with a Swift (Black) locked on a Render Greatsword, idle 41 (+9%) and never forges. The pacing tests hold after the tune.
 
+## Rev 7 — Pass 3, Milestone 8 (Afflictions and the Toll)
+
+| Knob | Value | Why |
+|---|---|---|
+| The clock | Dawn 8 / Day 14 / Dusk 12 / Black Hour 6 min; a 40-minute turn | a Black Hour every forty minutes is a reason to open the app at a particular time without ever waiting long |
+| Phase tilts | Dawn: draughts +25%, enemies −10% dmg · Day: marrow +5% · Dusk: materials +40%, status +25% · Black Hour: enemies +50% HP and dmg, marrow ×1.75, materials ×2, Stair haul ×1.5, 35% dark-touched spawns | the first draft (Day +10%, Black ×2) averaged +18% marrow and put the greedy first Snuff at 0.91 h; now about +13% |
+| Creed hours | Wickkeepers at Dawn, Legion by Day, Rot Wardens at Dusk, the Vigil and the Nadir Pact in the Black Hour; the passive's gifts applied twice, its costs once | the first draft squared the whole passive and the Legion's hour made it weaker |
+| Absence | the Black Hour's share of the time away multiplies the summary's marrow and materials by (1 + share) | generous: missing a window costs nothing, sleeping through one still pays |
+| Afflictions | Thin Blood (taken ×1.4 → marrow ×1.5) · Bitter Draught (heal ×0.5 → dmg ×1.2) · The Leak (−1%/s held → marrow ×1.75) · Iron Composure (composure ×1.6 → Reprisal ×2.2) · Short Breath (stamina regen ×0.6 → dmg ×1.25) · Dimmed Lantern (reflexes sleep → marrow ×1.4) · Brittle Steel (reinforce ×0.5 → materials ×2) · The Waning (HP ×0.6 → Vestige ×1.3) | the first draft's gains were a fifth smaller and `bold` finished behind greedy; a dial that costs more than it pays is a trap |
+
+Six hours, seed 7: `bold` (greedy under Thin Blood, Short Breath, Iron Composure, Brittle Steel) level 165 vs greedy 147, marrow/hour 1.0e11 vs 1.8e11 in hour five but ahead in hour four, 31 deaths vs 4, first Snuff 1.09 h vs 0.95 h. Idle is unchanged by the dial and gains about 10% from the clock. The pacing test's first-Snuff floor is 0.8 h from this revision.
+
 ## Latest simulator run
 
 ### Run — 2026-09-05 08:25 UTC · 12h · seed 7

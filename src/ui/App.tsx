@@ -11,6 +11,8 @@ import { DescentStrip } from './components/DescentStrip';
 import { BoonSheet } from './components/BoonSheet';
 import { HaulSheet } from './components/HaulSheet';
 import { OrdersPanel } from './components/OrdersPanel';
+import { TollPanel } from './components/TollPanel';
+import { tollPhase } from '@/engine';
 import { useSwipe } from './shell/useSwipe';
 import { applyOffline, canRecruit, canSnuff, vestigePreview, canSever } from '@/engine';
 import { SHADES, BALANCE } from '@/content';
@@ -87,6 +89,9 @@ export default function App() {
   const severingReady = useSel((s) => canSever(s) === null);
   const stairVisible = useSel((s) => !!s.flags.descentUnlocked);
   const ordersVisible = useSel((s) => !!s.flags.ordersUnlocked);
+  const tollId = useSel((s) => tollPhase(s).id);
+  const blackNow = tollId === 'black';
+  useEffect(() => { const cls = document.documentElement.classList; for (const p of ['dawn', 'day', 'dusk', 'black']) cls.toggle('toll-' + p, p === tollId); }, [tollId]);
   const ordersNew = useSel((s) => !!s.flags.ordersUnlocked && s.orders.rules.length === 0);
   const stairNew = useSel((s) => !!s.flags.descentUnlocked && s.descent.runs === 0 && !s.descent.run);
   const badges = { combat: ordersNew, cortege: recruitable, arsenal: keepsakeHeld, lantern: snuffReady || (severingVisible && severingReady) || stairNew };
@@ -108,6 +113,7 @@ export default function App() {
       { id: 'rest', label: 'Rest', node: <LanternPanel /> },
       { id: 'road', label: 'Road', node: <MapPanel /> },
       ...(stairVisible ? [{ id: 'stair', label: 'Stair', badge: stairNew, node: <StairPanel /> }] : []),
+      { id: 'toll', label: 'Toll', badge: blackNow, node: <TollPanel /> },
       { id: 'snuff', label: 'Snuff', badge: snuffReady, node: <SnuffPanel /> },
       ...(severingVisible ? [{ id: 'severing', label: 'Severing', badge: severingReady, node: <SeveringPanel /> }] : []),
       { id: 'lore', label: 'Lore', node: <BestiaryPanel /> },

@@ -32,14 +32,14 @@ function useCountUp(target: number, ms = 1400, delay = 0): number {
  */
 export function AwayReport() {
   const dispatch = useGame((g) => g.dispatch);
-  const off = useSel((s) => (s.offline ? JSON.stringify({ ...s.offline, marrow: s.offline.marrow.toString(), kills: s.offline.kills.toString(), shadeXp: s.offline.shadeXp.toString() }) : ''));
+  const off = useSel((s) => (s.offline ? JSON.stringify({ ...s.offline, marrow: s.offline.marrow.toString(), kills: s.offline.kills.toString(), shadeXp: s.offline.shadeXp.toString(), blackShare: s.offline.blackShare ?? 0 }) : ''));
   const hunters = useSel((s) => s.cortege.shades.map((p) => p.id).join(','));
   if (!off) return null;
   return <Report json={off} hunters={hunters.split(',').filter(Boolean)} onClose={() => dispatch({ type: 'ackOffline' })} />;
 }
 
 function Report({ json, hunters, onClose }: { json: string; hunters: string[]; onClose: () => void }) {
-  const o = JSON.parse(json) as { seconds: number; cappedSeconds: number; marrow: string; materials: Record<string, number>; kills: string; shadeXp: string; zone: string; tier: number; wiped: boolean };
+  const o = JSON.parse(json) as { seconds: number; cappedSeconds: number; marrow: string; materials: Record<string, number>; kills: string; shadeXp: string; zone: string; tier: number; wiped: boolean; blackShare?: number };
   const capped = o.seconds > o.cappedSeconds + 1;
   const nothing = o.marrow === '0' && Object.keys(o.materials).length === 0;
   const zone = getZone(o.zone);

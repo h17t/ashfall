@@ -1,7 +1,7 @@
 import { memo, useCallback, useRef, useState } from 'react';
 import { useGame, useSel } from '../store';
 import { useEvents } from '../hooks/useEvents';
-import { fmt, type GameEvent } from '@/engine';
+import { fmt, tollPhase, type GameEvent } from '@/engine';
 import { getEnemy, getBoss, getZone } from '@/content';
 import { Gauge } from '@/render/Gauge';
 import { Slab } from '@/render/materials/Slab';
@@ -36,6 +36,7 @@ export const Encounter = memo(function Encounter() {
   const attackId = useSel((s) => s.encounter.enemy?.attackId ?? '');
   const zone = useSel((s) => s.encounter.zone);
   const zoneName = useSel((s) => (s.descent.run ? 'The Stair' : getZone(s.encounter.zone).name));
+  const hour = useSel((s) => tollPhase(s).name);
   const tier = useSel((s) => s.encounter.tier);
   const tierName = useSel((s) => { const z = getZone(s.encounter.zone); return s.descent.run ? `Floor ${s.descent.run.floor}${s.descent.run.floor % 5 === 0 ? ' · a lord' : ''}` : s.encounter.tier >= 0 ? z.tiers[s.encounter.tier].name : s.encounter.tier === -1 ? 'Boss Arena' : s.encounter.tier === -2 ? 'A hidden place' : 'Something new walks the road'; });
   const phaseName = useSel((s) => (s.encounter.enemy?.isBoss ? getBoss(s.encounter.enemy.id).phases[s.encounter.enemy.phase].name : ''));
@@ -88,7 +89,7 @@ export const Encounter = memo(function Encounter() {
 
         {/* name card */}
         <div className="arena-namecard absolute left-7 top-6 max-w-[62%] pointer-events-none">
-          <div className="t-label">{zoneName} · {tierName}</div>
+          <div className="t-label">{zoneName} · {tierName} · <span className="hour-mark">{hour}</span></div>
           <div className={`t-display leading-none mt-2 ${isBoss ? 'text-[44px] bossname' : 'text-[30px] arena-name'}`} style={{ textShadow: '0 2px 0 var(--void), 0 0 24px var(--void)' }}>{isBoss ? bossName : name || '—'}</div>
           {isBoss && bossTitle && <div className="t-display text-[17px] mt-2" style={{ color: 'var(--bone)', letterSpacing: '0.2em' }}>{bossTitle}</div>}
           {!isBoss && lore && <div className="arena-lore t-lore text-[14px] mt-2 max-w-[360px] leading-snug" style={{ textShadow: '0 1px 2px var(--void)' }}>{lore}</div>}

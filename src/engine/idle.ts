@@ -4,6 +4,7 @@
  */
 import { D, ZERO, Decimal, safe } from './num';
 import { BALANCE } from '@/content/balance';
+import { blackShare, advanceToll } from './toll';
 import type { GameState, OfflineSummary } from './types';
 import type { Mods } from './mods';
 import { computeMods } from './mods';
@@ -51,7 +52,7 @@ export function applyOffline(state: GameState, elapsedSeconds: number, mods: Mod
   const secs = Math.min(elapsedSeconds, cap);
   const rate = idleRate(state, mods);
   const mult = mods.offlineRate;
-  const marrow = safe(rate.marrow.mul(secs).mul(mult).floor());
+  const marrow0 = safe(rate.marrow.mul(secs).mul(mult).floor());
   const kills = D(rate.kills * secs * mult).floor();
   const materials: Record<string, number> = {};
   for (const [id, per] of Object.entries(rate.materials)) {
@@ -59,6 +60,12 @@ export function applyOffline(state: GameState, elapsedSeconds: number, mods: Mod
     if (n > 0) materials[id] = n;
   }
   const xp = safe(rate.xp.mul(secs).mul(mult).floor());
+  // the Toll ran while you were away; the Black Hour's share of it pays as it would have
+  const share = blackShare(state, secs);
+  const blackMult = 1 + share * BALANCE.toll.offlineBlackBonus;
+  const marrow = safe(marrow0.mul(blackMult).floor());
+  for (const id of Object.keys(materials)) materials[id] = Math.floor(materials[id] * blackMult);
+  advanceToll(state, elapsedSeconds);
   state.marrow = state.marrow.add(marrow);
   state.stats.marrowEarned = state.stats.marrowEarned.add(marrow);
   state.stats.cycleMarrow = state.stats.cycleMarrow.add(marrow);
@@ -74,7 +81,7 @@ export function applyOffline(state: GameState, elapsedSeconds: number, mods: Mod
   state.player.buffs = [];
   state.encounter.enemy = null;
   state.encounter.respawnIn = 0.8;
-  const summary: OfflineSummary = { seconds: elapsedSeconds, cappedSeconds: secs, marrow, materials, kills, shadeXp: xp, zone: rate.zone, tier: rate.tier, wiped: rate.wiped };
+  const summary: OfflineSummary = { seconds: elapsedSeconds, cappedSeconds: secs, marrow, materials, kills, shadeXp: xp, zone: rate.zone, tier: rate.tier, wiped: rate.wiped, blackShare: share };
   state.offline = summary;
   return summary;
 }

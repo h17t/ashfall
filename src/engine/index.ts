@@ -20,3 +20,5 @@ export * from './descent';
 export * from './orders';
 export * from './study';
 export * from './forge';
+export * from './afflictions';
+export * from './toll';

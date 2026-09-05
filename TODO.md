@@ -11,7 +11,7 @@ Kept accurate enough that a fresh session can resume mid-milestone. Update befor
   - [x] M5 Descent Runs: the Stair (engine module, 27 boons, offer sheet, strip, haul sheet, Stair page), save v3 + v2 fixture test, sim strategies with a control and a reckless, BALANCE.md rev 4
   - [x] M6 Standing Orders: rule engine (15 conditions, 13 actions, earned slots and kinds), chip-and-sheet editor in Combat, save v4 + v3 fixture, authored sim strategy, BALANCE.md rev 5
   - [x] M7 The Study and Reforging: kill ranks with reveals and permanent bonuses, 15 affixes in five sets with Study gates, reforge and lock, sets across the Cortege, save v5 + v4 fixture, forge sim extension, BALANCE.md rev 6
-  - [ ] M8 Afflictions and the Toll
+  - [x] M8 Afflictions and the Toll: eight stacking curses with a readout, a 40-minute world clock with four hours, creed hours, Black Hour spawns and pay, generous absence credit, save v6 + v5 fixture, bold sim strategy, BALANCE.md rev 7
   - [ ] M9 stretch: Dispatch, Holdfasts, Creed War, Weapon Mastery
   - [ ] M10 content and art for everything new
   - [ ] M11 test and polish: device matrix, audits, onboarding, accessibility, QA.md, balance

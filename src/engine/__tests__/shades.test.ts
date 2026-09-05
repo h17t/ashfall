@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { newGame, advance, D, computeMods, evaluateHunt, resolveHunt, applyOffline, shadeLevelCost, cortegeSlots, canRecruit, shadeNumbers } from '..';
+import { newGame, advance, D, computeMods, evaluateHunt, resolveHunt, applyOffline, shadeLevelCost, cortegeSlots, canRecruit, shadeNumbers, blackShare } from '..';
 
 function withAldric(seed = 1) {
   const s = newGame(seed);
@@ -124,8 +124,9 @@ describe('hunting', () => {
     const s = withAldric();
     const mods = computeMods(s);
     const r = resolveHunt(s, mods, s.cortege.shades);
+    const black = blackShare(s, 3600); // the Toll turns while away; the Black Hour's share pays
     const sum = applyOffline(s, 3600)!;
-    expect(sum.marrow.toNumber()).toBeCloseTo(Math.floor(r.marrow.toNumber() * 3600 * mods.offlineRate), -1);
+    expect(sum.marrow.toNumber()).toBeCloseTo(Math.floor(Math.floor(r.marrow.toNumber() * 3600 * mods.offlineRate) * (1 + black)), -1);
     expect(sum.marrow.gt(0)).toBe(true);
     expect(s.cortege.shades[0].xp.gt(0)).toBe(true);
   });

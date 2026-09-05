@@ -9,6 +9,8 @@ import type { GameState } from './types';
 import { runFx, runDamageMult } from './descent';
 import { studyBonus } from './study';
 import { playerAffixFx } from './forge';
+import { applyAfflictions } from './afflictions';
+import { applyToll, creedHourFavoured } from './toll';
 import { BOONS } from '@/content';
 
 export interface Mods {
@@ -41,6 +43,14 @@ export interface Mods {
   startSouls: number;
   keepWeapons: boolean;
   ngScaling: number; // multiplier on Waking enemy scaling exponent (1 = normal)
+  /** afflictions and the Toll */
+  enemyComposure: number;
+  enemyHp: number;
+  enemyDmg: number;
+  reflexesSleep: boolean;
+  reinforceScale: number;
+  marrowLeak: number;
+  stairPay: number;
   unlocks: Set<string>;
   /** human-readable breakdown for the UI */
   sources: { name: string; effect: string }[];
@@ -53,7 +63,7 @@ export function baseMods(): Mods {
     draughtCount: 0, draughtPotency: 1, critBonus: 0, reprisalMult: 1, hpMult: 1, fpMult: 1, stamRegen: 1,
     statusBuild: 1, statusDmg: 1, materialMult: 1, humanityMult: 1, remainsKeep: 1, noBloodstain: false,
     dodgeCd: 1, phantomSlots: 0, recitationSlots: 0, startWeaponLevel: 0, startLevels: 0, startSouls: 0,
-    keepWeapons: false, ngScaling: 1, unlocks: new Set(), sources: [],
+    keepWeapons: false, ngScaling: 1, enemyComposure: 1, enemyHp: 1, enemyDmg: 1, reflexesSleep: false, reinforceScale: 1, marrowLeak: 0, stairPay: 1, unlocks: new Set(), sources: [],
   };
 }
 
@@ -84,6 +94,7 @@ export function computeMods(state: GameState): Mods {
   const cov = state.creed.current ? CREEDS[state.creed.current] : null;
   if (cov) {
     applyEffects(m, cov.passive, 1, cov.name, add);
+    if (creedHourFavoured(state, state.creed.current)) applyEffects(m, favourable(cov.passive), 1, `${cov.name}, in its hour`, add);
     if (cov.noBloodstain) m.noBloodstain = true;
     for (const up of cov.upgrades) {
       const rank = state.creed.upgrades[up.id] ?? 0;
@@ -105,8 +116,12 @@ export function computeMods(state: GameState): Mods {
   // ---- the forge: the affixes on the weapon in your hand, and the sets across the Cortege ----
   const fx = playerAffixFx(state);
   m.dmg *= fx.dmg; m.marrow *= fx.marrow; m.critBonus += fx.crit; m.strain *= fx.strain; m.taken *= fx.taken; m.materialMult *= fx.materials;
-  m.reprisalMult *= fx.reprisal; m.stamRegen *= fx.stamRegen; m.hpMult *= fx.hp; m.statusBuild *= fx.statusBuild; m.statusDmg *= fx.statusDmg;
+  m.reprisalMult *= fx.reprisal; m.stamRegen *= fx.stamRegen; m.hpMult *= fx.hp; m.statusBuild *= fx.statusBuild; m.statusDmg *= fx.statusDmg; m.stairPay *= fx.stairPay;
   for (const src of fx.sources) add(src.name, src.effect);
+  // ---- afflictions: the dial the player set ----
+  applyAfflictions(state, m, add);
+  // ---- the Toll: the hour of the world ----
+  applyToll(state, m, add);
   // ---- the Stair: boons last the run ----
   const run = state.descent?.run;
   if (run) {
@@ -120,6 +135,17 @@ export function computeMods(state: GameState): Mods {
     if (fx.momentum > 0 && run.runKills > 0) add('Grave-Momentum', `damage ×${Math.pow(1 + fx.momentum, run.runKills).toFixed(2)} from ${run.runKills} kills`);
   }
   return m;
+}
+
+/** The half of a passive that helps: a creed's hour redoubles its gifts, never its costs. */
+function favourable(effect: Record<string, number | undefined>): Record<string, number | undefined> {
+  const out: Record<string, number | undefined> = {};
+  for (const [k, v] of Object.entries(effect)) {
+    if (v === undefined) continue;
+    const good = k === 'takenMult' || k === 'dodgeCd' ? v < 1 : k.startsWith('unlock') || k === 'keepWeapons' ? false : v > 1;
+    if (good) out[k] = v;
+  }
+  return out;
 }
 
 function applyEffects(m: Mods, effect: Record<string, number | undefined>, rank: number, name: string, add: (n: string, e: string) => void) {

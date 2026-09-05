@@ -393,3 +393,15 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .boon-chip.is-shut { opacity: 0.4; border-style: dashed; }
 @keyframes forge-flash { from { filter: brightness(2.2); } to { filter: brightness(1); } }
 .forge-flash { animation: forge-flash 0.7s ease-out; }
+
+/* ---- the Toll ---- */
+.hour-mark { color: var(--bone); }
+html.toll-black .hour-mark { color: var(--wisp); }
+html.toll-black .arena-stage { box-shadow: inset 0 0 120px 30px color-mix(in srgb, var(--ink) 55%, transparent); }
+html.toll-black .arena-stage::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 40%, transparent 45%, color-mix(in srgb, var(--wisp) 20%, color-mix(in srgb, var(--ink) 50%, transparent)) 100%); mix-blend-mode: multiply; }
+html.toll-dusk .arena-stage::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, color-mix(in srgb, var(--ember) 18%, transparent), transparent 60%); }
+.hour-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 48px; border: 1px solid; opacity: 0.6; }
+.hour-tile.is-now { opacity: 1; background: color-mix(in srgb, var(--ink) 60%, transparent); }
+.affl-row { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 6px 10px; border: 1px solid color-mix(in srgb, var(--ash) 70%, transparent); }
+.affl-row.is-on { border-color: var(--blood); background: color-mix(in srgb, var(--blood) 12%, var(--ink)); }
+.toll-bullet { display: inline-block; width: 7px; height: 7px; transform: rotate(45deg); flex: none; position: relative; top: -1px; }
