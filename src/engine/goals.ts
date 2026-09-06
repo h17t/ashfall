@@ -28,6 +28,7 @@ export function nextGoal(state: GameState): Goal {
     return { text: `Your marrow lies at ${getZone(r.zone).tiers[r.targetTier]?.name ?? 'the road ahead'}. One kill a tier brings it back.`, where: 'combat' };
   }
   if (state.stats.kills.lt(1)) return { text: 'Strike the foe. What it drops is marrow, and marrow is everything.', where: 'combat' };
+  if (p.hp < p.hpMax * 0.35 && p.draughts <= 0) return { text: 'Low and dry. Rest at the Lantern: full HP and flasks, and the road keeps its place.', where: 'lantern', tab: 'rest' };
   const zone = getZone(enc.zone);
   const zp = state.zones[enc.zone];
   const cost = levelCost(p.level);

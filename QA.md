@@ -83,4 +83,5 @@ each line or write what was wrong.
 - [ ] The goal line changes as you play, and following it alone gets you to the first lord.
 - [ ] Hold Strike for three seconds: it keeps swinging; let go: it stops. Clear a tier: the push-on button appears in the arena and the next tier begins without a menu.
 - [ ] Tap the goal line when it names the Lantern: the Lantern opens on Rest.
+- [ ] Low on HP with no flask: the goal line says so; tap it, tap Rest: full again, same tier.
 

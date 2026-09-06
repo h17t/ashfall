@@ -30,6 +30,7 @@ export const LanternPanel = memo(function LanternPanel() {
       <div className="grid grid-cols-1 gap-1">
         {STAT_KEYS.map((k) => <StatRow key={k} stat={k} canAfford={canAfford} onLevel={() => dispatch({ type: 'levelUp', stat: k })} />)}
       </div>
+      <RestRow />
       <div className="border-t border-ash/50 pt-2 flex flex-col gap-1">
         <div className="flex items-center justify-between text-[14px]">
           <Tooltip tip={<span>Each Tallowdraught Shard adds one flask. Shards drop from bosses and hidden places. Current: {draughts} flasks healing {Math.round(potency * 100)}% each.</span>}>
@@ -104,6 +105,29 @@ function StatTip({ stat, pts, nextCap, marginal, preview }: { stat: StatKey; pts
       <div className="text-bone">{STAT_DESC[stat]}</div>
       <div className="text-parchment">Next point: {preview}</div>
       <div className="text-bone/70">Scaling value +{marginal.toFixed(4)} per point in this band. {nextCap ? `Soft cap at ${nextCap}: returns drop after it.` : 'Past every soft cap: small returns.'} Caps at {BALANCE.level.softCaps.join(' / ')}.</div>
+    </div>
+  );
+}
+
+/** Resting: full HP, stamina, FP and flasks; the road keeps its place, a boss arena is left, the streak ends. No cost but the streak, so it is always here. */
+function RestRow() {
+  const dispatch = useGame((g) => g.dispatch);
+  const hp = useSel((s) => Math.round(s.player.hp));
+  const hpMax = useSel((s) => s.player.hpMax);
+  const draughts = useSel((s) => s.player.draughts);
+  const draughtsMax = useSel((s) => s.player.draughtsMax);
+  const dead = useSel((s) => s.deathScreen > 0);
+  const onStair = useSel((s) => !!s.descent.run);
+  const inArena = useSel((s) => s.encounter.tier < 0);
+  const streak = useSel((s) => s.encounter.streak);
+  const worn = hp < hpMax || draughts < draughtsMax;
+  return (
+    <div className="flex items-center justify-between gap-3 text-[14px] border-t border-ash/50 pt-2">
+      <div className="min-w-0">
+        <div className="text-parchment">Rest at the Lantern</div>
+        <div className="t-lore text-[13px]" style={{ color: 'var(--bone)' }}>{onStair ? 'Not on the Stair. Climb out first.' : inArena ? 'Leaves the arena; the lord waits at the road\'s end.' : streak > 0 ? `Full HP and flasks. Your streak of ${streak} ends.` : 'Full HP and flasks. The road keeps its place.'}</div>
+      </div>
+      <button className={`btn text-[13px] shrink-0 ${worn && !onStair ? 'btn-ember' : ''}`} disabled={dead || onStair} onClick={() => dispatch({ type: 'retreat' })}>Rest</button>
     </div>
   );
 }

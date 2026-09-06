@@ -123,6 +123,9 @@ describe('what to do now', () => {
     expect(nextGoal(s).text).toMatch(/The lord/);
     s.zones.tollroad.bossKills = 1; s.stats.cycleBosses = 1; s.stats.cycleMarrow = D(1e6); s.encounter.tier = 3;
     expect(nextGoal(s)).toMatchObject({ where: 'lantern', tab: 'snuff' });
+    s.player.hp = s.player.hpMax * 0.2; s.player.draughts = 0;
+    expect(nextGoal(s)).toMatchObject({ where: 'lantern', tab: 'rest' });
+    expect(nextGoal(s).text).toMatch(/Rest at the Lantern/);
     s.deathScreen = 2;
     expect(nextGoal(s).text).toMatch(/Unmade/);
   });
