@@ -47,8 +47,8 @@ for (const d of DEVICES) {
   // 3. a sheet opens and closes (settings quality picker exists), then back to combat
   const settings = page.getByRole('tab', { name: 'Settings' }).first();
   if ((await settings.count()) === 0) fail.push(`${d.name}: no Settings tab`); else { await settings.scrollIntoViewIfNeeded(); await settings.click(); }
-  await page.waitForTimeout(250);
-  if ((await page.getByRole('radiogroup', { name: 'Quality' }).count()) === 0) fail.push(`${d.name}: quality control missing`);
+  // the settings panel is a chunk of its own: give a loaded runner a moment to fetch it
+  if (!(await page.getByRole('radiogroup', { name: 'Quality' }).waitFor({ state: 'visible', timeout: 8000 }).then(() => true).catch(() => false))) fail.push(`${d.name}: quality control missing`);
   await page.getByRole('button', { name: /^Combat$/ }).first().click().catch(() => {});
   await page.waitForTimeout(400);
   const layout = await page.evaluate(() => document.querySelector('.shell')?.className.match(/shell-(portrait|landscape|wide)/)?.[1]);

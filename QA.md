@@ -81,4 +81,6 @@ each line or write what was wrong.
 - [ ] Open the Lantern mid wind-up: the red bar stops. Come back: it resumes where it was.
 - [ ] Tap Dodge the moment it lights: the blow misses every time. Tap it early on purpose: "too early", and a second tap inside the window still works.
 - [ ] The goal line changes as you play, and following it alone gets you to the first lord.
+- [ ] Hold Strike for three seconds: it keeps swinging; let go: it stops. Clear a tier: the push-on button appears in the arena and the next tier begins without a menu.
+- [ ] Tap the goal line when it names the Lantern: the Lantern opens on Rest.
 

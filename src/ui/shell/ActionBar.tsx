@@ -1,8 +1,10 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useRef } from 'react';
+import type React from 'react';
 import { useGame, useSel } from '../store';
 import { masteryRank, artFor, canArt } from '@/engine';
 import { getSpell, BALANCE } from '@/content';
 import { Plate } from '@/render/Plate';
+import { PushOn } from '../components/PushOn';
 
 /**
  * The thumb zone. Everything the hand does often lives here: Strike (the big one), Dodge,
@@ -26,6 +28,10 @@ export const ActionBar = memo(function ActionBar() {
   const fp = useSel((s) => Math.floor(s.player.fp));
   const art = useSel((s) => { const inst = s.player.weapons[s.player.weapon]; if (masteryRank(inst) < 1) return ''; const a = artFor(s); return JSON.stringify({ name: a.name, id: a.id, cd: Math.ceil(s.player.artCd ?? 0), ready: canArt(s) === null, on: !!s.player.artBuff }); });
   const strike = useCallback(() => dispatch({ type: 'click' }), [dispatch]);
+  // hold to keep striking, a little slower than a quick thumb: tapping still pays more
+  const holdTimer = useRef(0);
+  const holdStart = useCallback((e: React.PointerEvent<HTMLButtonElement>) => { try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* not every pointer can be captured */ } strike(); window.clearInterval(holdTimer.current); holdTimer.current = window.setInterval(strike, 300); }, [strike]);
+  const holdEnd = useCallback(() => { window.clearInterval(holdTimer.current); holdTimer.current = 0; }, []);
   const ids = recited.split(',');
   const cdList = cds.split(',').map(Number);
   return (
@@ -54,12 +60,13 @@ export const ActionBar = memo(function ActionBar() {
           })}
         </div>
       )}
+      <PushOn />
       <div className="action-main">
         <button className="act act-draught" disabled={draughts <= 0 || dead || hp >= hpMax} onClick={() => dispatch({ type: 'draughts' })} aria-label={`Tallowdraught, ${draughts} of ${draughtsMax}`}>
           <span className="act-name">Draught</span>
           <span className="act-sub t-num">{draughts}/{draughtsMax}</span>
         </button>
-        <button className={`act act-strike ${broken ? 'is-reprisal' : ''}`} disabled={dead} onPointerDown={(e) => { e.preventDefault(); strike(); }} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); strike(); } }} aria-label={broken ? 'Reprisal' : 'Strike'}>
+        <button className={`act act-strike ${broken ? 'is-reprisal' : ''}`} disabled={dead} onPointerDown={(e) => { e.preventDefault(); holdStart(e); }} onPointerUp={holdEnd} onPointerCancel={holdEnd} onLostPointerCapture={holdEnd} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); strike(); } }} aria-label={broken ? 'Reprisal' : 'Strike'}>
           <span className="act-name">{broken ? 'Reprisal' : 'Strike'}</span>
         </button>
         <button className={`act act-dodge ${telegraph ? 'is-urgent' : ''} ${iframes ? 'is-rolling' : ''}`} disabled={dodgeCd > 0 || dead} onPointerDown={(e) => { e.preventDefault(); dispatch({ type: 'dodge' }); }} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dispatch({ type: 'dodge' }); } }} aria-label={dodgeCd > 0 ? `Dodge, ${dodgeCd.toFixed(1)} seconds` : 'Dodge'}>

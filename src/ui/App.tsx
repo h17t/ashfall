@@ -8,6 +8,7 @@ import { startPwa } from './pwa';
 import { InstallSheet } from './components/InstallSheet';
 import { IntroSheet } from './components/IntroSheet';
 import { useSheetCount } from './shell/Sheet';
+import { useShell } from './shell/shellStore';
 import { DescentStrip } from './components/DescentStrip';
 import { RaidStrip } from './components/RaidStrip';
 import { BoonSheet } from './components/BoonSheet';
@@ -59,7 +60,6 @@ const TollPanel = loadable(() => import('./components/TollPanel').then((m) => m.
 const OrdersPanel = loadable(() => import('./components/OrdersPanel').then((m) => m.OrdersPanel));
 
 
-const PILLAR_KEY = 'mournwake.pillar';
 
 export default function App() {
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -68,8 +68,8 @@ export default function App() {
   const colorblind = useSettings((s) => s.colorblind);
   useEffect(() => { const cls = document.documentElement.classList; cls.toggle('plain-type', plainType); cls.toggle('cb-safe', colorblind); }, [plainType, colorblind]);
   const layout = useLayout();
-  const [pillar, setPillarState] = useState<Pillar>(() => { try { return (localStorage.getItem(PILLAR_KEY) as Pillar) || 'combat'; } catch { return 'combat'; } });
-  const setPillar = (p: Pillar) => { setPillarState(p); try { localStorage.setItem(PILLAR_KEY, p); } catch { /* ignore */ } };
+  const pillar = useShell((s) => s.pillar);
+  const setPillar = useShell((s) => s.setPillar);
   useEffect(() => {
     const report = loadFromStorage();
     if (report.error) setLoadError(report.error);

@@ -9,10 +9,17 @@ export interface SubTab { id: string; label: string; badge?: boolean; node: Reac
 
 const tabMemory = new Map<string, string>();
 const scrollMemory = new Map<string, number>();
+const tabListeners = new Map<string, Set<(tab: string) => void>>();
+/** Open a section's sub-tab from anywhere: the goal line, a strip, a hint. Works whether or not the section is mounted. */
+export function openSection(id: string, tab: string) {
+  tabMemory.set(id, tab);
+  tabListeners.get(id)?.forEach((l) => l(tab));
+}
 
 export function Section({ id, title, tabs, children }: { id: string; title?: string; tabs?: SubTab[]; children?: ReactNode }) {
   const [tab, setTab] = useState(() => tabMemory.get(id) ?? tabs?.[0]?.id ?? '');
   useEffect(() => { tabMemory.set(id, tab); }, [id, tab]);
+  useEffect(() => { const set = tabListeners.get(id) ?? new Set(); tabListeners.set(id, set); set.add(setTab); return () => { set.delete(setTab); }; }, [id]);
   const active = tabs?.find((t) => t.id === tab) ?? tabs?.[0];
   const key = `${id}:${active?.id ?? ''}`;
   return (

@@ -22,6 +22,12 @@ export function FloatingNumbers() {
         if (e.reason !== 'cooldown') add.push({ id: nextId++, text: e.reason === 'early' ? 'too early' : e.reason === 'stamina' ? 'winded' : 'nothing to dodge', x: 40 + Math.random() * 20, y: 66, cls: 'text-bone text-[15px]' });
       } else if (e.type === 'dodgeSet') {
         add.push({ id: nextId++, text: e.perfect ? 'PERFECT' : 'sidestep', x: 40 + Math.random() * 20, y: 68, cls: e.perfect ? 'text-ember-hot text-[22px]' : 'text-parchment text-[16px]' });
+      } else if (e.type === 'kill') {
+        add.push({ id: nextId++, text: `+${fmt(e.marrow)} marrow`, x: 30 + Math.random() * 20, y: 22, cls: e.isBoss ? 'text-ember-hot text-[26px]' : 'text-ember-hot text-[18px]' });
+      } else if (e.type === 'tierCleared') {
+        add.push({ id: nextId++, text: 'TIER CLEARED', x: 32, y: 14, cls: 'text-parchment text-[24px]' });
+      } else if (e.type === 'levelUp') {
+        add.push({ id: nextId++, text: `LEVEL ${e.level}`, x: 36, y: 18, cls: 'text-ember-hot text-[26px]' });
       } else if (e.type === 'heal') {
         add.push({ id: nextId++, text: `+${e.amount}`, x: 45, y: 72, cls: 'text-verdigris text-[24px]' });
       } else if (e.type === 'exhausted') {

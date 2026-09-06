@@ -14,13 +14,13 @@ const TOUCH = typeof window !== 'undefined' && ('ontouchstart' in window || navi
 interface Hint { id: string; text: string; until?: (e: GameEvent[]) => boolean; }
 
 const HINTS: Record<string, Hint> = {
-  click: { id: 'click', text: TOUCH ? 'Tap Strike, the big button under the fight. Hold nothing; tap again.' : 'Strike the enemy: click it (or press F).', until: (ev) => ev.some((e) => e.type === 'hit' && e.source === 'player') },
+  click: { id: 'click', text: TOUCH ? 'Tap Strike, the big button under the fight. Hold it to keep swinging; quick taps hit more often.' : 'Strike the enemy: click it (or press F).', until: (ev) => ev.some((e) => e.type === 'hit' && e.source === 'player') },
   telegraph: { id: 'telegraph', text: TOUCH ? 'The red bar is a wind-up. When Dodge lights up, tap it: the blow misses. The very last instant is a perfect dodge and buffs your damage.' : 'The red bar is a wind-up. When Dodge lights up, press Space: the blow misses. The very last instant is a perfect dodge and buffs your damage.', until: (ev) => ev.some((e) => e.type === 'enemyAttack' && e.dodged) },
   strain: { id: 'strain', text: 'The pale bar under its health is its composure. Fill it and the Reprisal window opens: strike then for ×3 or more.', until: (ev) => ev.some((e) => e.type === 'hit' && e.reprisal) },
   stamina: { id: 'stamina', text: 'Out of stamina, your hits land weak and build no strain. Find a rhythm; the bar refills fast.' },
   levelUp: { id: 'levelUp', text: TOUCH ? 'You can afford a level. Open Lantern in the bar below: each stat shows what its next point buys. The fight waits while you are there.' : 'You can afford a level. Open the Lantern tab: each stat shows exactly what its next point buys.', until: (ev) => ev.some((e) => e.type === 'levelUp') },
   death: { id: 'death', text: 'Your marrow fell where you are unmade. Fight back to that tier, one kill per tier, to reclaim them. Die first and they are gone.', until: (ev) => ev.some((e) => e.type === 'remainsRecovered' || e.type === 'remainsLost') },
-  cleared: { id: 'cleared', text: 'Tier cleared. Lantern, then Road, lets you push on or stay and farm. Every tier past this one is a choice.' },
+  cleared: { id: 'cleared', text: 'Tier cleared. Push on from the button under the fight, or stay and farm; the Road (Lantern) goes back as well as forward. Deeper pays more and hits harder.' },
   boss: { id: 'boss', text: 'The arena is open. Bosses have phases; each one punishes a lazy habit. Read the phase text under its name.' },
   shade: { id: 'shade', text: 'A shade will answer for 400 marrow (Cortege, in the bar below). Beside you it fights your fight; hunting, it earns while you are away.' },
   offline: { id: 'offline', text: 'Everyone hunts while you are gone, for up to 12 hours. Offline never costs you anything.' },

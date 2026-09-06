@@ -464,4 +464,14 @@ html.cb-safe .hp-poisoned, html.cb-safe .bar-poison { background: var(--parchmen
 .intro-steps { list-style: decimal; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.4; color: var(--ink); }
 .intro-steps b { color: var(--blood); font-weight: 600; }
 .intro-note { font-size: 14px; color: var(--stone); font-style: italic; }
+.goal-go { text-align: left; color: var(--parchment); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--ember) 55%, transparent); text-underline-offset: 3px; min-height: 0; padding: 0; }
+.shell-portrait .goal-go { min-height: 0 !important; min-width: 0 !important; }
+.push-on { display: flex; gap: 8px; }
+.push-on .btn { flex: 1 1 auto; min-height: 48px; }
+
+/* upright, in Combat: Strike and Dodge stay in the thumb zone while the column scrolls under them */
+/* sticky offsets are measured inside the scroller's padding, so the room for the nav and the bar lives on the column, not the scroller */
+.shell-portrait .shell-main.is-combat .action-bar { position: sticky; bottom: calc(var(--nav-h) + var(--safe-bottom)); z-index: 5; background: linear-gradient(180deg, transparent 0%, var(--void) 30%); }
+.shell-portrait .shell-main.is-combat { padding-bottom: 0; }
+.shell-portrait .shell-main.is-combat > * { padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 12px); }
 
