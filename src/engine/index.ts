@@ -26,3 +26,4 @@ export * from './dispatch';
 export * from './holdfasts';
 export * from './war';
 export * from './mastery';
+export * from './goals';

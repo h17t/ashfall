@@ -74,3 +74,11 @@ each line or write what was wrong.
 - [ ] Turn it back: the place you were in is kept.
 - [ ] Add to Home Screen, open from the icon, go offline: the first region and its foes play.
 - [ ] Tap a stat row's name to read its lore, then tap × and tap the shadow beside the sheet: it closes both ways and does not come back.
+
+## The first minute, again
+
+- [ ] The opening reads in under twenty seconds and every word on it is true of the screen behind it.
+- [ ] Open the Lantern mid wind-up: the red bar stops. Come back: it resumes where it was.
+- [ ] Tap Dodge the moment it lights: the blow misses every time. Tap it early on purpose: "too early", and a second tap inside the window still works.
+- [ ] The goal line changes as you play, and following it alone gets you to the first lord.
+

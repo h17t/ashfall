@@ -21,6 +21,7 @@ const hurry = (page) => page.evaluate(() => { const g = __ashfall.getState(); co
   const browser = await chromium.launch({ executablePath: EXE });
   const page = await (await browser.newContext(phone)).newPage();
   await page.goto(url, { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Begin' }).click({ timeout: 4000 }).catch(() => {});
   await page.waitForTimeout(1500);
   const before = await savedAt(page);
   await page.evaluate(() => {
@@ -45,6 +46,7 @@ const hurry = (page) => page.evaluate(() => { const g = __ashfall.getState(); co
   const ctx = await browser.newContext(phone);
   let page = await ctx.newPage();
   await page.goto(url, { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Begin' }).click({ timeout: 4000 }).catch(() => {});
   await hurry(page);
   await page.evaluate(() => { const g = __ashfall.getState(); setInterval(() => g.dispatch({ type: 'click' }), 120); });
   await page.waitForTimeout(AUTOSAVE_MS + 2500);
@@ -63,6 +65,7 @@ const hurry = (page) => page.evaluate(() => { const g = __ashfall.getState(); co
   await page.close().catch(() => {});
   page = await ctx.newPage();
   await page.goto(url, { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Begin' }).click({ timeout: 4000 }).catch(() => {});
   const at = await savedAt(page);
   const k2 = await kills(page);
   console.log(`B abrupt kill: ${k} kills when backgrounded, ${k2} after the renderer was killed and the game reopened; the surviving save was written ${at - tHide} ms after backgrounding`);
@@ -78,6 +81,7 @@ const hurry = (page) => page.evaluate(() => { const g = __ashfall.getState(); co
   const page = await (await browser.newContext(phone)).newPage();
   await page.clock.install({ time: Date.now() });
   await page.goto(url, { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Begin' }).click({ timeout: 4000 }).catch(() => {});
   await page.clock.runFor(2500);
   await hurry(page);
   await page.clock.fastForward('02:00:00');

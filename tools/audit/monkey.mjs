@@ -19,6 +19,7 @@ for (const d of [{ name: 'upright', w: 390, h: 844 }, { name: 'sideways', w: 844
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.locator('.arena-stage').waitFor({ state: 'visible', timeout: 15000 });
+  await page.getByRole('button', { name: 'Begin' }).click({ timeout: 4000 }).catch(() => {});
   // a mid-game save: everything unlocked, enough marrow to buy, two shades, a lord down
   await page.evaluate(() => { const g = __ashfall.getState(); const s = g.state; const D = s.marrow.constructor; s.marrow = new D(5e6); s.player.level = 25; s.stats.bossKills = 1; s.stats.cycleBosses = 1; s.stats.cycleMarrow = new D(1e6); s.materials.reliquaryBone = 2; s.materials.pitchCoal = 3; s.prestige.wakings = 1; g.replace(s); g.stepBy(1); for (const id of ['aldric', 'ilse']) g.dispatch({ type: 'recruit', shade: id }); });
   const tapped = new Map();

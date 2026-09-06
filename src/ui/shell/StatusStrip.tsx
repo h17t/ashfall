@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useSel } from '../store';
 import { useSettings } from '../settings';
-import { fmt, D } from '@/engine';
+import { fmt, D, nextGoal } from '@/engine';
 import { Gauge } from '@/render/Gauge';
 
 /** The top of the phone: Marrow, level, HP and stamina in one glance. Information lives up here; hands live below. */
@@ -15,6 +15,8 @@ export const StatusStrip = memo(function StatusStrip() {
   const poisoned = useSel((s) => s.player.poisoned > 0);
   const colorblind = useSettings((s) => s.colorblind);
   const remains = useSel((s) => s.remains?.marrow.toString() ?? null);
+  const goal = useSel((s) => nextGoal(s).text);
+  const held = useSel((s) => !!s.encounter.held);
   return (
     <div className="status-strip" aria-label="Status">
       <div className="flex items-baseline justify-between gap-3">
@@ -28,6 +30,11 @@ export const StatusStrip = memo(function StatusStrip() {
       <div className="grid grid-cols-[3fr_2fr] gap-2 mt-1.5">
         <Gauge value={hp} max={hpMax} tone={poisoned ? (colorblind ? 'wisp' : 'verdigris') : 'blood'} height={10} text={`${hp} / ${hpMax}`} label="HP" />
         <Gauge value={stam} max={stamMax} tone={stam < 10 ? 'gold' : 'stamina'} height={10} cut={1} text={`${stam}`} label="Stamina" />
+      </div>
+      <div className="goal-line" role="status" aria-live="polite">
+        <span className="goal-mark" aria-hidden>¶</span>
+        <span className="goal-text">{goal}</span>
+        {held && <span className="goal-held t-label">the fight waits</span>}
       </div>
     </div>
   );

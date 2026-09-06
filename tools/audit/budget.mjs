@@ -80,6 +80,8 @@ for (let attempt = 0; attempt < 2; attempt++) {
   await page.goto(url, { waitUntil: 'commit' });
   await page.locator('.arena-stage').waitFor({ state: 'visible', timeout: 20000 });
   tArena = Math.min(tArena, Date.now() - t0);
+  // the opening page is reading time, not load time: mark it read so the fight is not held
+  await page.evaluate(() => { __ashfall.getState().dispatch({ type: 'markSeen', what: 'intro' }); });
   // playable: a tap takes hit points off the enemy
   let landed = -1;
   for (let i = 0; i < 80; i++) {

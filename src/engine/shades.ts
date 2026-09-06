@@ -259,7 +259,7 @@ function tickPhantoms(state: GameState, mods: Mods, events: GameEvent[], dt: num
   const enemy = state.encounter.enemy;
   for (const ph of active) {
     if (ph.assignment !== 'beside') continue;
-    if (state.deathScreen > 0) continue;
+    if (state.deathScreen > 0 || state.encounter.held) continue;
     ph.actIn -= dt;
     if (ph.actIn > 0) continue;
     const n = shadeNumbers(state, mods, ph);

@@ -52,6 +52,10 @@ export const BALANCE = {
     draughtPotency: 0.4,
     dodgeCd: 1.6,
     iframes: 0.45,
+    /** a dodge pressed within this much of the blow sidesteps it outright */
+    dodgeWindow: 0.9,
+    /** the recovery after a dodge that met nothing (early, or no blow coming): short, so the next try is possible */
+    dodgeCdMiss: 0.5,
     perfectWindow: 0.22,
     perfectBuff: { dmg: 1.35, t: 4 },
     critMult: 2.0,

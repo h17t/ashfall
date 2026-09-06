@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Slab } from '@/render/materials/Slab';
 
@@ -21,8 +21,17 @@ interface Props {
   dismissable?: boolean;
 }
 
+/** How many sheets are open right now: the shell holds the fight while any is. */
+let openCount = 0;
+const countListeners = new Set<() => void>();
+const bump = (d: number) => { openCount += d; countListeners.forEach((l) => l()); };
+export function useSheetCount(): number {
+  return useSyncExternalStore((l) => { countListeners.add(l); return () => { countListeners.delete(l); }; }, () => openCount, () => 0);
+}
+
 export function Sheet({ open, onClose, title, children, material = 'parchment', label, dismissable = true }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (!open) return; bump(1); return () => bump(-1); }, [open]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState(0);
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useGame, useSel } from '../store';
 import { masteryRank, artFor, canArt } from '@/engine';
-import { getSpell } from '@/content';
+import { getSpell, BALANCE } from '@/content';
 import { Plate } from '@/render/Plate';
 
 /**
@@ -18,7 +18,8 @@ export const ActionBar = memo(function ActionBar() {
   const iframes = useSel((s) => s.player.iframes > 0);
   const dead = useSel((s) => s.deathScreen > 0);
   const broken = useSel((s) => (s.encounter.enemy?.reprisal ?? 0) > 0);
-  const telegraph = useSel((s) => (s.encounter.enemy?.windup ?? 0) > 0);
+  // the button lights inside the dodge window, the moment a press will sidestep the blow
+  const telegraph = useSel((s) => { const w = s.encounter.enemy?.windup ?? 0; return w > 0 && w <= BALANCE.player.dodgeWindow && (s.encounter.enemy?.reprisal ?? 0) <= 0; });
   const slots = useSel((s) => s.player.recitationSlots);
   const recited = useSel((s) => s.player.recited.join(','));
   const cds = useSel((s) => s.player.recited.map((id) => (id ? Math.ceil(s.player.cooldowns[id] ?? 0) : 0)).join(','));
@@ -62,7 +63,7 @@ export const ActionBar = memo(function ActionBar() {
           <span className="act-name">{broken ? 'Reprisal' : 'Strike'}</span>
         </button>
         <button className={`act act-dodge ${telegraph ? 'is-urgent' : ''} ${iframes ? 'is-rolling' : ''}`} disabled={dodgeCd > 0 || dead} onPointerDown={(e) => { e.preventDefault(); dispatch({ type: 'dodge' }); }} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dispatch({ type: 'dodge' }); } }} aria-label={dodgeCd > 0 ? `Dodge, ${dodgeCd.toFixed(1)} seconds` : 'Dodge'}>
-          <span className="act-name">Dodge</span>
+          <span className="act-name">{telegraph ? 'Dodge now' : 'Dodge'}</span>
           {dodgeCd > 0 && <span className="act-sub t-num">{dodgeCd.toFixed(1)}s</span>}
         </button>
       </div>

@@ -18,6 +18,10 @@ export function FloatingNumbers() {
       } else if (e.type === 'enemyAttack') {
         if (e.dodged) add.push({ id: nextId++, text: e.perfect ? 'PERFECT DODGE' : 'dodged', x: 40 + Math.random() * 20, y: 70, cls: e.perfect ? 'text-ember-hot text-[24px]' : 'text-bone text-[17px]' });
         else add.push({ id: nextId++, text: `-${e.dmg}`, x: 40 + Math.random() * 20, y: 75, cls: 'text-blood-bright text-[30px]' });
+      } else if (e.type === 'dodgeMiss') {
+        if (e.reason !== 'cooldown') add.push({ id: nextId++, text: e.reason === 'early' ? 'too early' : e.reason === 'stamina' ? 'winded' : 'nothing to dodge', x: 40 + Math.random() * 20, y: 66, cls: 'text-bone text-[15px]' });
+      } else if (e.type === 'dodgeSet') {
+        add.push({ id: nextId++, text: e.perfect ? 'PERFECT' : 'sidestep', x: 40 + Math.random() * 20, y: 68, cls: e.perfect ? 'text-ember-hot text-[22px]' : 'text-parchment text-[16px]' });
       } else if (e.type === 'heal') {
         add.push({ id: nextId++, text: `+${e.amount}`, x: 45, y: 72, cls: 'text-verdigris text-[24px]' });
       } else if (e.type === 'exhausted') {

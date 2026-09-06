@@ -23,6 +23,7 @@ for (const d of DEVICES) {
   const t0 = Date.now();
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.locator('.arena-stage').waitFor({ state: 'visible', timeout: 15000 });
+  await page.getByRole('button', { name: 'Begin' }).click({ timeout: 4000 }).catch(() => {});
   const loaded = Date.now() - t0;
   // 1. strike lands
   const hp0 = await page.evaluate(() => __ashfall.getState().state.encounter.enemy?.hp.toNumber() ?? null);

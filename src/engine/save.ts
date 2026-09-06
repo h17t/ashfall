@@ -93,6 +93,7 @@ export function normalize(raw: any): GameState {
   merged.version = SAVE_VERSION;
   // sanity on decimals
   for (const k of ['marrow'] as const) if (!isFiniteDec(merged[k])) merged[k] = new Decimal(0);
+  if (merged.encounter) merged.encounter.held = false;
   return merged as GameState;
 }
 

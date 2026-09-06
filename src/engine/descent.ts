@@ -317,7 +317,7 @@ registerActionHandler((state, action, events) => {
 registerTickHook((state, mods, events, dt) => {
   const run = state.descent.run;
   if (!run) return;
-  if (state.deathScreen > 0) return;
+  if (state.deathScreen > 0 || state.encounter.held) return;
   run.t += dt;
   if (!run.offer && state.encounter.enemy) run.floorT += dt;
   if (run.oilT > 0) run.oilT = Math.max(0, run.oilT - dt);

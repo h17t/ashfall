@@ -6,6 +6,8 @@ import { AwayReport } from './components/AwayReport';
 import { startHaptics } from './haptics';
 import { startPwa } from './pwa';
 import { InstallSheet } from './components/InstallSheet';
+import { IntroSheet } from './components/IntroSheet';
+import { useSheetCount } from './shell/Sheet';
 import { DescentStrip } from './components/DescentStrip';
 import { RaidStrip } from './components/RaidStrip';
 import { BoonSheet } from './components/BoonSheet';
@@ -86,6 +88,11 @@ export default function App() {
   }, []);
   useHotkeys();
   const mainRef = useRef<HTMLDivElement>(null);
+  // the fight waits while the player is looking elsewhere: a menu on a phone held upright, or any sheet
+  const sheets = useSheetCount();
+  const holdFight = useGame((g) => g.holdFight);
+  const held = (layout === 'portrait' && pillar !== 'combat') || sheets > 0;
+  useEffect(() => { holdFight(held); }, [held, holdFight]);
   useSwipe(mainRef, (dir) => { const order: Pillar[] = ['combat', 'cortege', 'arsenal', 'creeds', 'lantern']; const i = order.indexOf(pillar); const n = dir === 'left' ? Math.min(order.length - 1, i + 1) : Math.max(0, i - 1); if (n !== i) setPillar(order[n]); });
 
   // badges: something waits in a pillar
@@ -145,6 +152,7 @@ export default function App() {
       <CinemaLoader />
       <AwayReport />
       <InstallSheet />
+      <IntroSheet />
       <BoonSheet />
       <HaulSheet />
       <Fx />

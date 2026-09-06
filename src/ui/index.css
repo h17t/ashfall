@@ -454,3 +454,14 @@ html.cb-safe .hp-poisoned, html.cb-safe .bar-poison { background: var(--parchmen
 
 /* the page never scrolls sideways: anything that pokes past the edge is clipped, not scrolled to */
 .shell { overflow-x: clip; }
+
+/* the goal line: what to do now, under the gauges, on every screen */
+.goal-line { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; font-size: 14px; line-height: 1.3; color: var(--parchment); }
+.goal-mark { color: var(--ember); font-family: var(--font-display); font-size: 16px; line-height: 1; }
+.goal-text { flex: 1 1 auto; min-width: 0; }
+.goal-held { flex: none; color: var(--ember-hot); border: 1px solid color-mix(in srgb, var(--ember) 60%, transparent); padding: 2px 6px; }
+.intro p { font-size: 16px; line-height: 1.4; color: var(--ink); }
+.intro-steps { list-style: decimal; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.4; color: var(--ink); }
+.intro-steps b { color: var(--blood); font-weight: 600; }
+.intro-note { font-size: 14px; color: var(--stone); font-style: italic; }
+

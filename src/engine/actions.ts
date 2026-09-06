@@ -231,6 +231,9 @@ export function applyAction(state: GameState, action: Action, events: GameEvent[
     case 'ackDeath':
       state.deathScreen = 0;
       return;
+    case 'markSeen':
+      state.flags['seen:' + action.what] = true;
+      return;
     default:
       // Later-milestone actions are wired in their modules (shades, creeds, prestige).
       return handleExtended(state, action, events, mods);

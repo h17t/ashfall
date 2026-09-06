@@ -39,6 +39,7 @@ for (const d of [{ name: 'upright', w: 390, h: 844 }, { name: 'sideways', w: 844
 
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.locator('.arena-stage').waitFor({ state: 'visible', timeout: 15000 });
+  await page.getByRole('button', { name: 'Begin' }).click({ timeout: 4000 }).catch(() => {});
   // 1. strike by hand until something dies
   for (let i = 0; i < 40; i++) { await page.locator('.arena-stage').dispatchEvent('pointerdown'); await ff(0.5); }
   await ff(20);

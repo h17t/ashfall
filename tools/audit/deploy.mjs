@@ -32,6 +32,7 @@ for (const d of [{ name: 'phone', w: 390, h: 844, mobile: true }, { name: 'deskt
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.locator('.arena-stage').waitFor({ state: 'visible', timeout: 15000 });
+  await page.getByRole('button', { name: 'Begin' }).click({ timeout: 4000 }).catch(() => {});
   // unlock everything so every panel has something to draw
   await page.evaluate(() => { const g = __ashfall.getState(); const s = g.state; const D = s.marrow.constructor; s.marrow = new D(1e6); s.player.level = 40; s.stats.deepestTier = Math.max(s.stats.deepestTier ?? 0, 3); s.flags.descentUnlocked = true; s.flags.ordersUnlocked = true; s.prestige.wakings = Math.max(s.prestige.wakings, 3); g.replace(s); });
   await page.waitForTimeout(300);

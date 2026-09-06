@@ -488,21 +488,35 @@ export function hurtPlayer(state: GameState, mods: Mods, events: GameEvent[], am
   return false;
 }
 
+/**
+ * The dodge. A press inside the last `dodgeWindow` seconds of a wind-up commits to a sidestep:
+ * the blow will miss whenever it lands. The last `perfectWindow` of that is perfect and buffs
+ * damage. A press too early, or with nothing coming, still rolls (short i-frames) but recovers
+ * quickly, and says so, so a hand that taps too soon learns the rhythm instead of losing it.
+ */
 export function playerDodge(state: GameState, mods: Mods, events: GameEvent[]) {
   const p = state.player;
-  if (p.dodgeCd > 0 || state.deathScreen > 0) return;
+  if (state.deathScreen > 0) return;
+  if (p.dodgeCd > 0) { events.push({ type: 'dodgeMiss', reason: 'cooldown' }); return; }
   const cost = 14;
-  if (p.stamina < cost * 0.5) return;
-  p.stamina = Math.max(0, p.stamina - cost);
-  p.dodgeCd = BALANCE.player.dodgeCd * mods.dodgeCd;
-  p.iframes = BALANCE.player.iframes;
+  if (p.stamina < cost * 0.5) { events.push({ type: 'dodgeMiss', reason: 'stamina' }); return; }
   const enemy = state.encounter.enemy;
-  // perfect dodge: pressed within the last `perfectWindow` seconds of a telegraph
-  if (enemy && enemy.windup > 0 && enemy.windup <= BALANCE.player.perfectWindow) {
-    state.player.perfectPending = true;
-  } else {
-    state.player.perfectPending = false;
+  const B = BALANCE.player;
+  const coming = !!enemy && enemy.windup > 0 && enemy.reprisal <= 0;
+  if (coming && enemy!.windup <= B.dodgeWindow) {
+    p.stamina = Math.max(0, p.stamina - cost);
+    p.dodgeCd = B.dodgeCd * mods.dodgeCd;
+    // the roll lasts until the blow has come and gone
+    p.iframes = Math.max(B.iframes, enemy!.windup + 0.1);
+    p.perfectPending = enemy!.windup <= B.perfectWindow;
+    events.push({ type: 'dodgeSet', perfect: p.perfectPending });
+    return;
   }
+  p.stamina = Math.max(0, p.stamina - cost * 0.5);
+  p.dodgeCd = B.dodgeCdMiss;
+  p.iframes = B.iframes;
+  p.perfectPending = false;
+  events.push({ type: 'dodgeMiss', reason: coming ? 'early' : 'nothing' });
 }
 
 export function playerEstus(state: GameState, mods: Mods, events: GameEvent[]) {
@@ -737,6 +751,8 @@ export function tickCombat(state: GameState, mods: Mods, events: GameEvent[], dt
     state.deathScreen = Math.max(0, state.deathScreen - dt);
     return;
   }
+  // the fight waits while the player is in a menu: nothing swings, nothing winds up, nothing spawns
+  if (enc.held) return;
 
   // ---- player regen & timers ----
   p.stamina = Math.min(p.staminaMax, p.stamina + playerStaminaRegen(p.stats.bre, mods.stamRegen * buffMult(p.buffs, 'stamRegen')) * dt);

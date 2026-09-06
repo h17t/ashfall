@@ -13,6 +13,7 @@ const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, de
 const page = await ctx.newPage();
 page.on('pageerror', (e) => problems.push('page error: ' + e.message));
 await page.goto(url, { waitUntil: 'networkidle' });
+await page.getByRole('button', { name: 'Begin' }).click({ timeout: 4000 }).catch(() => {});
 await page.waitForTimeout(500);
 await page.evaluate(() => {
   const g = __ashfall.getState(); const s = g.state; const D = s.marrow.constructor;

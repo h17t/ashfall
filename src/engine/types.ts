@@ -169,6 +169,8 @@ export interface Encounter {
   streak: number;
   /** total time in this encounter, for boss enrage mechanics */
   t: number;
+  /** the fight waits: set by the shell while the player is in a menu or a sheet, never saved as true */
+  held?: boolean;
 }
 
 export interface PhantomState {
@@ -453,6 +455,8 @@ export type Action =
   | { type: 'chooseBoon'; index: number }
   | { type: 'descentWithdraw' }
   | { type: 'setOrders'; rules: Order[] }
+  /** the player has read something once (the opening, a hint): flags['seen:' + what] */
+  | { type: 'markSeen'; what: string }
   | { type: 'reforge'; weapon: string }
   | { type: 'lockAffix'; weapon: string; affix: string | null }
   | { type: 'toggleAffliction'; affliction: string }
@@ -467,6 +471,10 @@ export type GameEvent =
   | { type: 'hit'; dmg: Decimal; crit: boolean; reprisal: boolean; source: 'player' | 'shade' | 'dot' | 'spell'; kind?: string }
   | { type: 'exhausted' }
   | { type: 'enemyAttack'; dmg: number; dodged: boolean; perfect: boolean; attackId: string }
+  /** a dodge that did not sidestep anything: too early, nothing coming, winded, or still recovering */
+  | { type: 'dodgeMiss'; reason: 'early' | 'nothing' | 'stamina' | 'cooldown' }
+  /** a dodge committed inside the window: the coming blow will miss */
+  | { type: 'dodgeSet'; perfect: boolean }
   | { type: 'strain' }
   | { type: 'riposteMissed' }
   | { type: 'kill'; enemy: string; marrow: Decimal; isBoss: boolean; drops: Record<string, number> }

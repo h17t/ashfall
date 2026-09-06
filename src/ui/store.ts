@@ -25,6 +25,8 @@ export interface GameStore {
   dispatch: (action: Action) => void;
   stepBy: (dt: number) => void;
   replace: (state: GameState) => void;
+  /** the fight waits while the player is in a menu or a sheet (the world outside it does not) */
+  holdFight: (held: boolean) => void;
 }
 
 export const useGame = create<GameStore>((set, get) => ({
@@ -44,6 +46,7 @@ export const useGame = create<GameStore>((set, get) => ({
     set({ tick: get().tick + 1 });
   },
   replace: (state) => set({ state, tick: get().tick + 1 }),
+  holdFight: (held) => { const s = get().state; if (!!s.encounter.held === held) return; s.encounter.held = held; set({ tick: get().tick + 1 }); },
 }));
 
 /** Select a primitive derived from the game state. */
